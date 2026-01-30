@@ -334,6 +334,77 @@
                     </div>
                 </div>
 
+                <!-- NEW SECTION: REALITY CHECK -->
+                <div class="mt-8 border-t border-slate-200 pt-10 animate-enter delay-300">
+                    <h2 class="text-2xl font-bold text-slate-800 mb-6 flex items-center gap-3">
+                        <i class="fas fa-search-dollar text-indigo-600"></i> The Reality Check
+                    </h2>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        
+                        <!-- Inflation Impact -->
+                        <div class="bg-orange-50 rounded-3xl p-6 border border-orange-100 relative overflow-hidden">
+                            <div class="absolute -right-6 -top-6 text-orange-100 text-9xl opacity-50">
+                                <i class="fas fa-percentage"></i>
+                            </div>
+                            
+                            <h3 class="text-lg font-bold text-orange-900 mb-2 relative z-10">The Inflation Effect</h3>
+                            <p class="text-sm text-orange-800/80 mb-6 relative z-10 leading-relaxed">
+                                Inflation silently eats your money. Here's what happens to your <span class="font-bold">Total Savings</span> if you let it sit idle or under a mattress.
+                            </p>
+                
+                            <div class="bg-white/60 backdrop-blur-sm rounded-xl p-4 border border-orange-100 relative z-10 mb-4">
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="text-xs font-bold text-orange-800 uppercase">Cash Value Today</span>
+                                    <span class="text-sm font-bold text-slate-700" id="inf_cash">₹ 0</span>
+                                </div>
+                                <div class="h-px bg-orange-200/50 my-2"></div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-xs font-bold text-orange-800 uppercase">Purchasing Power in 7 Years</span>
+                                    <span class="text-xl font-bold text-orange-600" id="inf_value">₹ 0</span>
+                                </div>
+                                <p class="text-[10px] text-orange-700 mt-2 text-right">Assuming 6% annual inflation</p>
+                            </div>
+                            <p class="text-xs text-orange-800 italic relative z-10 bg-orange-100/50 p-2 rounded-lg">
+                                "Basically, your money shrinks by ~34% in 7 years if it doesn't grow."
+                            </p>
+                        </div>
+                
+                        <!-- What We Missed Checklist -->
+                        <div class="bg-slate-100 rounded-3xl p-6 border border-slate-200">
+                            <h3 class="text-lg font-bold text-slate-800 mb-2">What This Calculator Ignores</h3>
+                            <p class="text-sm text-slate-500 mb-5 leading-relaxed">
+                                Real life has more variables. We focused on the loan math, but don't forget these costs:
+                            </p>
+                
+                            <ul class="space-y-4">
+                                <li class="flex gap-3 items-start group">
+                                    <div class="mt-0.5 w-6 h-6 rounded-full bg-white border border-slate-200 flex items-center justify-center text-xs text-slate-500 group-hover:text-indigo-600 group-hover:border-indigo-200 transition-colors shrink-0"><i class="fas fa-wrench"></i></div>
+                                    <div>
+                                        <span class="block text-sm font-bold text-slate-700">Maintenance & Repairs</span>
+                                        <span class="text-xs text-slate-500 leading-tight block mt-0.5">Luxury cars cost exponentially more to service as they age (Years 5-7).</span>
+                                    </div>
+                                </li>
+                                <li class="flex gap-3 items-start group">
+                                    <div class="mt-0.5 w-6 h-6 rounded-full bg-white border border-slate-200 flex items-center justify-center text-xs text-slate-500 group-hover:text-indigo-600 group-hover:border-indigo-200 transition-colors shrink-0"><i class="fas fa-file-invoice-dollar"></i></div>
+                                    <div>
+                                        <span class="block text-sm font-bold text-slate-700">Insurance Depreciation</span>
+                                        <span class="text-xs text-slate-500 leading-tight block mt-0.5">Premiums might drop, but claim ratios often increase with age. Zero-dep cover gets expensive.</span>
+                                    </div>
+                                </li>
+                                <li class="flex gap-3 items-start group">
+                                    <div class="mt-0.5 w-6 h-6 rounded-full bg-white border border-slate-200 flex items-center justify-center text-xs text-slate-500 group-hover:text-indigo-600 group-hover:border-indigo-200 transition-colors shrink-0"><i class="fas fa-gas-pump"></i></div>
+                                    <div>
+                                        <span class="block text-sm font-bold text-slate-700">Fuel & Running Costs</span>
+                                        <span class="text-xs text-slate-500 leading-tight block mt-0.5">We ignored fuel. If you drive >1500km/month, an EV might change this math entirely.</span>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
@@ -419,7 +490,6 @@
             
             const elNetB = document.getElementById('netB');
             elNetB.innerText = (finalGainB > 0 ? "+" : "") + formatCurrency(finalGainB);
-            // Dynamic color logic is now handled by container styles, but we can toggle slight opacity
             
             // --- Scenario C: Wealth Builder (5Y, Full Cash, Invest Later) ---
             const emiC = emiA; 
@@ -434,6 +504,16 @@
             document.getElementById('emiC').innerText = formatCurrency(emiC);
             const elNetC = document.getElementById('netC');
             elNetC.innerText = "+" + formatCurrency(finalGainC);
+
+            // --- NEW: Inflation Calculation ---
+            // Formula: Real Value = Nominal Value / (1 + inflation_rate)^years
+            // We use 6% as a standard inflation rate
+            const inflationRate = 0.06;
+            const years = 7;
+            const purchasingPower = C / Math.pow(1 + inflationRate, years);
+            
+            document.getElementById('inf_cash').innerText = formatCurrency(C);
+            document.getElementById('inf_value').innerText = formatCurrency(purchasingPower);
         };
 
         // Add event listeners with a small debounce for performance if needed, 
