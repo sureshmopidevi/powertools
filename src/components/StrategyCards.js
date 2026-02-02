@@ -17,6 +17,17 @@ export const StrategyCards = () => `
                     <span class="text-slate-500 dark:text-slate-400 font-medium">Interest Paid:</span>
                     <span class="font-bold text-rose-500 dark:text-rose-400" id="interestA">₹0</span>
                 </div>
+                
+                 <!-- Metric Placeholder for Layout Match -->
+                 <div class="bg-slate-100 dark:bg-slate-700/50 rounded-xl p-3 border border-slate-200 dark:border-slate-600/50 opacity-75">
+                    <div class="flex justify-between items-center mb-1">
+                       <span class="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400 tracking-wider">Invested Returns</span>
+                       <i class="fas fa-ban text-slate-400 text-xs"></i>
+                    </div>
+                    <div class="text-2xl font-bold text-slate-600 dark:text-slate-300 tracking-tight" id="invValueA">₹0</div>
+                    <div class="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5 font-medium">No Investment Strategy</div>
+               </div>
+
                 <ul class="space-y-2 mt-2 pt-2 border-t border-slate-50 dark:border-slate-700">
                     <li class="flex items-start gap-2 text-xs font-medium text-slate-600 dark:text-slate-400">
                         <i class="fas fa-check-circle text-emerald-500 dark:text-emerald-400 mt-0.5"></i> Lowest interest cost
@@ -48,6 +59,17 @@ export const StrategyCards = () => `
                         </div>
                         <div class="text-3xl font-bold text-indigo-600 dark:text-indigo-400 tracking-tight" id="emiB">₹0</div>
                     </div>
+
+                    <!-- New Metric: Investment Gains -->
+                    <div class="bg-indigo-800/20 rounded-xl p-3 border border-indigo-400/20">
+                         <div class="flex justify-between items-center mb-1">
+                            <span class="text-[10px] uppercase font-bold text-indigo-200 tracking-wider">Investment Gains (7yr)</span>
+                            <i class="fas fa-coins text-yellow-400 text-xs"></i>
+                         </div>
+                         <div class="text-2xl font-bold text-white tracking-tight" id="invValueB">₹0</div>
+                         <div class="text-[10px] text-indigo-300 mt-0.5 font-medium">Returns on investments</div>
+                    </div>
+
                     <div class="flex justify-between items-center text-xs mt-2 px-1 text-indigo-100">
                         <span class="font-medium opacity-80">Interest Paid:</span>
                         <span class="font-bold text-white" id="interestB">₹0</span>
@@ -70,23 +92,34 @@ export const StrategyCards = () => `
             <div class="mb-6">
                 <span class="inline-block px-2 py-1 rounded bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-[10px] font-bold uppercase tracking-wide mb-2">Strategy 3</span>
                 <h3 class="text-xl font-bold text-slate-800 dark:text-white leading-tight">Late Bloomer</h3>
-                <p class="text-xs text-slate-500 dark:text-slate-400 mt-2 font-medium leading-relaxed">Pay fast (5yr). Start investing aggressively only after loan ends.</p>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mt-2 font-medium leading-relaxed">Pay off loan fast (5yr). Then invest aggressively for years 6-7.</p>
             </div>
             <div class="mt-auto space-y-4">
                 <div class="bg-slate-50 dark:bg-slate-900 rounded-2xl p-4 border border-slate-100 dark:border-slate-700">
-                    <div class="main-stat-label text-slate-400 dark:text-slate-500">Invest Yrs 6-7</div>
+                    <div class="main-stat-label text-slate-400 dark:text-slate-500">Monthly EMI (5yr)</div>
                     <div class="text-2xl font-bold text-emerald-700 dark:text-emerald-400" id="emiC">₹0</div>
                 </div>
                 <div class="flex justify-between items-center text-xs mt-2 px-1">
                     <span class="text-slate-500 dark:text-slate-400 font-medium">Interest Paid:</span>
                     <span class="font-bold text-rose-500 dark:text-rose-400" id="interestC">₹0</span>
                 </div>
+
+                <!-- Metric: Investment Gains -->
+                <div class="bg-emerald-50 dark:bg-emerald-900/10 rounded-xl p-3 border border-emerald-100 dark:border-emerald-900/30">
+                     <div class="flex justify-between items-center mb-1">
+                        <span class="text-[10px] uppercase font-bold text-emerald-700 dark:text-emerald-400 tracking-wider">Post-Loan Investments (Yr 6-7)</span>
+                        <i class="fas fa-piggy-bank text-emerald-500 text-xs"></i>
+                     </div>
+                     <div class="text-2xl font-bold text-slate-700 dark:text-white tracking-tight" id="invValueC">₹0</div>
+                     <div class="text-[10px] text-emerald-600/70 dark:text-emerald-500/70 mt-0.5 font-medium">Invested after loan ends</div>
+                </div>
+
                 <ul class="space-y-2 mt-2 pt-2 border-t border-slate-50 dark:border-slate-700">
                     <li class="flex items-start gap-2 text-xs font-medium text-slate-600 dark:text-slate-400">
-                        <i class="fas fa-check-circle text-emerald-500 dark:text-emerald-400 mt-0.5"></i> Debt free quickly
+                        <i class="fas fa-check-circle text-emerald-500 dark:text-emerald-400 mt-0.5"></i> Debt-free in 5 years
                     </li>
                     <li class="flex items-start gap-2 text-xs font-medium text-slate-600 dark:text-slate-400">
-                        <i class="fas fa-clock text-orange-500 dark:text-orange-400 mt-0.5"></i> Lost 5 years of compounding
+                        <i class="fas fa-clock text-orange-500 dark:text-orange-400 mt-0.5"></i> Missed 5 years of compounding
                     </li>
                 </ul>
             </div>

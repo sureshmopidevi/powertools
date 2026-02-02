@@ -1,8 +1,10 @@
 import { AnalysisSection } from '../components/AnalysisSection.js';
+import { ComparisonCallout } from '../components/ComparisonCallout.js';
 import { EducationalSection } from '../components/EducationalSection.js';
 import { Header } from '../components/Header.js';
 import { InflationSection } from '../components/InflationSection.js';
 import { InputPanel } from '../components/InputPanel.js';
+import { NetWorthChart } from '../components/NetWorthChart.js';
 import { StrategyCards } from '../components/StrategyCards.js';
 
 export class AppUI {
@@ -21,6 +23,8 @@ export class AppUI {
                     <!-- Right Column: Results -->
                     <div class="lg:col-span-8 space-y-8 animate-enter delay-200">
                         ${StrategyCards()}
+                        ${ComparisonCallout()}
+                        ${NetWorthChart()}
                         ${AnalysisSection()}
                         ${EducationalSection()}
                         ${InflationSection()}

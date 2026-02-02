@@ -2,14 +2,20 @@ export const InputPanel = () => `
     <div class="lg:col-span-4 animate-enter delay-100">
         <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-xl shadow-slate-200/50 dark:shadow-black/20 border border-slate-100 dark:border-slate-700 p-6 md:p-8 sticky top-6 z-10 overflow-y-auto max-h-[90vh]">
 
-            <div class="flex items-center gap-3 mb-6 pb-4 border-b border-slate-100 dark:border-slate-700">
-                <div class="w-10 h-10 rounded-full bg-indigo-600 text-white flex items-center justify-center text-lg shadow-lg shadow-indigo-500/30">
-                    <i class="fas fa-sliders-h"></i>
+            <div class="flex items-center justify-between gap-3 mb-6 pb-4 border-b border-slate-100 dark:border-slate-700">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-indigo-600 text-white flex items-center justify-center text-lg shadow-lg shadow-indigo-500/30">
+                        <i class="fas fa-sliders-h"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-lg font-bold text-slate-900 dark:text-white leading-tight">Configuration</h2>
+                        <p class="text-xs text-slate-400 font-medium">Adjust your variables</p>
+                    </div>
                 </div>
-                <div>
-                    <h2 class="text-lg font-bold text-slate-900 dark:text-white leading-tight">Configuration</h2>
-                    <p class="text-xs text-slate-400 font-medium">Adjust your variables</p>
-                </div>
+                <button id="resetButton" class="px-3 py-1.5 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-300 rounded-lg text-xs font-semibold transition-colors flex items-center gap-1.5" title="Reset to defaults">
+                    <i class="fas fa-undo text-[10px]"></i>
+                    <span>Reset</span>
+                </button>
             </div>
 
             <div class="space-y-6">
@@ -69,25 +75,26 @@ export const InputPanel = () => `
 
                 <!-- Savings -->
                 <div>
-                    <label class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-3 block">Your Capital</label>
+                    <label class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-3 block">Down Payment Configuration</label>
                     <div class="space-y-4">
                         <div class="input-group">
-                            <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Total Savings Available</label>
+                            <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Total Down Payment Amount</label>
                             <div class="relative">
                                 <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold">₹</span>
-                                <input type="text" id="totalCash" value="6,00,000" class="currency-input w-full pl-8 pr-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl font-bold text-slate-800 dark:text-slate-100 focus:outline-none focus:bg-white dark:focus:bg-slate-950">
+                                <input type="text" id="totalCash" value="5,00,000" class="currency-input w-full pl-8 pr-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl font-bold text-slate-800 dark:text-slate-100 focus:outline-none focus:bg-white dark:focus:bg-slate-950">
                             </div>
-                            <div class="word-helper" id="totalCashWords">Six Lakh</div>
+                            <div class="word-helper" id="totalCashWords">Five Lakh</div>
+                            <p class="text-[10px] text-slate-500 mt-1">Amount you are willing to spend upfront.</p>
                         </div>
                         <div class="p-4 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-800 input-group">
-                            <label class="block text-sm font-bold text-indigo-900 dark:text-indigo-300 mb-1.5">Buffer Cash (Don't Spend)</label>
+                            <label class="block text-sm font-bold text-indigo-900 dark:text-indigo-300 mb-1.5">Investable Lumpsum (Sliced)</label>
                             <div class="relative mb-2">
                                 <span class="absolute left-3 top-1/2 -translate-y-1/2 text-indigo-400 dark:text-indigo-500 font-bold">₹</span>
                                 <input type="text" id="bufferCash" value="1,00,000" class="currency-input w-full pl-8 pr-4 py-3 bg-white dark:bg-slate-800 border border-indigo-200 dark:border-indigo-700 rounded-xl font-bold text-indigo-700 dark:text-indigo-300 focus:outline-none focus:ring-2 focus:ring-indigo-200 dark:focus:ring-indigo-800">
                             </div>
                             <div class="word-helper text-indigo-600/70 dark:text-indigo-400" id="bufferCashWords">One Lakh</div>
                             <p class="text-[10px] text-indigo-600 dark:text-indigo-400 leading-relaxed font-medium mt-2">
-                                Money you deliberately keep in the bank to invest instead of paying as Down Payment.
+                                Calculated Amount: (Total - Min Down Payment). Auto-calculated but editable.
                             </p>
                         </div>
                     </div>
