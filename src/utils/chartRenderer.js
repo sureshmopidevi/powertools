@@ -8,6 +8,17 @@ export class ChartRenderer {
         if (!this.canvas) return;
 
         this.ctx = this.canvas.getContext('2d');
+
+        // Initialize resize observer to handle responsive layout changes
+        // This ensures the chart stays crisp and correctly sized when window resizes
+        this.resizeObserver = new ResizeObserver(() => {
+            this.setupCanvas();
+            if (this.lastData) {
+                this.render(this.lastData);
+            }
+        });
+        this.resizeObserver.observe(this.canvas);
+
         this.setupCanvas();
     }
 
@@ -16,8 +27,19 @@ export class ChartRenderer {
         const rect = this.canvas.getBoundingClientRect();
         const dpr = window.devicePixelRatio || 1;
 
-        this.canvas.width = rect.width * dpr;
-        this.canvas.height = rect.height * dpr;
+        // Avoid unnecessary context resets if size hasn't changed
+        const currentWidth = rect.width * dpr;
+        const currentHeight = rect.height * dpr;
+
+        if (Math.abs(this.canvas.width - currentWidth) < 1 &&
+            Math.abs(this.canvas.height - currentHeight) < 1) {
+            this.width = rect.width;
+            this.height = rect.height;
+            return;
+        }
+
+        this.canvas.width = currentWidth;
+        this.canvas.height = currentHeight;
 
         // Reset transform before scaling to prevent compounding
         this.ctx.setTransform(1, 0, 0, 1, 0, 0);
@@ -30,6 +52,10 @@ export class ChartRenderer {
 
     render(data) {
         if (!this.ctx) return;
+
+        // specific check to ensure size is correct before rendering this frame
+        this.setupCanvas();
+        this.lastData = data;
 
         const { strategyA, strategyB, strategyC } = data;
 
