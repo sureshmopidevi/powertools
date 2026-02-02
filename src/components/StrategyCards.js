@@ -63,11 +63,11 @@ export const StrategyCards = () => `
                     <!-- New Metric: Investment Gains -->
                     <div class="bg-indigo-800/20 rounded-xl p-3 border border-indigo-400/20">
                          <div class="flex justify-between items-center mb-1">
-                            <span class="text-[10px] uppercase font-bold text-indigo-200 tracking-wider">Invested Returns (7yr)</span>
+                            <span class="text-[10px] uppercase font-bold text-indigo-200 tracking-wider">Investment Gains (7yr)</span>
                             <i class="fas fa-coins text-yellow-400 text-xs"></i>
                          </div>
                          <div class="text-2xl font-bold text-white tracking-tight" id="invValueB">₹0</div>
-                         <div class="text-[10px] text-indigo-300 mt-0.5 font-medium">Excl. Initial Lumpsum</div>
+                         <div class="text-[10px] text-indigo-300 mt-0.5 font-medium">Returns on investments</div>
                     </div>
 
                     <div class="flex justify-between items-center text-xs mt-2 px-1 text-indigo-100">

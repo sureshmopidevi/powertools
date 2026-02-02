@@ -1,3 +1,4 @@
+import { ChartRenderer } from '../utils/chartRenderer.js';
 import * as math from '../utils/math.js';
 import { formatNumber, getRawValue, numToWords } from '../utils/math.js';
 
@@ -5,8 +6,24 @@ export class App {
     constructor() {
         this.initElements();
         this.initEventListeners();
+        this.initChart();
         this.update();
     }
+
+    // Default values for reset functionality
+    static DEFAULT_VALUES = {
+        carPrice: '22,81,000',
+        totalCash: '5,00,000',
+        bufferCash: '1,00,000',
+        loanRate: '9.0',
+        sipRate: '13.0',
+        taxRate: '12.5',
+        monthlyKm: '1000',
+        mileage: '15',
+        fuelPrice: '100',
+        depreciation: '15',
+        includeFuel: true
+    };
 
     initElements() {
         this.inputs = {
@@ -78,6 +95,12 @@ export class App {
             fuelVals: document.querySelectorAll('.fuel-val'),
             resaleVals: document.querySelectorAll('.resale-val'),
 
+            // Comparison Callout
+            savingsVsA: document.getElementById('savingsVsA'),
+            savingsVsALabel: document.getElementById('savingsVsALabel'),
+            savingsVsC: document.getElementById('savingsVsC'),
+            savingsVsCLabel: document.getElementById('savingsVsCLabel'),
+
             inf_cash: document.getElementById('inf_cash'),
             inf_value: document.getElementById('inf_value')
         };
@@ -137,6 +160,46 @@ export class App {
         });
 
         this.elements.fuelToggle.addEventListener('change', () => this.update());
+
+        // Reset button
+        const resetButton = document.getElementById('resetButton');
+        if (resetButton) {
+            resetButton.addEventListener('click', () => this.resetToDefaults());
+        }
+    }
+
+    resetToDefaults() {
+        const defaults = App.DEFAULT_VALUES;
+
+        // Set currency inputs
+        this.inputs.price.value = defaults.carPrice;
+        this.inputs.totalCash.value = defaults.totalCash;
+        this.inputs.buffer.value = defaults.bufferCash;
+
+        // Set numeric inputs
+        this.inputs.loanRate.value = defaults.loanRate;
+        this.inputs.sipRate.value = defaults.sipRate;
+        this.inputs.taxRate.value = defaults.taxRate;
+        this.inputs.monthlyKm.value = defaults.monthlyKm;
+        this.inputs.mileage.value = defaults.mileage;
+        this.inputs.fuelPrice.value = defaults.fuelPrice;
+        this.inputs.depreciation.value = defaults.depreciation;
+
+        // Set fuel toggle
+        this.elements.fuelToggle.checked = defaults.includeFuel;
+
+        // Update word helpers
+        if (this.helpers.price) this.helpers.price.innerText = numToWords(getRawValue(defaults.carPrice));
+        if (this.helpers.totalCash) this.helpers.totalCash.innerText = numToWords(getRawValue(defaults.totalCash));
+        if (this.helpers.buffer) this.helpers.buffer.innerText = numToWords(getRawValue(defaults.bufferCash));
+
+        // Trigger update
+        this.update();
+    }
+
+    initChart() {
+        // Initialize chart renderer synchronously to avoid race condition
+        this.chart = new ChartRenderer('netWorthCanvas');
     }
 
     update() {
@@ -304,6 +367,97 @@ export class App {
         const purchasingPower = C / Math.pow(1 + inflationRate, 7);
         this.elements.inf_cash.innerText = formatCurrency(C);
         this.elements.inf_value.innerText = formatCurrency(purchasingPower);
+
+        // ========= COMPARISON CALLOUT =========
+        // Smart Investor vs Debt Hater
+        const savingsVsA = totalAssetsB - totalAssetsA;
+        if (this.elements.savingsVsA) {
+            this.elements.savingsVsA.innerText = formatCurrency(Math.abs(savingsVsA));
+            if (this.elements.savingsVsALabel) {
+                this.elements.savingsVsALabel.innerText = savingsVsA > 0 ? 'more in assets' : 'less in assets';
+            }
+        }
+
+        // Smart Investor vs Late Bloomer
+        const savingsVsC = totalAssetsB - totalAssetsC;
+        if (this.elements.savingsVsC) {
+            this.elements.savingsVsC.innerText = formatCurrency(Math.abs(savingsVsC));
+            if (this.elements.savingsVsCLabel) {
+                this.elements.savingsVsCLabel.innerText = savingsVsC > 0 ? 'more in assets' : 'less in assets';
+            }
+        }
+
+        // ========= NET WORTH CHART DATA =========
+        // Calculate year-by-year net worth for all strategies
+        const calculateYearlyNetWorth = (strategy) => {
+            const netWorth = [];
+
+            if (strategy === 'A') {
+                // Debt Hater: No investments, just car depreciation
+                // Year 0: Just bought the car
+                netWorth.push(P);
+
+                for (let year = 1; year <= 7; year++) {
+                    const carValue = P * Math.pow(1 - depRate / 100, year);
+                    netWorth.push(carValue);
+                }
+            } else if (strategy === 'B') {
+                // Smart Investor: Lumpsum + SIP for 7 years + car depreciation
+                // Year 0: Car + Buffer investment
+                netWorth.push(P + B);
+
+                for (let year = 1; year <= 7; year++) {
+                    const carValue = P * Math.pow(1 - depRate / 100, year);
+
+                    // Lumpsum growth
+                    const lumpsum = fvLumpsum(B, rInv, year * 12);
+                    const lumpsumGains = Math.max(0, lumpsum - B);
+                    const taxOnLumpsum = lumpsumGains * (rTax / 100);
+                    const netLumpsum = lumpsum - taxOnLumpsum;
+
+                    // SIP growth
+                    const sipValue = fvSIP(monthlySurplus, rInv, year * 12);
+                    const sipPrincipal = monthlySurplus * year * 12;
+                    const sipGains = Math.max(0, sipValue - sipPrincipal);
+                    const taxOnSip = sipGains * (rTax / 100);
+                    const netSip = sipValue - taxOnSip;
+
+                    netWorth.push(carValue + netLumpsum + netSip);
+                }
+            } else if (strategy === 'C') {
+                // Late Bloomer: SIP only in years 6-7
+                // Year 0: Just bought the car (same as A)
+                netWorth.push(P);
+
+                for (let year = 1; year <= 7; year++) {
+                    const carValue = P * Math.pow(1 - depRate / 100, year);
+                    if (year <= 5) {
+                        netWorth.push(carValue);
+                    } else {
+                        const sipMonths = (year - 5) * 12;
+                        const sipValue = fvSIP(emiC, rInv, sipMonths);
+                        const sipPrincipal = emiC * sipMonths;
+                        const sipGains = Math.max(0, sipValue - sipPrincipal);
+                        const taxOnSip = sipGains * (rTax / 100);
+                        const netInvestment = sipValue - taxOnSip;
+                        netWorth.push(carValue + netInvestment);
+                    }
+                }
+            }
+
+            return netWorth;
+        };
+
+        const chartData = {
+            strategyA: calculateYearlyNetWorth('A'),
+            strategyB: calculateYearlyNetWorth('B'),
+            strategyC: calculateYearlyNetWorth('C')
+        };
+
+        // Render chart if initialized
+        if (this.chart) {
+            this.chart.render(chartData);
+        }
     }
 }
 App.math = math;

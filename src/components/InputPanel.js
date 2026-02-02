@@ -2,14 +2,20 @@ export const InputPanel = () => `
     <div class="lg:col-span-4 animate-enter delay-100">
         <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-xl shadow-slate-200/50 dark:shadow-black/20 border border-slate-100 dark:border-slate-700 p-6 md:p-8 sticky top-6 z-10 overflow-y-auto max-h-[90vh]">
 
-            <div class="flex items-center gap-3 mb-6 pb-4 border-b border-slate-100 dark:border-slate-700">
-                <div class="w-10 h-10 rounded-full bg-indigo-600 text-white flex items-center justify-center text-lg shadow-lg shadow-indigo-500/30">
-                    <i class="fas fa-sliders-h"></i>
+            <div class="flex items-center justify-between gap-3 mb-6 pb-4 border-b border-slate-100 dark:border-slate-700">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-indigo-600 text-white flex items-center justify-center text-lg shadow-lg shadow-indigo-500/30">
+                        <i class="fas fa-sliders-h"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-lg font-bold text-slate-900 dark:text-white leading-tight">Configuration</h2>
+                        <p class="text-xs text-slate-400 font-medium">Adjust your variables</p>
+                    </div>
                 </div>
-                <div>
-                    <h2 class="text-lg font-bold text-slate-900 dark:text-white leading-tight">Configuration</h2>
-                    <p class="text-xs text-slate-400 font-medium">Adjust your variables</p>
-                </div>
+                <button id="resetButton" class="px-3 py-1.5 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-300 rounded-lg text-xs font-semibold transition-colors flex items-center gap-1.5" title="Reset to defaults">
+                    <i class="fas fa-undo text-[10px]"></i>
+                    <span>Reset</span>
+                </button>
             </div>
 
             <div class="space-y-6">
