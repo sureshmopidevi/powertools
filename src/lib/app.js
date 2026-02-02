@@ -257,24 +257,22 @@ export class App {
 
 
         // ========= SCENARIO C: LATE BLOOMER =========
-        // Invests EMI amount for 2 years first, THEN buys car with same logic as A.
-        // This is a simplified model: 
-        // Phase 1: SIP for 24 months at emiA amount
-        // Phase 2: Buy car (same as A)
+        // Buy car now (same as Strategy A - 5 year loan)
+        // After loan ends (year 5), invest aggressively for years 6-7
+        // Timeline: Months 1-60 = Pay EMI, Months 61-84 = Invest EMI amount as SIP
         const emiC = emiA;
         const interestC = interestA;
 
-        // Investment: SIP of emiA for 24 months ONLY
-        // Late Bloomer invests for 2 years, then uses that money + takes loan to buy car
-        // Investment does NOT continue growing after car purchase (locked in or withdrawn)
-        const fvInvC = fvSIP(emiC, rInv, 24); // Only 24 months of growth
+        // Investment: SIP of emiA for 24 months (years 6-7, AFTER loan ends)
+        // Investment only grows for 24 months since it starts at month 61
+        const fvInvC = fvSIP(emiC, rInv, 24); // 24 months SIP starting after loan
         const sipPrincipalC = emiC * 24;
         const taxOnInvC = (fvInvC - sipPrincipalC) > 0 ? (fvInvC - sipPrincipalC) * (rTax / 100) : 0;
         const totalInvestmentC = fvInvC - taxOnInvC;
 
         const totalAssetsC = carValue7 + totalInvestmentC;
 
-        // Costs: Same DP as A + Same EMI as A + SIP contributions (emiC * 24)
+        // Costs: Same as A (DP + EMI for 60mo) + Post-loan SIP contributions (24mo)
         const totalCashPaidC = totalCashPaidA + sipPrincipalC;
         const netCostC = totalCashPaidC - totalAssetsC;
 
