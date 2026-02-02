@@ -17,6 +17,17 @@ export const StrategyCards = () => `
                     <span class="text-slate-500 dark:text-slate-400 font-medium">Interest Paid:</span>
                     <span class="font-bold text-rose-500 dark:text-rose-400" id="interestA">₹0</span>
                 </div>
+                
+                 <!-- Metric Placeholder for Layout Match -->
+                 <div class="bg-slate-100 dark:bg-slate-700/50 rounded-xl p-3 border border-slate-200 dark:border-slate-600/50 opacity-75">
+                    <div class="flex justify-between items-center mb-1">
+                       <span class="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400 tracking-wider">Invested Returns</span>
+                       <i class="fas fa-ban text-slate-400 text-xs"></i>
+                    </div>
+                    <div class="text-2xl font-bold text-slate-600 dark:text-slate-300 tracking-tight" id="invValueA">₹0</div>
+                    <div class="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5 font-medium">No Investment Strategy</div>
+               </div>
+
                 <ul class="space-y-2 mt-2 pt-2 border-t border-slate-50 dark:border-slate-700">
                     <li class="flex items-start gap-2 text-xs font-medium text-slate-600 dark:text-slate-400">
                         <i class="fas fa-check-circle text-emerald-500 dark:text-emerald-400 mt-0.5"></i> Lowest interest cost
@@ -48,6 +59,17 @@ export const StrategyCards = () => `
                         </div>
                         <div class="text-3xl font-bold text-indigo-600 dark:text-indigo-400 tracking-tight" id="emiB">₹0</div>
                     </div>
+
+                    <!-- New Metric: Investment Gains -->
+                    <div class="bg-indigo-800/20 rounded-xl p-3 border border-indigo-400/20">
+                         <div class="flex justify-between items-center mb-1">
+                            <span class="text-[10px] uppercase font-bold text-indigo-200 tracking-wider">Invested Returns (7yr)</span>
+                            <i class="fas fa-coins text-yellow-400 text-xs"></i>
+                         </div>
+                         <div class="text-2xl font-bold text-white tracking-tight" id="invValueB">₹0</div>
+                         <div class="text-[10px] text-indigo-300 mt-0.5 font-medium">Excl. Initial Lumpsum</div>
+                    </div>
+
                     <div class="flex justify-between items-center text-xs mt-2 px-1 text-indigo-100">
                         <span class="font-medium opacity-80">Interest Paid:</span>
                         <span class="font-bold text-white" id="interestB">₹0</span>
@@ -81,6 +103,17 @@ export const StrategyCards = () => `
                     <span class="text-slate-500 dark:text-slate-400 font-medium">Interest Paid:</span>
                     <span class="font-bold text-rose-500 dark:text-rose-400" id="interestC">₹0</span>
                 </div>
+
+                <!-- Metric: Investment Gains -->
+                <div class="bg-emerald-50 dark:bg-emerald-900/10 rounded-xl p-3 border border-emerald-100 dark:border-emerald-900/30">
+                     <div class="flex justify-between items-center mb-1">
+                        <span class="text-[10px] uppercase font-bold text-emerald-700 dark:text-emerald-400 tracking-wider">Invested Returns</span>
+                        <i class="fas fa-coins text-emerald-500 text-xs"></i>
+                     </div>
+                     <div class="text-2xl font-bold text-slate-700 dark:text-white tracking-tight" id="invValueC">₹0</div>
+                     <div class="text-[10px] text-emerald-600/70 dark:text-emerald-500/70 mt-0.5 font-medium">Years 6-7 Gains</div>
+                </div>
+
                 <ul class="space-y-2 mt-2 pt-2 border-t border-slate-50 dark:border-slate-700">
                     <li class="flex items-start gap-2 text-xs font-medium text-slate-600 dark:text-slate-400">
                         <i class="fas fa-check-circle text-emerald-500 dark:text-emerald-400 mt-0.5"></i> Debt free quickly
