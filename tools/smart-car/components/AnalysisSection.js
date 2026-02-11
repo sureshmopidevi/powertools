@@ -15,30 +15,30 @@ export const AnalysisSection = () => `
                 <table class="w-full analysis-table">
                     <thead>
                         <tr>
-                            <th>Strategy</th>
-                            <th>Loan EMI</th>
-                            <th>Fuel Cost</th>
-                            <th>Total Monthly Outflow</th>
+                            <th class="text-left">Strategy</th>
+                            <th class="text-right">Loan EMI</th>
+                            <th class="text-right">Fuel Cost</th>
+                            <th class="text-right">Total Monthly Outflow</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
                             <td><strong>1. Debt Hater</strong></td>
-                            <td id="t_emiA">₹0</td>
-                            <td class="text-orange-600 dark:text-orange-400 font-medium fuel-val">₹0</td>
-                            <td class="font-bold text-slate-800 dark:text-white" id="t_totalA">₹0</td>
+                            <td class="text-right" id="t_emiA">₹0</td>
+                            <td class="text-right text-orange-600 dark:text-orange-400 font-medium fuel-val">₹0</td>
+                            <td class="text-right font-bold text-slate-800 dark:text-white" id="t_totalA">₹0</td>
                         </tr>
                         <tr class="bg-indigo-50/30 dark:bg-indigo-900/10">
                             <td><strong>2. Smart Investor</strong></td>
-                            <td id="t_emiB" class="text-indigo-600 dark:text-indigo-400 font-bold">₹0</td>
-                            <td class="text-orange-600 dark:text-orange-400 font-medium fuel-val">₹0</td>
-                            <td class="font-bold text-indigo-900 dark:text-indigo-300" id="t_totalB">₹0</td>
+                            <td id="t_emiB" class="text-right text-indigo-600 dark:text-indigo-400 font-bold">₹0</td>
+                            <td class="text-right text-orange-600 dark:text-orange-400 font-medium fuel-val">₹0</td>
+                            <td class="text-right font-bold text-indigo-900 dark:text-indigo-300" id="t_totalB">₹0</td>
                         </tr>
                         <tr>
                             <td><strong>3. Late Bloomer</strong></td>
-                            <td id="t_emiC">₹0</td>
-                            <td class="text-orange-600 dark:text-orange-400 font-medium fuel-val">₹0</td>
-                            <td class="font-bold text-slate-800 dark:text-white" id="t_totalC">₹0</td>
+                            <td class="text-right" id="t_emiC">₹0</td>
+                            <td class="text-right text-orange-600 dark:text-orange-400 font-medium fuel-val">₹0</td>
+                            <td class="text-right font-bold text-slate-800 dark:text-white" id="t_totalC">₹0</td>
                         </tr>
                     </tbody>
                 </table>
@@ -58,7 +58,7 @@ export const AnalysisSection = () => `
                 <table class="w-full analysis-table">
                     <thead>
                         <tr>
-                            <th>Strategy</th>
+                            <th class="text-left">Strategy</th>
                             <th class="text-right">Car Value (Depreciated)</th>
                             <th class="text-right">Investment Value</th>
                             <th class="text-right font-bold">Total Assets</th>
@@ -100,7 +100,7 @@ export const AnalysisSection = () => `
                 <table class="w-full analysis-table">
                     <thead>
                         <tr>
-                            <th>Strategy</th>
+                            <th class="text-left">Strategy</th>
                             <th class="text-right">Down Payment</th>
                             <th class="text-right">Total EMI Paid</th>
                             <th class="text-right">Interest Paid</th>

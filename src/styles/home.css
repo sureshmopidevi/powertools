@@ -1,0 +1,129 @@
+:root {
+    --font-primary: 'Plus Jakarta Sans', 'Google Sans', 'Inter', sans-serif;
+}
+
+body {
+    font-family: var(--font-primary);
+    -webkit-font-smoothing: antialiased;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Animations */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-enter {
+    opacity: 0;
+    animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.delay-100 {
+    animation-delay: 0.1s;
+}
+
+.delay-200 {
+    animation-delay: 0.2s;
+}
+
+/* Tool Card */
+.tool-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1.5rem 1rem;
+    border-radius: 1.25rem;
+    background: white;
+    border: 1px solid #e2e8f0;
+    text-decoration: none;
+    transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    cursor: pointer;
+}
+
+.tool-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.08);
+    border-color: #c7d2fe;
+}
+
+.dark .tool-card {
+    background: #1e293b;
+    border-color: #334155;
+}
+
+.dark .tool-card:hover {
+    border-color: #4f46e5;
+    box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.4);
+}
+
+/* Tool Icon */
+.tool-icon {
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Tool Label */
+.tool-label {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #334155;
+    text-align: center;
+    line-height: 1.2;
+}
+
+.dark .tool-label {
+    color: #e2e8f0;
+}
+
+/* Tool Sublabel */
+.tool-sublabel {
+    font-size: 0.7rem;
+    font-weight: 500;
+    color: #94a3b8;
+    text-align: center;
+    margin-top: -0.35rem;
+}
+
+.dark .tool-sublabel {
+    color: #64748b;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #CBD5E1;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #94A3B8;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+    background: #475569;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+    background: #64748B;
+}

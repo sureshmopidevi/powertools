@@ -4,9 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Car Decision Maker</title>
+    <title>Powertools — Your Toolkit</title>
 
-    <!-- Scripts & Icons -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -30,20 +29,91 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
         rel="stylesheet">
 
-    <!-- Stylesheets -->
-    <link rel="stylesheet" href="src/styles/main.css">
+    <link rel="stylesheet" href="src/styles/home.css">
 </head>
 
 <body
     class="bg-[#F8FAFC] dark:bg-[#0F172A] text-slate-600 dark:text-slate-400 min-h-screen transition-colors duration-300">
-    <div id="app">
-        <!-- Components will be rendered here by src/lib/ui.js -->
-        <div class="min-h-screen flex items-center justify-center">
-            <div class="animate-pulse text-slate-400 font-medium">Loading Analysis Matrix...</div>
-        </div>
+
+    <div class="min-h-screen flex flex-col">
+        <!-- Header -->
+        <header class="pt-8 pb-4 px-6 text-center animate-enter">
+            <div class="flex items-center justify-center gap-3 mb-2">
+                <div
+                    class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+                    <i class="fa-solid fa-bolt text-white text-lg"></i>
+                </div>
+                <h1 class="text-3xl font-extrabold text-slate-800 dark:text-white tracking-tight">Powertools</h1>
+            </div>
+            <p class="text-sm text-slate-500 dark:text-slate-400 font-medium">Smart utilities for smarter decisions</p>
+
+            <!-- Theme toggle -->
+            <button id="themeToggle"
+                class="absolute top-6 right-6 w-10 h-10 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all shadow-sm hover:shadow-md">
+                <i class="fa-solid fa-moon dark:hidden"></i>
+                <i class="fa-solid fa-sun hidden dark:inline"></i>
+            </button>
+        </header>
+
+        <!-- Main Grid -->
+        <main class="flex-1 px-6 py-10 max-w-5xl mx-auto w-full">
+            <!-- Powertools Section -->
+            <section class="mb-12 animate-enter delay-100">
+                <div class="flex items-center gap-2 mb-6">
+                    <div
+                        class="w-7 h-7 rounded-lg bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center">
+                        <i class="fa-solid fa-wrench text-indigo-500 dark:text-indigo-400 text-xs"></i>
+                    </div>
+                    <h2 class="text-lg font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wider text-xs">
+                        Powertools</h2>
+                </div>
+
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                    <!-- Smart Car Tool -->
+                    <a href="tools/smart-car/index.html" class="tool-card group">
+                        <div
+                            class="tool-icon bg-gradient-to-br from-blue-500 to-indigo-600 shadow-lg shadow-blue-500/20 group-hover:shadow-blue-500/40 group-hover:scale-110">
+                            <i class="fa-solid fa-car text-white text-xl"></i>
+                        </div>
+                        <span class="tool-label">Smart Car</span>
+                        <span class="tool-sublabel">Decision Maker</span>
+                    </a>
+                </div>
+            </section>
+
+            <!-- Apps Section -->
+            <section class="animate-enter delay-200">
+                <div class="flex items-center gap-2 mb-6">
+                    <div
+                        class="w-7 h-7 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
+                        <i
+                            class="fa-solid fa-grid-2 text-emerald-500 dark:text-emerald-400 text-xs fa-solid fa-table-cells"></i>
+                    </div>
+                    <h2 class="text-lg font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wider text-xs">
+                        Apps</h2>
+                </div>
+
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                    <!-- 2nd Tool -->
+                    <a href="tools/second-tool/index.html" class="tool-card group">
+                        <div
+                            class="tool-icon bg-gradient-to-br from-emerald-400 to-teal-500 shadow-lg shadow-emerald-500/20 group-hover:shadow-emerald-500/40 group-hover:scale-110">
+                            <i class="fa-solid fa-flask text-white text-xl"></i>
+                        </div>
+                        <span class="tool-label">2nd Tool</span>
+                        <span class="tool-sublabel">Coming Soon</span>
+                    </a>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="py-6 text-center">
+            <p class="text-xs text-slate-400 dark:text-slate-600 font-medium">Built with <i
+                    class="fa-solid fa-heart text-red-400 mx-0.5"></i> by Powertools</p>
+        </footer>
     </div>
 
-    <!-- Main Logic -->
     <script type="module" src="src/main.js"></script>
 </body>
 

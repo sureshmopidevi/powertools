@@ -176,7 +176,6 @@ input[type="number"]::-webkit-outer-spin-button {
     letter-spacing: 0.05em;
     color: #64748B;
     padding: 1rem;
-    text-align: left;
     font-weight: 700;
     border-bottom: 1px solid #E2E8F0;
 }
