@@ -5,28 +5,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Powertools — Your Toolkit</title>
+    <meta name="description" content="Smart utilities for smarter decisions.">
 
-    <script>
-        // Apply theme immediately to avoid FOUC (Flash of Unstyled Content)
-        (function () {
-            const savedTheme = localStorage.getItem('theme');
-            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 
-            if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
-                document.documentElement.classList.add('dark');
-                document.documentElement.classList.remove('light');
-            } else {
-                document.documentElement.classList.remove('dark');
-                document.documentElement.classList.add('light');
-            }
-        })();
-    </script>
-
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             darkMode: 'class',
             theme: {
+                fontFamily: {
+                    sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                },
                 extend: {
                     colors: {
                         slate: {
@@ -34,158 +30,300 @@
                             900: '#0f172a',
                             950: '#020617',
                         }
+                    },
+                    animation: {
+                        'fade-in-up': 'fadeInUp 0.5s ease-out forwards',
+                        'blob': 'blob 7s infinite',
+                    },
+                    keyframes: {
+                        fadeInUp: {
+                            '0%': { opacity: '0', transform: 'translateY(10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        blob: {
+                            '0%': { transform: 'translate(0px, 0px) scale(1)' },
+                            '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
+                            '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
+                            '100%': { transform: 'translate(0px, 0px) scale(1)' },
+                        }
                     }
                 }
             }
         }
     </script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
-        rel="stylesheet">
 
-    <link rel="stylesheet" href="src/styles/home.css">
+    <style>
+        /* Custom Utilities */
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Subtle Dot Pattern Background */
+        .bg-grid-pattern {
+            background-size: 40px 40px;
+            background-image: radial-gradient(circle, #cbd5e1 1px, transparent 1px);
+        }
+
+        .dark .bg-grid-pattern {
+            background-image: radial-gradient(circle, #1e293b 1px, transparent 1px);
+        }
+
+        /* Card Hover Effects */
+        .tool-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .tool-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+        }
+
+        .dark .tool-card:hover {
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.5), 0 8px 10px -6px rgb(0 0 0 / 0.5);
+            border-color: rgba(99, 102, 241, 0.5);
+            /* Indigo tint on hover */
+        }
+
+        /* Animation Delays */
+        .delay-100 {
+            animation-delay: 100ms;
+        }
+
+        .delay-200 {
+            animation-delay: 200ms;
+        }
+
+        .delay-300 {
+            animation-delay: 300ms;
+        }
+
+        /* Badge Styles */
+        .badge-new {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            box-shadow: 0 2px 10px rgba(99, 102, 241, 0.3);
+        }
+
+        .badge-popular {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            box-shadow: 0 2px 10px rgba(245, 158, 11, 0.3);
+        }
+    </style>
+
+    <script>
+        // Pre-load theme preference to prevent flash
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark')
+        } else {
+            document.documentElement.classList.remove('dark')
+        }
+    </script>
 </head>
 
 <body
-    class="bg-[#F8FAFC] dark:bg-[#0F172A] text-slate-600 dark:text-slate-400 min-h-screen transition-colors duration-300">
+    class="bg-slate-50 dark:bg-slate-950 text-slate-600 dark:text-slate-400 min-h-screen transition-colors duration-300 flex flex-col relative overflow-x-hidden">
 
-    <div class="min-h-screen flex flex-col">
-        <!-- Header -->
-        <header class="pt-8 pb-4 px-6 text-center animate-enter">
-            <div class="flex items-center justify-center gap-3 mb-2">
-                <div
-                    class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
-                    <i class="fa-solid fa-bolt text-white text-lg"></i>
-                </div>
-                <h1 class="text-3xl font-extrabold text-slate-800 dark:text-white tracking-tight">Powertools</h1>
-            </div>
-            <p class="text-sm text-slate-500 dark:text-slate-400 font-medium">Smart utilities for smarter decisions</p>
-
-            <!-- Theme toggle -->
-            <button id="themeToggle"
-                class="absolute top-6 right-6 w-10 h-10 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all shadow-sm hover:shadow-md">
-                <i class="fa-solid fa-moon dark:hidden"></i>
-                <i class="fa-solid fa-sun hidden dark:inline"></i>
-            </button>
-        </header>
-
-        <!-- Main Grid -->
-        <main class="flex-1 px-6 py-10 max-w-5xl mx-auto w-full">
-            <!-- Powertools Section -->
-            <section class="mb-12 animate-enter delay-100">
-                <div class="flex items-center gap-2 mb-6">
-                    <div
-                        class="w-7 h-7 rounded-lg bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center">
-                        <i class="fa-solid fa-wrench text-indigo-500 dark:text-indigo-400 text-xs"></i>
-                    </div>
-                    <h2 class="text-lg font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wider text-xs">
-                        Powertools</h2>
-                </div>
-
-                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                    <!-- Smart Car Tool -->
-                    <a href="tools/smart-car/index.html" class="tool-card group">
-                        <span class="status-badge new">New</span>
-                        <div
-                            class="tool-icon bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-600 shadow-lg shadow-blue-500/20 group-hover:shadow-blue-500/40">
-                            <i class="fa-solid fa-car text-white text-xl"></i>
-                        </div>
-                        <span class="tool-label">Smart Car</span>
-                        <span class="tool-sublabel">Decision Maker</span>
-                    </a>
-
-                    <!-- EMI Calculator Tool -->
-                    <a href="tools/emi-calculator/index.html" class="tool-card group">
-                        <span class="status-badge new">New</span>
-                        <div
-                            class="tool-icon bg-gradient-to-br from-violet-500 via-purple-500 to-fuchsia-500 shadow-lg shadow-violet-500/20 group-hover:shadow-violet-500/40">
-                            <i class="fa-solid fa-calculator text-white text-xl"></i>
-                        </div>
-                        <span class="tool-label">EMI Analyzer</span>
-                        <span class="tool-sublabel">True Cost & Savings</span>
-                    </a>
-                </div>
-            </section>
-
-            <!-- Apps Section -->
-            <section class="animate-enter delay-200">
-                <div class="flex items-center gap-2 mb-6">
-                    <div
-                        class="w-7 h-7 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
-                        <i
-                            class="fa-solid fa-grid-2 text-emerald-500 dark:text-emerald-400 text-xs fa-solid fa-table-cells"></i>
-                    </div>
-                    <h2 class="text-lg font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wider text-xs">
-                        Apps</h2>
-                </div>
-
-                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                    <!-- 2nd Tool -->
-                    <a href="tools/spam-link-detector/index.html" class="tool-card group">
-                        <span class="status-badge popular">Popular</span>
-                        <div
-                            class="tool-icon bg-gradient-to-br from-sky-400 via-cyan-500 to-blue-600 shadow-lg shadow-sky-500/20 group-hover:shadow-sky-500/40">
-                            <i class="fa-solid fa-shield-halved text-white text-xl"></i>
-                        </div>
-                        <span class="tool-label">Link Detector</span>
-                        <span class="tool-sublabel">Spam & Phishing</span>
-                    </a>
-                </div>
-            </section>
-        </main>
-
-        <!-- Footer -->
-        <footer class="py-6 text-center">
-            <p class="text-xs text-slate-400 dark:text-slate-600 font-medium">Built with <i
-                    class="fa-solid fa-heart text-red-400 mx-0.5"></i> by Powertools</p>
-        </footer>
+    <!-- Background Decoration -->
+    <div class="fixed inset-0 pointer-events-none z-0">
+        <div class="absolute inset-0 bg-grid-pattern opacity-[0.4]"></div>
+        <!-- Decorative Gradient Blobs -->
+        <div
+            class="absolute top-0 left-1/4 w-96 h-96 bg-indigo-500/10 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob dark:bg-indigo-500/20 dark:mix-blend-screen">
+        </div>
+        <div
+            class="absolute top-0 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob animation-delay-2000 dark:bg-purple-500/20 dark:mix-blend-screen">
+        </div>
     </div>
 
+    <!-- Header -->
+    <header class="relative z-10 pt-12 pb-8 px-6 text-center animate-fade-in-up">
+        <div class="flex items-center justify-center gap-3 mb-3">
+            <div
+                class="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/25 ring-4 ring-white dark:ring-slate-900 transform transition-transform hover:rotate-12">
+                <i class="fa-solid fa-bolt text-white text-xl"></i>
+            </div>
+            <h1 class="text-4xl font-extrabold text-slate-800 dark:text-white tracking-tight">Powertools</h1>
+        </div>
+        <p class="text-base text-slate-500 dark:text-slate-400 font-medium max-w-sm mx-auto">
+            A suite of smart utilities designed to help you make better decisions, faster.
+        </p>
+
+        <!-- Theme Toggle -->
+        <button id="themeToggle"
+            class="absolute top-6 right-6 p-2 rounded-full text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 transition-all focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <div class="relative w-6 h-6">
+                <i
+                    class="fa-solid fa-moon absolute inset-0 transition-transform duration-500 rotate-0 dark:-rotate-90 scale-100 dark:scale-0"></i>
+                <i
+                    class="fa-solid fa-sun absolute inset-0 transition-transform duration-500 rotate-90 dark:rotate-0 scale-0 dark:scale-100 text-yellow-400"></i>
+            </div>
+        </button>
+    </header>
+
+    <!-- Main Content -->
+    <main class="relative z-10 flex-1 px-4 sm:px-6 py-6 max-w-6xl mx-auto w-full">
+
+        <!-- Section: Finance & Lifestyle -->
+        <section class="mb-12 animate-fade-in-up delay-100">
+            <div class="flex items-center gap-3 mb-6 px-1">
+                <div
+                    class="h-px bg-gradient-to-r from-transparent via-slate-300 dark:via-slate-700 to-transparent w-full">
+                </div>
+                <span
+                    class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest whitespace-nowrap">Finance
+                    & Lifestyle</span>
+                <div
+                    class="h-px bg-gradient-to-r from-transparent via-slate-300 dark:via-slate-700 to-transparent w-full">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+
+                <!-- Card: Smart Car -->
+                <a href="tools/smart-car/index.html"
+                    class="tool-card group relative flex flex-col bg-white dark:bg-slate-800/50 backdrop-blur-sm border border-slate-200 dark:border-slate-700/50 rounded-3xl p-6 overflow-hidden">
+                    <div class="absolute top-4 right-4 z-20">
+                        <span
+                            class="badge-new text-[10px] font-bold text-white px-2.5 py-1 rounded-full uppercase tracking-wide">New</span>
+                    </div>
+
+                    <div class="flex items-start justify-between mb-4">
+                        <div
+                            class="w-14 h-14 rounded-2xl bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                            <i class="fa-solid fa-car text-blue-500 dark:text-blue-400 text-2xl"></i>
+                        </div>
+                    </div>
+
+                    <div class="mt-auto">
+                        <h3
+                            class="text-lg font-bold text-slate-800 dark:text-slate-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                            Smart Car</h3>
+                        <p class="text-sm text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">Analyze fuel vs.
+                            electric costs to find your perfect ride.</p>
+                    </div>
+
+                    <!-- Hover Arrow -->
+                    <div
+                        class="absolute bottom-6 right-6 opacity-0 transform translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300">
+                        <i class="fa-solid fa-arrow-right text-blue-500"></i>
+                    </div>
+                </a>
+
+                <!-- Card: EMI Calculator -->
+                <a href="tools/emi-calculator/index.html"
+                    class="tool-card group relative flex flex-col bg-white dark:bg-slate-800/50 backdrop-blur-sm border border-slate-200 dark:border-slate-700/50 rounded-3xl p-6 overflow-hidden">
+                    <div class="absolute top-4 right-4 z-20">
+                        <span
+                            class="bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-300 text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wide border border-slate-200 dark:border-slate-600">Updated</span>
+                    </div>
+
+                    <div class="flex items-start justify-between mb-4">
+                        <div
+                            class="w-14 h-14 rounded-2xl bg-purple-50 dark:bg-purple-900/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                            <i class="fa-solid fa-calculator text-purple-500 dark:text-purple-400 text-2xl"></i>
+                        </div>
+                    </div>
+
+                    <div class="mt-auto">
+                        <h3
+                            class="text-lg font-bold text-slate-800 dark:text-slate-100 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
+                            EMI Analyzer</h3>
+                        <p class="text-sm text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">Calculate loans,
+                            interest, and visualize your savings path.</p>
+                    </div>
+
+                    <div
+                        class="absolute bottom-6 right-6 opacity-0 transform translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300">
+                        <i class="fa-solid fa-arrow-right text-purple-500"></i>
+                    </div>
+                </a>
+            </div>
+        </section>
+
+        <!-- Section: Security & Utilities -->
+        <section class="animate-fade-in-up delay-200">
+            <div class="flex items-center gap-3 mb-6 px-1">
+                <div
+                    class="h-px bg-gradient-to-r from-transparent via-slate-300 dark:via-slate-700 to-transparent w-full">
+                </div>
+                <span
+                    class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest whitespace-nowrap">Security
+                    & Utilities</span>
+                <div
+                    class="h-px bg-gradient-to-r from-transparent via-slate-300 dark:via-slate-700 to-transparent w-full">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <!-- Card: Link Detector -->
+                <a href="tools/spam-link-detector/index.html"
+                    class="tool-card group relative flex flex-col bg-white dark:bg-slate-800/50 backdrop-blur-sm border border-slate-200 dark:border-slate-700/50 rounded-3xl p-6 overflow-hidden">
+                    <div class="absolute top-4 right-4 z-20">
+                        <span
+                            class="badge-popular text-[10px] font-bold text-white px-2.5 py-1 rounded-full uppercase tracking-wide">Popular</span>
+                    </div>
+
+                    <div class="flex items-start justify-between mb-4">
+                        <div
+                            class="w-14 h-14 rounded-2xl bg-teal-50 dark:bg-teal-900/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                            <i class="fa-solid fa-shield-halved text-teal-500 dark:text-teal-400 text-2xl"></i>
+                        </div>
+                    </div>
+
+                    <div class="mt-auto">
+                        <h3
+                            class="text-lg font-bold text-slate-800 dark:text-slate-100 group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
+                            Link Detector</h3>
+                        <p class="text-sm text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">Instantly verify
+                            suspicious URLs for spam and phishing.</p>
+                    </div>
+
+                    <div
+                        class="absolute bottom-6 right-6 opacity-0 transform translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300">
+                        <i class="fa-solid fa-arrow-right text-teal-500"></i>
+                    </div>
+                </a>
+
+                <!-- Card: Coming Soon (Placeholder) -->
+                <div
+                    class="relative flex flex-col bg-slate-50 dark:bg-slate-800/30 border border-dashed border-slate-300 dark:border-slate-700 rounded-3xl p-6 items-center justify-center text-center opacity-60">
+                    <div
+                        class="w-12 h-12 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center mb-3">
+                        <i class="fa-solid fa-plus text-slate-400"></i>
+                    </div>
+                    <p class="text-sm font-medium text-slate-500">More Coming Soon</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="py-8 text-center relative z-10">
+        <div class="flex items-center justify-center gap-2 mb-2">
+            <a href="#" class="text-slate-400 hover:text-indigo-500 transition-colors"><i
+                    class="fa-brands fa-github text-lg"></i></a>
+            <a href="#" class="text-slate-400 hover:text-blue-400 transition-colors"><i
+                    class="fa-brands fa-twitter text-lg"></i></a>
+        </div>
+        <p class="text-xs text-slate-400 dark:text-slate-600 font-medium">
+            Built with <i class="fa-solid fa-heart text-rose-500 mx-0.5 animate-pulse"></i> by Powertools
+        </p>
+    </footer>
+
     <script>
-            // Theme Manager - Inline to avoid CORS issues with file:// protocol
-            (function () {
-                const html = document.documentElement;
-                const toggleBtn = document.getElementById('themeToggle');
+        // Theme Logic
+        const toggleBtn = document.getElementById('themeToggle');
+        const html = document.documentElement;
 
-                function applyTheme() {
-                    const isDark = localStorage.theme === 'dark' ||
-                        (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches);
-
-                    if (isDark) {
-                        html.classList.add('dark');
-                    } else {
-                        html.classList.remove('dark');
-                    }
-                }
-
-                function toggle() {
-                    const willBeDark = !html.classList.contains('dark');
-                    if (willBeDark) {
-                        html.classList.add('dark');
-                        localStorage.theme = 'dark';
-                    } else {
-                        html.classList.remove('dark');
-                        localStorage.theme = 'light';
-                    }
-                }
-
-                // Initialize theme
-                applyTheme();
-
-                // Listen for system theme changes
-                window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
-                    if (!localStorage.theme) {
-                        applyTheme();
-                    }
-                });
-
-                // Attach toggle handler
-                if (toggleBtn) {
-                    toggleBtn.addEventListener('click', toggle);
-                }
-            })();
+        toggleBtn.addEventListener('click', () => {
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                localStorage.theme = 'light';
+            } else {
+                html.classList.add('dark');
+                localStorage.theme = 'dark';
+            }
+        });
     </script>
 </body>
 
