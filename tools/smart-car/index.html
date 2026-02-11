@@ -4,7 +4,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <base href="/tools/smart-car/">
+    <script>
+        // Enforce trailing slash for directory URLs to ensure relative paths work
+        if (!window.location.pathname.endsWith('/') && !window.location.pathname.endsWith('.html')) {
+            window.location.replace(window.location.pathname + '/' + window.location.search);
+        }
+
+        // Apply theme immediately to avoid FOUC (Flash of Unstyled Content)
+        (function () {
+            const savedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+            if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+                document.documentElement.classList.add('dark');
+                document.documentElement.classList.remove('light');
+            } else {
+                document.documentElement.classList.remove('dark');
+                document.documentElement.classList.add('light');
+            }
+        })();
+    </script>
     <title>Smart Car Decision Maker | Powertools</title>
 
     <!-- Scripts & Icons -->
@@ -32,7 +51,7 @@
         rel="stylesheet">
 
     <!-- Stylesheets -->
-    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="./styles/main.css">
 </head>
 
 <body
@@ -45,7 +64,7 @@
     </div>
 
     <!-- Main Logic -->
-    <script type="module" src="main.js"></script>
+    <script type="module" src="./main.js"></script>
 </body>
 
 </html>

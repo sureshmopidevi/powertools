@@ -1,7 +1,7 @@
 export const Header = () => `
     <header class="mb-10 animate-enter flex flex-col md:flex-row justify-between items-center md:items-start text-center md:text-left relative">
         <div>
-            <a href="/index.html" class="inline-flex items-center gap-2 px-3 py-1.5 mb-4 rounded-lg bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:border-indigo-300 dark:hover:border-indigo-600 transition-all text-xs font-semibold no-underline">
+            <a href="../../index.html" class="inline-flex items-center gap-2 px-3 py-1.5 mb-4 rounded-lg bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:border-indigo-300 dark:hover:border-indigo-600 transition-all text-xs font-semibold no-underline">
                 <i class="fa-solid fa-arrow-left"></i>Home
             </a>
             <div class="flex items-center gap-2 mb-2 justify-center md:justify-start">
