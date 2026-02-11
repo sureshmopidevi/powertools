@@ -113,11 +113,11 @@
                     <!-- 2nd Tool -->
                     <a href="tools/second-tool/index.html" class="tool-card group">
                         <div
-                            class="tool-icon bg-gradient-to-br from-emerald-400 to-teal-500 shadow-lg shadow-emerald-500/20 group-hover:shadow-emerald-500/40 group-hover:scale-110">
-                            <i class="fa-solid fa-flask text-white text-xl"></i>
+                            class="tool-icon bg-gradient-to-br from-sky-400 to-blue-500 shadow-lg shadow-sky-500/20 group-hover:shadow-sky-500/40 group-hover:scale-110">
+                            <i class="fa-solid fa-shield-halved text-white text-xl"></i>
                         </div>
-                        <span class="tool-label">2nd Tool</span>
-                        <span class="tool-sublabel">Coming Soon</span>
+                        <span class="tool-label">Link Detector</span>
+                        <span class="tool-sublabel">Spam & Phishing</span>
                     </a>
                 </div>
             </section>
@@ -130,7 +130,50 @@
         </footer>
     </div>
 
-    <script type="module" src="src/main.js"></script>
+    <script>
+            // Theme Manager - Inline to avoid CORS issues with file:// protocol
+            (function () {
+                const html = document.documentElement;
+                const toggleBtn = document.getElementById('themeToggle');
+
+                function applyTheme() {
+                    const isDark = localStorage.theme === 'dark' ||
+                        (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches);
+
+                    if (isDark) {
+                        html.classList.add('dark');
+                    } else {
+                        html.classList.remove('dark');
+                    }
+                }
+
+                function toggle() {
+                    const willBeDark = !html.classList.contains('dark');
+                    if (willBeDark) {
+                        html.classList.add('dark');
+                        localStorage.theme = 'dark';
+                    } else {
+                        html.classList.remove('dark');
+                        localStorage.theme = 'light';
+                    }
+                }
+
+                // Initialize theme
+                applyTheme();
+
+                // Listen for system theme changes
+                window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+                    if (!localStorage.theme) {
+                        applyTheme();
+                    }
+                });
+
+                // Attach toggle handler
+                if (toggleBtn) {
+                    toggleBtn.addEventListener('click', toggle);
+                }
+            })();
+    </script>
 </body>
 
 </html>
