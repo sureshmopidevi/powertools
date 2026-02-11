@@ -8,7 +8,10 @@ body {
     transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* Animations */
+/* ========================================
+   ANIMATIONS
+   ======================================== */
+
 @keyframes fadeInUp {
     from {
         opacity: 0;
@@ -18,6 +21,64 @@ body {
     to {
         opacity: 1;
         transform: translateY(0);
+    }
+}
+
+@keyframes gradientShift {
+
+    0%,
+    100% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+}
+
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-8px);
+    }
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: -200% center;
+    }
+
+    100% {
+        background-position: 200% center;
+    }
+}
+
+@keyframes glow {
+
+    0%,
+    100% {
+        box-shadow: 0 0 20px rgba(99, 102, 241, 0.3), 0 0 40px rgba(99, 102, 241, 0.1);
+    }
+
+    50% {
+        box-shadow: 0 0 30px rgba(99, 102, 241, 0.5), 0 0 60px rgba(99, 102, 241, 0.2);
     }
 }
 
@@ -34,77 +95,273 @@ body {
     animation-delay: 0.2s;
 }
 
-/* Tool Card */
+/* ========================================
+   TOOL CARD - GLASSMORPHIC DESIGN
+   ======================================== */
+
 .tool-card {
+    position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.75rem;
-    padding: 1.5rem 1rem;
-    border-radius: 1.25rem;
-    background: white;
-    border: 1px solid #e2e8f0;
+    gap: 0.875rem;
+    padding: 1.75rem 1.25rem;
+    border-radius: 1.5rem;
     text-decoration: none;
-    transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
     cursor: pointer;
+    overflow: hidden;
+
+    /* Glassmorphism */
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+
+    /* Multi-layer borders */
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    box-shadow:
+        0 4px 6px -1px rgba(0, 0, 0, 0.05),
+        0 2px 4px -1px rgba(0, 0, 0, 0.03),
+        inset 0 1px 0 0 rgba(255, 255, 255, 0.9);
+
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    transform-style: preserve-3d;
+    perspective: 1000px;
+}
+
+/* Gradient overlay on hover */
+.tool-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg,
+            rgba(99, 102, 241, 0.05) 0%,
+            rgba(168, 85, 247, 0.05) 100%);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    border-radius: 1.5rem;
+    z-index: 0;
+}
+
+.tool-card:hover::before {
+    opacity: 1;
+}
+
+/* Shimmer effect */
+.tool-card::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(90deg,
+            transparent,
+            rgba(255, 255, 255, 0.3),
+            transparent);
+    transform: rotate(45deg);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+
+.tool-card:hover::after {
+    animation: shimmer 1.5s ease-in-out;
 }
 
 .tool-card:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.08);
-    border-color: #c7d2fe;
+    transform: translateY(-10px) scale(1.02);
+    box-shadow:
+        0 20px 40px -12px rgba(99, 102, 241, 0.15),
+        0 10px 20px -8px rgba(99, 102, 241, 0.1),
+        0 0 0 1px rgba(99, 102, 241, 0.1),
+        inset 0 1px 0 0 rgba(255, 255, 255, 1);
+    border-color: rgba(199, 210, 254, 0.6);
 }
 
+.tool-card:active {
+    transform: translateY(-8px) scale(0.98);
+}
+
+/* Dark mode glassmorphism */
 .dark .tool-card {
-    background: #1e293b;
-    border-color: #334155;
+    background: rgba(30, 41, 59, 0.6);
+    border: 1px solid rgba(51, 65, 85, 0.8);
+    box-shadow:
+        0 4px 6px -1px rgba(0, 0, 0, 0.3),
+        0 2px 4px -1px rgba(0, 0, 0, 0.2),
+        inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
+}
+
+.dark .tool-card::before {
+    background: linear-gradient(135deg,
+            rgba(99, 102, 241, 0.1) 0%,
+            rgba(168, 85, 247, 0.1) 100%);
 }
 
 .dark .tool-card:hover {
-    border-color: #4f46e5;
-    box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.4);
+    border-color: rgba(79, 70, 229, 0.5);
+    box-shadow:
+        0 20px 40px -12px rgba(0, 0, 0, 0.6),
+        0 10px 20px -8px rgba(99, 102, 241, 0.3),
+        0 0 0 1px rgba(99, 102, 241, 0.3),
+        inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
 }
 
-/* Tool Icon */
+/* ========================================
+   TOOL ICON - ANIMATED GRADIENTS
+   ======================================== */
+
 .tool-icon {
-    width: 3.5rem;
-    height: 3.5rem;
-    border-radius: 1rem;
+    position: relative;
+    width: 4rem;
+    height: 4rem;
+    border-radius: 1.25rem;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    background-size: 200% 200%;
+    animation: gradientShift 6s ease infinite;
+    z-index: 1;
 }
 
-/* Tool Label */
+.tool-card:hover .tool-icon {
+    transform: scale(1.15) rotate(5deg);
+    animation: gradientShift 3s ease infinite, pulse 2s ease-in-out infinite;
+}
+
+.tool-icon i {
+    position: relative;
+    z-index: 2;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+    transition: transform 0.3s ease;
+}
+
+.tool-card:hover .tool-icon i {
+    transform: scale(1.1);
+}
+
+/* Icon glow effect */
+.tool-icon::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: 1.25rem;
+    background: inherit;
+    filter: blur(8px);
+    opacity: 0.5;
+    z-index: -1;
+}
+
+/* ========================================
+   TOOL LABELS
+   ======================================== */
+
 .tool-label {
-    font-size: 0.85rem;
+    font-size: 0.9rem;
     font-weight: 700;
-    color: #334155;
+    color: #1e293b;
     text-align: center;
-    line-height: 1.2;
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+    position: relative;
+    z-index: 1;
+    transition: all 0.3s ease;
+}
+
+.tool-card:hover .tool-label {
+    color: #0f172a;
+    transform: translateY(-2px);
 }
 
 .dark .tool-label {
-    color: #e2e8f0;
+    color: #f1f5f9;
 }
 
-/* Tool Sublabel */
+.dark .tool-card:hover .tool-label {
+    color: #ffffff;
+}
+
 .tool-sublabel {
-    font-size: 0.7rem;
+    font-size: 0.75rem;
     font-weight: 500;
-    color: #94a3b8;
+    color: #64748b;
     text-align: center;
-    margin-top: -0.35rem;
+    margin-top: -0.25rem;
+    position: relative;
+    z-index: 1;
+    transition: all 0.3s ease;
+}
+
+.tool-card:hover .tool-sublabel {
+    color: #475569;
 }
 
 .dark .tool-sublabel {
-    color: #64748b;
+    color: #94a3b8;
 }
 
-/* Custom Scrollbar */
+.dark .tool-card:hover .tool-sublabel {
+    color: #cbd5e1;
+}
+
+/* ========================================
+   STATUS BADGE
+   ======================================== */
+
+.status-badge {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    padding: 0.25rem 0.625rem;
+    border-radius: 0.5rem;
+    font-size: 0.625rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    z-index: 2;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    transition: all 0.3s ease;
+}
+
+.status-badge.new {
+    background: rgba(34, 197, 94, 0.15);
+    color: #16a34a;
+    border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.dark .status-badge.new {
+    background: rgba(34, 197, 94, 0.2);
+    color: #4ade80;
+    border: 1px solid rgba(34, 197, 94, 0.4);
+}
+
+.status-badge.popular {
+    background: rgba(249, 115, 22, 0.15);
+    color: #ea580c;
+    border: 1px solid rgba(249, 115, 22, 0.3);
+}
+
+.dark .status-badge.popular {
+    background: rgba(249, 115, 22, 0.2);
+    color: #fb923c;
+    border: 1px solid rgba(249, 115, 22, 0.4);
+}
+
+.tool-card:hover .status-badge {
+    transform: scale(1.05);
+}
+
+/* ========================================
+   CUSTOM SCROLLBAR
+   ======================================== */
+
 ::-webkit-scrollbar {
-    width: 6px;
+    width: 8px;
+    height: 8px;
 }
 
 ::-webkit-scrollbar-track {
@@ -112,18 +369,42 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-    background: #CBD5E1;
+    background: linear-gradient(180deg, #cbd5e1 0%, #94a3b8 100%);
     border-radius: 10px;
+    transition: background 0.3s ease;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: #94A3B8;
+    background: linear-gradient(180deg, #94a3b8 0%, #64748b 100%);
 }
 
 .dark ::-webkit-scrollbar-thumb {
-    background: #475569;
+    background: linear-gradient(180deg, #475569 0%, #334155 100%);
 }
 
 .dark ::-webkit-scrollbar-thumb:hover {
-    background: #64748B;
+    background: linear-gradient(180deg, #64748b 0%, #475569 100%);
+}
+
+/* ========================================
+   RESPONSIVE ENHANCEMENTS
+   ======================================== */
+
+@media (max-width: 640px) {
+    .tool-card {
+        padding: 1.5rem 1rem;
+    }
+
+    .tool-icon {
+        width: 3.5rem;
+        height: 3.5rem;
+    }
+
+    .tool-label {
+        font-size: 0.85rem;
+    }
+
+    .tool-sublabel {
+        font-size: 0.7rem;
+    }
 }
