@@ -1,0 +1,57 @@
+[
+  {
+    "title": "Finance & Lifestyle",
+    "tools": [
+      {
+        "id": "smart-car",
+        "title": "Smart Car",
+        "description": "Analyze fuel vs. electric costs to find your perfect ride.",
+        "icon": "fa-car",
+        "url": "tools/smart-car/index.html",
+        "badge": "New",
+        "badgeType": "new",
+        "color": "blue"
+      },
+      {
+        "id": "emi-calculator",
+        "title": "EMI Analyzer",
+        "description": "Calculate loans, interest, and visualize your savings path.",
+        "icon": "fa-calculator",
+        "url": "tools/emi-calculator/index.html",
+        "badge": "Updated",
+        "badgeType": "updated",
+        "color": "purple"
+      }
+    ]
+  },
+  {
+    "title": "Education & Algorithms",
+    "tools": [
+      {
+        "id": "algorithm-visualizer",
+        "title": "Algorithm Visualizer",
+        "description": "Visualize search complexities (O(n) vs O(log n)) in real-time.",
+        "icon": "fa-code",
+        "url": "tools/algorithm-visualizer/index.html",
+        "badge": "New",
+        "badgeType": "new",
+        "color": "indigo"
+      }
+    ]
+  },
+  {
+    "title": "Security & Utilities",
+    "tools": [
+      {
+        "id": "spam-link-detector",
+        "title": "Link Detector",
+        "description": "Instantly verify suspicious URLs for spam and phishing.",
+        "icon": "fa-shield-halved",
+        "url": "tools/spam-link-detector/index.html",
+        "badge": "Popular",
+        "badgeType": "popular",
+        "color": "teal"
+      }
+    ]
+  }
+]
