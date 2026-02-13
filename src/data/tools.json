@@ -21,6 +21,16 @@
         "badge": "Updated",
         "badgeType": "updated",
         "color": "gold"
+      },
+      {
+        "id": "loan-emi-calculator",
+        "title": "Loan Calculator",
+        "description": "Plan your loans with monthly breakdowns and amortization charts.",
+        "icon": "fa-hand-holding-dollar",
+        "url": "tools/loan-emi-calculator/index.html",
+        "badge": "New",
+        "badgeType": "new",
+        "color": "gold"
       }
     ]
   },
