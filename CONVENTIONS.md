@@ -20,7 +20,7 @@ The button should use a consistent style, specifically:
 
 ## 2. Tech Stack & Styling
 - **Logic**: Use Vanilla JS (ES6 modules) where possible to avoid build-step overhead and maintain performance.
-- **Styling**: Tailwind CSS with the **Slate** color palette (`slate-900` for dark backgrounds, `slate-50` for light).
+- **Styling**: Tailwind CSS with custom metallic color palettes.
 - **Typography**: Use **Plus Jakarta Sans** as the primary display font.
 - **Icons**: Standardize on **FontAwesome 6+**.
 
@@ -28,3 +28,45 @@ The button should use a consistent style, specifically:
 - Tools should be centered in a `max-w-7xl` container.
 - Use `rounded-3xl` for major card components.
 - Maintain a consistent spacing system (e.g., `mb-10` or `mb-14` for headers).
+
+## 4. Category Color Coding
+To ensure visual consistency on the homescreen and throughout the app, use the following metallic color mapping for categories:
+
+| Category | Color Theme | Tailwind Class Example |
+| :--- | :--- | :--- |
+| **Finance & Lifestyle** | **Gold** | `text-gold-500` |
+| **Education & Algorithms** | **Platinum** | `text-platinum-500` |
+| **Security & Utilities** | **Copper** | `text-copper-500` |
+| *General / Other* | *Silver* | `text-silver-500` |
+
+### Metallic Palette Reference
+These colors are defined in the `tailwind.config` within `index.html`.
+
+- **Gold**: Wealth, Value, Finance.
+- **Platinum**: Premium, High-Tech, Education.
+- **Copper**: Robust, Utility, Security.
+- **Silver**: Sleek, General purpose.
+
+## 5. Tool Registration (JSON)
+The main dashboard is dynamic and driven by a JSON configuration file. When creating a new tool, it must be registered in the central configuration to appear on the homepage.
+
+**File Path**: `src/data/tools.json`
+
+### Workflow
+1.  **Develop**: Create your tool in a dedicated directory under `tools/` (e.g., `tools/my-new-tool/index.html`).
+2.  **Register**: Add a new entry to `src/data/tools.json`.
+3.  **Categorize**: Ensure the tool is placed under the correct category array.
+
+### JSON Schema
+```json
+{
+  "id": "tool-id-slug",
+  "title": "Tool Display Name",
+  "description": "Short, punchy description (max 80 chars).",
+  "icon": "fa-icon-name",  // FontAwesome class (e.g., "fa-calculator")
+  "url": "tools/tool-dir/index.html",
+  "badge": "New",           // Optional
+  "badgeType": "new",       // Optional: 'new', 'popular', 'updated'
+  "color": "gold"           // Must match the Category Color Theme (gold, platinum, copper, silver)
+}
+```

@@ -10,7 +10,7 @@
         "url": "tools/smart-car/index.html",
         "badge": "New",
         "badgeType": "new",
-        "color": "blue"
+        "color": "gold"
       },
       {
         "id": "emi-calculator",
@@ -20,7 +20,7 @@
         "url": "tools/emi-calculator/index.html",
         "badge": "Updated",
         "badgeType": "updated",
-        "color": "purple"
+        "color": "gold"
       }
     ]
   },
@@ -35,7 +35,7 @@
         "url": "tools/algorithm-visualizer/index.html",
         "badge": "New",
         "badgeType": "new",
-        "color": "indigo"
+        "color": "platinum"
       }
     ]
   },
@@ -50,7 +50,7 @@
         "url": "tools/spam-link-detector/index.html",
         "badge": "Popular",
         "badgeType": "popular",
-        "color": "teal"
+        "color": "copper"
       }
     ]
   }

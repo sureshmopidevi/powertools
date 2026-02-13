@@ -27,22 +27,14 @@ export class ToolCard {
     render() {
         const { id, title, description, icon, url, color } = this.tool;
 
-        // Color mapping for dynamic classes
-        const colorMap = {
-            blue: 'text-blue-500 dark:text-blue-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 bg-blue-50 dark:bg-blue-900/20',
-            purple: 'text-purple-500 dark:text-purple-400 group-hover:text-purple-600 dark:group-hover:text-purple-400 bg-purple-50 dark:bg-purple-900/20',
-            indigo: 'text-indigo-500 dark:text-indigo-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/20',
-            teal: 'text-teal-500 dark:text-teal-400 group-hover:text-teal-600 dark:group-hover:text-teal-400 bg-teal-50 dark:bg-teal-900/20'
-        };
-
-        const themeColor = colorMap[color] || colorMap['blue'];
-        const [textColor, titleHoverColor, bgColor] = themeColor.split(' '); // Rough split, but we can do better.
+        // Dynamic classes are generated based on the 'color' property
+        // relying on the custom colors defined in tailwind.config in index.html
 
         // Actually, let's just use the color name to construct the classes dynamically if possible, 
         // OR just stick to a map for safety and tailwind compilation scanning (though we are using CDN here so it's dynamic).
         // Since it's CDN, dynamic classes like `text-${color}-500` work if they are included in the full build or JIT if configured.
         // We will assume the colors used are standard safe list or just use the map to be safe.
-        
+
         const iconClass = `text-${color}-500 dark:text-${color}-400`;
         const bgClass = `bg-${color}-50 dark:bg-${color}-900/20`;
         const titleHoverClass = `group-hover:text-${color}-600 dark:group-hover:text-${color}-400`;
