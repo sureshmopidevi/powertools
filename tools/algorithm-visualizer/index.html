@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script>
+        // Enforce trailing slash for directory URLs to ensure relative paths work
+        if (!window.location.pathname.endsWith('/') && !window.location.pathname.endsWith('.html')) {
+            window.location.replace(window.location.pathname + '/' + window.location.search);
+        }
+
+        // Apply theme immediately to avoid FOUC
+        (function () {
+            const savedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+            if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+                document.documentElement.classList.add('dark');
+                document.documentElement.classList.remove('light');
+            } else {
+                document.documentElement.classList.remove('dark');
+                document.documentElement.classList.add('light');
+            }
+        })();
+    </script>
+    <title>Algorithm Visualizer | Powertools</title>
+
+    <!-- Scripts & Icons -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        slate: {
+                            850: '#1e293b',
+                            900: '#0f172a',
+                            950: '#020617',
+                        }
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        .font-mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Custom scrollbar for analytics */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 10px;
+        }
+
+        .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #334155;
+        }
+
+        /* 3D and transform transitions */
+        .visualizer-block {
+            transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        /* Grid layout for visualizer to ensure alignment */
+        .visualizer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+            gap: 0.5rem;
+            width: 100%;
+            max-width: 64rem;
+            /* max-w-5xl */
+            margin: 0 auto;
+        }
+    </style>
+</head>
+
+<body
+    class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-200 h-screen w-screen overflow-hidden flex flex-col relative transition-colors duration-300">
+
+    <!-- Header -->
+    <header
+        class="z-10 bg-white/80 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 p-3 shrink-0 flex flex-col md:flex-row items-center justify-between gap-4 shadow-sm">
+        <div class="flex items-center gap-4">
+            <a href="../../index.html"
+                class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:text-violet-600 dark:hover:text-violet-400 hover:border-violet-300 dark:hover:border-violet-600 transition-all text-xs font-semibold no-underline w-fit">
+                <i class="fa-solid fa-arrow-left"></i>Home
+            </a>
+            <div class="flex items-center gap-2 text-violet-600 dark:text-violet-400">
+                <i class="fa-solid fa-layer-group text-xl animate-pulse-slow"></i>
+                <h1 class="text-lg font-extrabold tracking-tight uppercase">
+                    Algorithms: <span class="text-slate-800 dark:text-white">Traditional</span> vs <span
+                        class="text-fuchsia-500">Binary</span>
+                </h1>
+            </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="flex flex-wrap items-center justify-center gap-4 text-xs font-medium">
+            <div
+                class="flex items-center gap-3 bg-slate-100 dark:bg-slate-850 px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-xl">
+                <i class="fa-solid fa-sliders text-slate-400"></i>
+                <label class="text-slate-500 dark:text-slate-400 uppercase tracking-widest text-[10px]">Size:</label>
+                <input type="range" id="sizeRange" min="7" max="31" step="2" value="15"
+                    class="w-24 accent-violet-500 cursor-pointer disabled:opacity-50">
+                <span id="sizeValue" class="text-violet-600 dark:text-violet-400 font-bold w-4">15</span>
+            </div>
+
+            <div
+                class="flex items-center gap-3 bg-slate-100 dark:bg-slate-850 px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-xl">
+                <i class="fa-solid fa-bolt text-slate-400"></i>
+                <label class="text-slate-500 dark:text-slate-400 uppercase tracking-widest text-[10px]">Speed:</label>
+                <input type="range" id="speedRange" min="0.5" max="3" step="0.5" value="1"
+                    class="w-24 accent-fuchsia-500 cursor-pointer">
+                <span id="speedValue" class="text-fuchsia-500 font-bold w-8">1x</span>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+            <div class="relative group">
+                <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-violet-500 transition-colors"
+                    style="font-size: 10px;"></i>
+                <input type="number" id="targetInput"
+                    class="w-24 bg-slate-100 dark:bg-slate-850 border border-slate-200 dark:border-slate-700 rounded-xl pl-8 pr-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-violet-500/50 transition-all text-sm font-bold text-violet-600 dark:text-violet-400"
+                    placeholder="TARGET">
+            </div>
+
+            <button id="runBtn"
+                class="flex items-center gap-2 px-4 py-1.5 bg-violet-600 hover:bg-violet-700 text-white rounded-xl font-bold text-xs tracking-wider transition-all disabled:opacity-50 shadow-md shadow-violet-500/20">
+                <i class="fa-solid fa-play"></i>
+                RUN
+            </button>
+
+            <button id="resetBtn"
+                class="p-2 bg-slate-100 dark:bg-slate-850 text-slate-500 hover:text-slate-800 dark:hover:text-white border border-slate-200 dark:border-slate-700 rounded-xl transition-all">
+                <i class="fa-solid fa-rotate-right"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main View Port -->
+    <main class="flex-1 flex flex-col p-4 gap-4 overflow-hidden relative">
+
+        <!-- Linear Search Section -->
+        <div
+            class="flex-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl relative overflow-hidden flex flex-col shadow-sm">
+            <div
+                class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-violet-500 to-transparent opacity-30">
+            </div>
+
+            <div
+                class="p-3 px-6 flex justify-between items-center shrink-0 border-b border-slate-100 dark:border-slate-800">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-lg bg-violet-50 dark:bg-violet-900/20 flex items-center justify-center">
+                        <i class="fa-solid fa-list-ol text-violet-500 text-xs"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-slate-800 dark:text-slate-100 font-bold tracking-tight text-xs">TRADITIONAL
+                            (LINEAR)
+                            SEARCH</h2>
+                        <p class="text-[9px] text-slate-400 uppercase tracking-widest font-mono">Sequential Scan O(n)
+                        </p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4">
+                    <div class="text-right">
+                        <p class="text-[9px] text-slate-400 uppercase tracking-widest">Cycles</p>
+                        <p id="linearSteps" class="text-xl font-black text-violet-500 font-mono">0</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Added visualizer-grid class for alignment -->
+            <div id="linearVisualizer" class="flex-1 p-6 visualizer-grid content-center">
+                <!-- Blocks injected here -->
+            </div>
+
+            <div
+                class="bg-slate-50 dark:bg-slate-900/50 border-t border-slate-100 dark:border-slate-800 p-2.5 px-6 flex items-center gap-3">
+                <i class="fa-solid fa-terminal text-[10px] text-slate-400"></i>
+                <div id="linearLog" class="text-[11px] font-mono text-violet-500 font-bold truncate">AWAITING
+                    EXECUTION...</div>
+            </div>
+        </div>
+
+        <!-- Binary Search Section -->
+        <div
+            class="flex-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl relative overflow-hidden flex flex-col shadow-sm">
+            <div
+                class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-fuchsia-500 to-transparent opacity-30">
+            </div>
+
+            <div
+                class="p-3 px-6 flex justify-between items-center shrink-0 border-b border-slate-100 dark:border-slate-800">
+                <div class="flex items-center gap-3">
+                    <div
+                        class="w-8 h-8 rounded-lg bg-fuchsia-50 dark:bg-fuchsia-900/20 flex items-center justify-center">
+                        <i class="fa-solid fa-code-branch text-fuchsia-500 text-xs"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-slate-800 dark:text-slate-100 font-bold tracking-tight text-xs">BINARY
+                            (LOGARITHMIC)
+                            SEARCH</h2>
+                        <p class="text-[9px] text-slate-400 uppercase tracking-widest font-mono">Divide & Conquer O(log
+                            n)</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4">
+                    <div class="text-right">
+                        <p class="text-[9px] text-slate-400 uppercase tracking-widest">Cycles</p>
+                        <p id="binarySteps" class="text-xl font-black text-fuchsia-500 font-mono">0</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Added visualizer-grid class for alignment -->
+            <div id="binaryVisualizer" class="flex-1 p-6 visualizer-grid content-center">
+                <!-- Blocks with pointers injected here -->
+            </div>
+
+            <div
+                class="bg-slate-50 dark:bg-slate-900/50 border-t border-slate-100 dark:border-slate-800 p-2.5 px-6 flex items-center gap-3">
+                <i class="fa-solid fa-terminal text-[10px] text-slate-400"></i>
+                <div id="binaryLog" class="text-[11px] font-mono text-fuchsia-500 font-bold truncate">AWAITING
+                    EXECUTION...</div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Analytics Modal -->
+    <div id="modalOverlay"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4 transition-all opacity-0 pointer-events-none">
+        <div
+            class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2.5rem] shadow-2xl max-w-2xl w-full p-8 relative flex flex-col max-h-[85vh] transform scale-95 transition-transform duration-300">
+            <button id="closeModal"
+                class="absolute top-6 right-6 w-10 h-10 flex items-center justify-center rounded-xl hover:bg-slate-100 dark:hover:bg-slate-850 text-slate-400 transition-colors">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <div class="flex items-center gap-4 mb-8">
+                <div
+                    class="w-12 h-12 rounded-2xl bg-violet-500 flex items-center justify-center text-white text-xl shadow-lg shadow-violet-500/20">
+                    <i class="fa-solid fa-chart-pie"></i>
+                </div>
+                <h3 class="text-2xl font-black text-slate-800 dark:text-white tracking-tight uppercase">Execution
+                    Analytics</h3>
+            </div>
+
+            <div class="overflow-y-auto pr-4 custom-scrollbar space-y-8">
+
+                <!-- Performance Cards -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div
+                        class="p-6 bg-slate-50 dark:bg-slate-950/50 rounded-3xl border border-slate-100 dark:border-slate-800">
+                        <p class="text-[10px] font-bold text-violet-500 uppercase tracking-widest mb-2">Traditional O(n)
+                        </p>
+                        <div class="flex items-baseline gap-2">
+                            <span id="finalLinearSteps"
+                                class="text-3xl font-black text-slate-800 dark:text-white font-mono">0</span>
+                            <span class="text-xs text-slate-400 font-medium">CYCLES</span>
+                        </div>
+                    </div>
+                    <div
+                        class="p-6 bg-slate-50 dark:bg-slate-950/50 rounded-3xl border border-slate-100 dark:border-slate-800">
+                        <p class="text-[10px] font-bold text-fuchsia-500 uppercase tracking-widest mb-2">Binary O(log n)
+                        </p>
+                        <div class="flex items-baseline gap-2">
+                            <span id="finalBinarySteps"
+                                class="text-3xl font-black text-slate-800 dark:text-white font-mono">0</span>
+                            <span class="text-xs text-slate-400 font-medium">CYCLES</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-6 bg-emerald-500/5 border border-emerald-500/20 rounded-3xl text-center">
+                    <p class="text-[10px] font-bold text-emerald-500 uppercase tracking-widest mb-3">Efficiency
+                        Multiplier</p>
+                    <div id="efficiencyValue" class="text-5xl font-black text-emerald-500 tracking-tighter">1.0x</div>
+                    <p class="text-xs text-emerald-600/60 font-medium mt-2 italic">Binary search proved faster</p>
+                </div>
+
+                <!-- Descriptive Report -->
+                <div class="space-y-6 pt-4 border-t border-slate-100 dark:border-slate-800">
+                    <div
+                        class="flex items-center gap-2 text-slate-800 dark:text-white font-black uppercase text-xs tracking-widest">
+                        <i class="fa-solid fa-microchip text-slate-400"></i>
+                        Diagnostic Summary
+                    </div>
+
+                    <div class="space-y-4 text-sm leading-relaxed text-slate-500 dark:text-slate-400">
+                        <p>
+                            <span class="text-violet-500 font-extrabold">TRADITIONAL SEARCH</span> operates by checking
+                            every
+                            single item from the start until it hits the target. Its complexity scales exactly with the
+                            size of the data.
+                        </p>
+
+                        <p>
+                            <span class="text-fuchsia-500 font-extrabold">BINARY SEARCH</span> is significantly more
+                            advanced. By assuming the data is sorted, it can eliminate <span
+                                class="text-slate-800 dark:text-white font-bold">50% of the entire search space</span>
+                            in every single cycle.
+                        </p>
+
+                        <div class="bg-violet-500/5 dark:bg-slate-950 p-6 rounded-[2rem] border-l-4 border-violet-500">
+                            <h4 class="text-xs font-black text-violet-500 uppercase tracking-widest mb-2">The Scale
+                                Advantage</h4>
+                            <p class="text-xs leading-relaxed">
+                                On this small dataset, the difference is measured in cycles. On a dataset of <span
+                                    class="font-bold">4 billion items</span>, Traditional search might take 4 billion
+                                steps,
+                                while Binary search will finish in at most <span
+                                    class="font-bold text-slate-800 dark:text-white underline decoration-fuchsia-500 decoration-2">32
+                                    steps</span>.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="./main.js"></script>
+</body>
+
+</html>

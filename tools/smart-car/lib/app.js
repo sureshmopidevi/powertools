@@ -203,12 +203,12 @@ export class App {
     }
 
     update() {
-        const { calculateEMI, fvSIP, fvLumpsum, formatCurrency } = App.math;
+        const { calculateEMI, fvSIP, fvLumpsum, formatCurrency, calculateLoanBalance } = App.math;
 
-        // Get values
+        // 1. Get Inputs
         const P = getRawValue(this.inputs.price.value);
         const C = getRawValue(this.inputs.totalCash.value);
-        const B = getRawValue(this.inputs.buffer.value); // Investable Lumpsum
+        const B = getRawValue(this.inputs.buffer.value); // Investable Lumpsum for Strategy B
 
         const rLoan = parseFloat(this.inputs.loanRate.value) || 0;
         const rInv = parseFloat(this.inputs.sipRate.value) || 0;
@@ -221,7 +221,7 @@ export class App {
 
         const isFuelIncluded = this.elements.fuelToggle.checked;
 
-        // UI Toggle for fuel section - but keep display
+        // 2. UI Toggle for fuel section
         if (isFuelIncluded) {
             this.elements.fuelContainer.classList.remove('disabled-section');
             if (this.elements.fuelNote) this.elements.fuelNote.style.display = 'block';
@@ -230,146 +230,120 @@ export class App {
             if (this.elements.fuelNote) this.elements.fuelNote.style.display = 'none';
         }
 
-        // Monthly fuel cost: ₹0 if toggle is off
+        // 3. Shared Values
+        const HORIZON = 84; // 7 years analysis period
         const monthlyFuel = isFuelIncluded ? (km / mil) * fuelP : 0;
-        const carValue7 = P * Math.pow(1 - (depRate / 100), 7);
+        const carValueAt = (years) => P * Math.pow(1 - (depRate / 100), years);
+        const carValue7 = carValueAt(7);
+        const totalFuelHorizon = monthlyFuel * HORIZON;
 
-        // Helpers
         const fmt = (val) => formatCurrency(Math.round(val));
+        const taxOnGains = (fv, principal) => {
+            const gains = fv - principal;
+            return gains > 0 ? gains * (rTax / 100) : 0;
+        };
 
-        // Update investment rate display
         if (this.elements.invRateDisplay) this.elements.invRateDisplay.innerText = rInv;
 
-        // ========= SCENARIO A: DEBT HATER =========
-        // Uses all cash as down payment. No investments. 5-year loan.
-        const dpA = C;
+        // ========= STRATEGY A: DEBT HATER (5 Year Loan) =========
+        const dpA = Math.min(C, P);
         const loanA = Math.max(0, P - dpA);
-        const emiA = calculateEMI(loanA, rLoan, 60); // 5 years
+        const emiA = calculateEMI(loanA, rLoan, 60);
         const totalEmiPaidA = emiA * 60;
         const interestA = Math.max(0, totalEmiPaidA - loanA);
+        const leftoverCashA = Math.max(0, C - dpA);
 
-        // Assets: Only car (no investments)
-        const investmentA = 0;
-        const totalAssetsA = carValue7 + investmentA;
+        const totalAssetsA = carValue7 + leftoverCashA;
+        const totalOutgoA = C + totalEmiPaidA + totalFuelHorizon;
+        const netCostA = totalOutgoA - totalAssetsA;
 
-        // Costs: DP (capped at car price) + Total EMI Paid
-        const effectiveDpA = Math.min(dpA, P);
-        const totalCashPaidA = effectiveDpA + totalEmiPaidA;
-        const netCostA = totalCashPaidA - totalAssetsA;
-
-        // Update UI - Strategy Cards
+        // Update Strategy A UI
         this.elements.emiA.innerText = formatCurrency(emiA);
         this.elements.interestA.innerText = formatCurrency(interestA);
         this.elements.t_emiA.innerText = formatCurrency(emiA);
         this.elements.t_totalA.innerText = formatCurrency(emiA + monthlyFuel);
 
-        // Update Tables
         if (this.elements.assetTotalA) this.elements.assetTotalA.innerText = fmt(totalAssetsA);
-        if (this.elements.costDpA) this.elements.costDpA.innerText = fmt(effectiveDpA);
+        if (this.elements.costDpA) this.elements.costDpA.innerText = fmt(dpA);
         if (this.elements.costEmiPaidA) this.elements.costEmiPaidA.innerText = fmt(totalEmiPaidA);
         if (this.elements.costIntA) this.elements.costIntA.innerText = fmt(interestA);
         if (this.elements.costNetA) this.elements.costNetA.innerText = fmt(netCostA);
 
 
-        // ========= SCENARIO B: SMART INVESTOR =========
-        // Puts min DP, invests the rest. 7-year loan.
-        const dpB = Math.max(0, C - B); // DP = Total Cash - Buffer (what's kept for investment)
+        // ========= STRATEGY B: SMART INVESTOR (7 Year Loan) =========
+        const dpB = Math.max(0, C - B);
         const loanB = Math.max(0, P - dpB);
-        const emiB = calculateEMI(loanB, rLoan, 84); // 7 years
+        const emiB = calculateEMI(loanB, rLoan, 84);
         const totalEmiPaidB = emiB * 84;
         const interestB = Math.max(0, totalEmiPaidB - loanB);
 
-        // Investment 1: Lumpsum 'B' grown for 7 years
-        const fvBuffer = fvLumpsum(B, rInv, 84);
-        const taxOnBuffer = (fvBuffer - B) > 0 ? (fvBuffer - B) * (rTax / 100) : 0;
-        const netBuffer = fvBuffer - taxOnBuffer;
+        // SIP from surplus (assuming budget = emiA)
+        const monthlySurplusB = Math.max(0, emiA - emiB);
+        const fvSipB = fvSIP(monthlySurplusB, rInv, 84);
+        const sipPrincipalB = monthlySurplusB * 84;
+        const netSipB = fvSipB - taxOnGains(fvSipB, sipPrincipalB);
 
-        // Investment 2: SIP from monthly savings (difference between A's EMI and B's EMI)
-        const monthlySurplus = Math.max(0, emiA - emiB);
-        const fvSipVal = fvSIP(monthlySurplus, rInv, 84);
-        const sipPrincipal = monthlySurplus * 84;
-        const taxOnSip = (fvSipVal - sipPrincipal) > 0 ? (fvSipVal - sipPrincipal) * (rTax / 100) : 0;
-        const netSip = fvSipVal - taxOnSip;
+        // Investment from Buffer B
+        const fvBufferB = fvLumpsum(B, rInv, 84);
+        const netBufferB = fvBufferB - taxOnGains(fvBufferB, B);
 
-        const totalInvestmentB = netBuffer + netSip;
+        const totalInvestmentB = netBufferB + netSipB;
         const totalAssetsB = carValue7 + totalInvestmentB;
+        const totalOutgoB = C + totalEmiPaidB + sipPrincipalB + totalFuelHorizon;
+        const netCostB = totalOutgoB - totalAssetsB;
 
-        // Costs: DP + Total EMI + Buffer (invested)
-        // Net Cost = Total Paid - Total Assets
-        const totalCashPaidB = dpB + totalEmiPaidB + B;
-        const netCostB = totalCashPaidB - totalAssetsB;
-
-        // Investment returns for card display
-        const investmentGainsB = totalInvestmentB - B;
-
-        // Update UI - Strategy Cards
+        // Update Strategy B UI
         this.elements.emiB.innerText = formatCurrency(emiB);
         this.elements.interestB.innerText = formatCurrency(interestB);
-        this.elements.sipB_label.innerText = `Save ${formatCurrency(monthlySurplus)}/mo`;
+        this.elements.sipB_label.innerText = `Save ${formatCurrency(monthlySurplusB)}/mo`;
         this.elements.t_emiB.innerText = formatCurrency(emiB);
-        this.elements.t_totalB.innerText = formatCurrency(emiB + monthlyFuel);
-        if (this.elements.invValueB) this.elements.invValueB.innerText = formatCurrency(investmentGainsB);
+        this.elements.t_totalB.innerText = formatCurrency(emiB + monthlySurplusB + monthlyFuel);
+        if (this.elements.invValueB) this.elements.invValueB.innerText = formatCurrency(totalInvestmentB);
 
-        // Update Tables
         if (this.elements.assetInvB) this.elements.assetInvB.innerText = fmt(totalInvestmentB);
         if (this.elements.assetTotalB) this.elements.assetTotalB.innerText = fmt(totalAssetsB);
         if (this.elements.costDpB) this.elements.costDpB.innerText = fmt(dpB);
-        if (this.elements.costEmiPaidB) this.elements.costEmiPaidB.innerText = fmt(totalEmiPaidB);
+        if (this.elements.costEmiPaidB) this.elements.costEmiPaidB.innerText = fmt(totalEmiPaidB + sipPrincipalB);
         if (this.elements.costIntB) this.elements.costIntB.innerText = fmt(interestB);
         if (this.elements.costNetB) this.elements.costNetB.innerText = fmt(netCostB);
 
 
-        // ========= SCENARIO C: LATE BLOOMER =========
-        // Buy car now (same as Strategy A - 5 year loan)
-        // After loan ends (year 5), invest aggressively for years 6-7
-        // Timeline: Months 1-60 = Pay EMI, Months 61-84 = Invest EMI amount as SIP
+        // ========= STRATEGY C: LATE BLOOMER (5 Yr Loan + 2 Yr SIP) =========
         const emiC = emiA;
-        const interestC = interestA;
-
-        // Investment: SIP of emiA for 24 months (years 6-7, AFTER loan ends)
-        // Investment only grows for 24 months since it starts at month 61
-        const fvInvC = fvSIP(emiC, rInv, 24); // 24 months SIP starting after loan
         const sipPrincipalC = emiC * 24;
-        const taxOnInvC = (fvInvC - sipPrincipalC) > 0 ? (fvInvC - sipPrincipalC) * (rTax / 100) : 0;
-        const totalInvestmentC = fvInvC - taxOnInvC;
+        const fvSipC = fvSIP(emiC, rInv, 24);
+        const netSipC = fvSipC - taxOnGains(fvSipC, sipPrincipalC);
 
-        const totalAssetsC = carValue7 + totalInvestmentC;
+        const totalInvestmentC = netSipC;
+        const totalAssetsC = carValue7 + leftoverCashA + totalInvestmentC;
+        const totalOutgoC = C + totalEmiPaidA + sipPrincipalC + totalFuelHorizon;
+        const netCostC = totalOutgoC - totalAssetsC;
 
-        // Costs: Same as A (DP + EMI for 60mo) + Post-loan SIP contributions (24mo)
-        const totalCashPaidC = totalCashPaidA + sipPrincipalC;
-        const netCostC = totalCashPaidC - totalAssetsC;
-
-        const investmentGainsC = totalInvestmentC;
-
-        // Update UI - Strategy Cards
+        // Update Strategy C UI
         this.elements.emiC.innerText = formatCurrency(emiC);
-        this.elements.interestC.innerText = formatCurrency(interestC);
+        this.elements.interestC.innerText = formatCurrency(interestA);
         this.elements.t_emiC.innerText = formatCurrency(emiC);
         this.elements.t_totalC.innerText = formatCurrency(emiC + monthlyFuel);
-        if (this.elements.invValueC) this.elements.invValueC.innerText = formatCurrency(investmentGainsC);
+        if (this.elements.invValueC) this.elements.invValueC.innerText = formatCurrency(totalInvestmentC);
 
-        // Update Tables
         if (this.elements.assetInvC) this.elements.assetInvC.innerText = fmt(totalInvestmentC);
         if (this.elements.assetTotalC) this.elements.assetTotalC.innerText = fmt(totalAssetsC);
-        if (this.elements.costDpC) this.elements.costDpC.innerText = fmt(effectiveDpA); // Same DP as A
+        if (this.elements.costDpC) this.elements.costDpC.innerText = fmt(dpA);
         if (this.elements.costEmiPaidC) this.elements.costEmiPaidC.innerText = fmt(totalEmiPaidA + sipPrincipalC);
         if (this.elements.costIntC) this.elements.costIntC.innerText = fmt(interestA);
         if (this.elements.costNetC) this.elements.costNetC.innerText = fmt(netCostC);
 
 
-        // ========= COMMON UPDATES =========
-        // Fuel values - always show (₹0 if disabled)
+        // ========= COMMON UI UPDATES =========
         this.elements.fuelVals.forEach(el => el.innerText = formatCurrency(monthlyFuel));
         this.elements.resaleVals.forEach(el => el.innerText = formatCurrency(carValue7));
 
-        // Inflation section
         const inflationRate = 0.06;
         const purchasingPower = C / Math.pow(1 + inflationRate, 7);
         this.elements.inf_cash.innerText = formatCurrency(C);
         this.elements.inf_value.innerText = formatCurrency(purchasingPower);
 
-        // ========= COMPARISON CALLOUT =========
-        // Smart Investor vs Debt Hater
+        // Comparison Callout
         const savingsVsA = totalAssetsB - totalAssetsA;
         if (this.elements.savingsVsA) {
             this.elements.savingsVsA.innerText = formatCurrency(Math.abs(savingsVsA));
@@ -378,7 +352,6 @@ export class App {
             }
         }
 
-        // Smart Investor vs Late Bloomer
         const savingsVsC = totalAssetsB - totalAssetsC;
         if (this.elements.savingsVsC) {
             this.elements.savingsVsC.innerText = formatCurrency(Math.abs(savingsVsC));
@@ -388,63 +361,32 @@ export class App {
         }
 
         // ========= NET WORTH CHART DATA =========
-        // Calculate year-by-year net worth for all strategies
         const calculateYearlyNetWorth = (strategy) => {
             const netWorth = [];
+            netWorth.push(C); // Year 0: Net Worth is always starting cash
 
-            if (strategy === 'A') {
-                // Debt Hater: No investments, just car depreciation
-                // Year 0: Just bought the car
-                netWorth.push(P);
-
-                for (let year = 1; year <= 7; year++) {
-                    const carValue = P * Math.pow(1 - depRate / 100, year);
-                    netWorth.push(carValue);
-                }
-            } else if (strategy === 'B') {
-                // Smart Investor: Lumpsum + SIP for 7 years + car depreciation
-                // Year 0: Car + Buffer investment
-                netWorth.push(P + B);
-
-                for (let year = 1; year <= 7; year++) {
-                    const carValue = P * Math.pow(1 - depRate / 100, year);
-
-                    // Lumpsum growth
-                    const lumpsum = fvLumpsum(B, rInv, year * 12);
-                    const lumpsumGains = Math.max(0, lumpsum - B);
-                    const taxOnLumpsum = lumpsumGains * (rTax / 100);
-                    const netLumpsum = lumpsum - taxOnLumpsum;
-
-                    // SIP growth
-                    const sipValue = fvSIP(monthlySurplus, rInv, year * 12);
-                    const sipPrincipal = monthlySurplus * year * 12;
-                    const sipGains = Math.max(0, sipValue - sipPrincipal);
-                    const taxOnSip = sipGains * (rTax / 100);
-                    const netSip = sipValue - taxOnSip;
-
-                    netWorth.push(carValue + netLumpsum + netSip);
-                }
-            } else if (strategy === 'C') {
-                // Late Bloomer: SIP only in years 6-7
-                // Year 0: Just bought the car (same as A)
-                netWorth.push(P);
-
-                for (let year = 1; year <= 7; year++) {
-                    const carValue = P * Math.pow(1 - depRate / 100, year);
-                    if (year <= 5) {
-                        netWorth.push(carValue);
-                    } else {
-                        const sipMonths = (year - 5) * 12;
-                        const sipValue = fvSIP(emiC, rInv, sipMonths);
-                        const sipPrincipal = emiC * sipMonths;
-                        const sipGains = Math.max(0, sipValue - sipPrincipal);
-                        const taxOnSip = sipGains * (rTax / 100);
-                        const netInvestment = sipValue - taxOnSip;
-                        netWorth.push(carValue + netInvestment);
+            for (let year = 1; year <= 7; year++) {
+                const months = year * 12;
+                const carVal = carValueAt(year);
+                
+                if (strategy === 'A') {
+                    const loanBal = calculateLoanBalance(loanA, rLoan, 60, months);
+                    netWorth.push(carVal + leftoverCashA - loanBal);
+                } else if (strategy === 'B') {
+                    const loanBal = calculateLoanBalance(loanB, rLoan, 84, months);
+                    const inv = fvLumpsum(B, rInv, months) + fvSIP(monthlySurplusB, rInv, months);
+                    const netInv = inv - taxOnGains(inv, B + monthlySurplusB * months);
+                    netWorth.push(carVal + netInv - loanBal);
+                } else if (strategy === 'C') {
+                    const loanBal = calculateLoanBalance(loanA, rLoan, 60, months);
+                    let netInv = 0;
+                    if (months > 60) {
+                        const sipVal = fvSIP(emiC, rInv, months - 60);
+                        netInv = sipVal - taxOnGains(sipVal, emiC * (months - 60));
                     }
+                    netWorth.push(carVal + leftoverCashA + netInv - loanBal);
                 }
             }
-
             return netWorth;
         };
 
@@ -454,10 +396,10 @@ export class App {
             strategyC: calculateYearlyNetWorth('C')
         };
 
-        // Render chart if initialized
         if (this.chart) {
             this.chart.render(chartData);
         }
     }
+
 }
 App.math = math;

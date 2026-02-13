@@ -58,6 +58,22 @@ export const formatCurrency = (num) => new Intl.NumberFormat('en-IN', {
 }).format(num);
 
 /**
+ * Calculates the remaining loan balance.
+ * @param {number} p - Principal
+ * @param {number} r - Annual interest rate (%)
+ * @param {number} n - Total tenure in months
+ * @param {number} m - Months passed
+ * @returns {number}
+ */
+export const calculateLoanBalance = (p, r, n, m) => {
+    if (m <= 0) return p;
+    if (m >= n) return 0;
+    const i = r / 1200;
+    if (i === 0) return p * (1 - m / n);
+    return p * (Math.pow(1 + i, n) - Math.pow(1 + i, m)) / (Math.pow(1 + i, n) - 1);
+};
+
+/**
  * Calculates Equated Monthly Installment (EMI).
  * @param {number} p - Principal
  * @param {number} r - Annual interest rate (%)
