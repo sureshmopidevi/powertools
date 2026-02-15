@@ -60,7 +60,7 @@
             inset: 0;
             pointer-events: none;
             z-index: 1;
-            opacity: 0.7;
+            opacity: 0.3;
         }
 
         .code-syntax {
@@ -82,7 +82,7 @@
             bottom: 0;
             left: 2rem;
             width: 2px;
-            background: rgba(13, 166, 242, 0.2);
+            background: rgba(13,166,242, 0.2);
             z-index: 0;
         }
 
@@ -99,7 +99,7 @@
     class="bg-background-light dark:bg-background-dark text-slate-800 dark:text-slate-200 font-display min-h-screen selection:bg-primary/30 transition-colors duration-300">
     <canvas id="particleCanvas" aria-hidden="true"></canvas>
     <a href="../../index.html"
-        class="absolute top-6 left-6 z-50 inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-primary hover:border-primary/30 transition-all text-xs font-semibold no-underline">
+        class="absolute top-6 left-6 z-50 inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/95 dark:bg-slate-800/92 backdrop-blur-sm border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-primary hover:border-primary/30 transition-all text-xs font-semibold no-underline">
         <i class="fa-solid fa-arrow-left"></i>Home
     </a>
 
@@ -118,9 +118,10 @@
                     Updated for iOS 17
                 </div>
 
-                <h1
-                    class="text-4xl md:text-6xl font-bold mb-6 tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-slate-500 dark:from-white dark:to-slate-400">
-                    Build an iPhone <br />Spam Link Detector
+                <h1 class="text-4xl md:text-6xl font-bold mb-6 tracking-tight text-slate-900 dark:text-white">
+                    Build an iPhone
+                    <br />
+                    <span class="text-red-600 dark:text-red-400">Spam</span> Link Detector
                 </h1>
 
                 <p class="text-lg text-slate-500 dark:text-slate-400 mb-10 max-w-2xl mx-auto leading-relaxed">
@@ -130,16 +131,16 @@
 
                 <div class="grid md:grid-cols-2 gap-6 text-left max-w-3xl mx-auto">
                     <div
-                        class="bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm border border-slate-200 dark:border-slate-700/50 rounded-xl p-6 hover:border-primary/30 transition-colors shadow-sm">
+                        class="bg-white dark:bg-slate-900 border border-primary/20 dark:border-primary/25 rounded-xl p-6 hover:border-primary/40 transition-colors shadow-sm">
                         <div class="flex items-center gap-3 mb-4">
                             <span class="material-icons text-primary">bolt</span>
                             <h3 class="font-semibold text-lg text-slate-900 dark:text-white">Quick Start Summary</h3>
                         </div>
-                        <p class="text-slate-500 dark:text-slate-400 text-sm mb-4">
+                        <p class="text-slate-700 dark:text-slate-200 text-sm mb-4">
                             This automation runs locally on your device. It triggers when clipboard content changes,
                             checks against a regex pattern, and alerts you.
                         </p>
-                        <div class="flex gap-4 text-xs font-mono text-slate-500">
+                        <div class="flex gap-4 text-xs font-mono text-slate-700 dark:text-slate-300">
                             <span class="flex items-center gap-1"><span
                                     class="material-icons text-[14px]">schedule</span> 5 mins</span>
                             <span class="flex items-center gap-1"><span
@@ -148,23 +149,23 @@
                     </div>
 
                     <div
-                        class="bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm border border-slate-200 dark:border-slate-700/50 rounded-xl p-6 hover:border-primary/30 transition-colors shadow-sm">
+                        class="bg-white dark:bg-slate-900 border border-primary/20 dark:border-primary/25 rounded-xl p-6 hover:border-primary/40 transition-colors shadow-sm">
                         <div class="flex items-center gap-3 mb-4">
                             <span class="material-icons text-primary">checklist</span>
                             <h3 class="font-semibold text-lg text-slate-900 dark:text-white">Prerequisites</h3>
                         </div>
                         <ul class="space-y-3">
-                            <li class="flex items-center gap-3 text-sm text-slate-600 dark:text-slate-300">
+                            <li class="flex items-center gap-3 text-sm text-slate-700 dark:text-slate-200">
                                 <span class="bg-primary/20 text-primary rounded-full p-0.5"><span
                                         class="material-icons text-sm font-bold">check</span></span>
                                 iPhone running iOS 15 or later
                             </li>
-                            <li class="flex items-center gap-3 text-sm text-slate-600 dark:text-slate-300">
+                            <li class="flex items-center gap-3 text-sm text-slate-700 dark:text-slate-200">
                                 <span class="bg-primary/20 text-primary rounded-full p-0.5"><span
                                         class="material-icons text-sm font-bold">check</span></span>
                                 Shortcuts App (Pre-installed)
                             </li>
-                            <li class="flex items-center gap-3 text-sm text-slate-600 dark:text-slate-300">
+                            <li class="flex items-center gap-3 text-sm text-slate-700 dark:text-slate-200">
                                 <span class="bg-primary/20 text-primary rounded-full p-0.5"><span
                                         class="material-icons text-sm font-bold">check</span></span>
                                 No coding experience required
@@ -212,7 +213,7 @@
                         </p>
 
                         <div
-                            class="bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50 rounded-lg p-5 mb-6 shadow-sm">
+                            class="bg-white dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700/50 rounded-lg p-5 mb-6 shadow-sm">
                             <h4 class="text-sm font-semibold text-primary uppercase tracking-wider mb-3">Action Steps
                             </h4>
                             <ul class="space-y-3">
@@ -254,7 +255,7 @@
                         </p>
 
                         <div
-                            class="bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50 rounded-lg p-5 mb-6 shadow-sm">
+                            class="bg-white dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700/50 rounded-lg p-5 mb-6 shadow-sm">
                             <h4 class="text-sm font-semibold text-primary uppercase tracking-wider mb-3">Action Steps
                             </h4>
                             <ul class="space-y-3">
@@ -332,7 +333,7 @@
                         </p>
 
                         <div
-                            class="bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50 rounded-lg p-5 mb-6 shadow-sm">
+                            class="bg-white dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700/50 rounded-lg p-5 mb-6 shadow-sm">
                             <h4 class="text-sm font-semibold text-primary uppercase tracking-wider mb-3">Action Steps
                             </h4>
                             <ul class="space-y-3">
@@ -401,7 +402,7 @@
                         </p>
 
                         <div
-                            class="bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50 rounded-lg p-5 shadow-sm">
+                            class="bg-white dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700/50 rounded-lg p-5 shadow-sm">
                             <h4 class="text-sm font-semibold text-primary uppercase tracking-wider mb-3">Action Steps
                             </h4>
                             <ul class="space-y-3">
@@ -480,7 +481,7 @@
                         </p>
 
                         <div
-                            class="bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50 rounded-lg p-5 mb-6 shadow-sm">
+                            class="bg-white dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700/50 rounded-lg p-5 mb-6 shadow-sm">
                             <h4 class="text-sm font-semibold text-primary uppercase tracking-wider mb-3">Action Steps
                             </h4>
                             <ul class="space-y-3">
@@ -529,54 +530,54 @@ End If</pre>
             </div>
 
             <div
-                class="mt-20 bg-white/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 rounded-2xl p-6 md:p-8 shadow-sm">
+                class="mt-20 bg-white dark:bg-slate-900 border border-primary/20 dark:border-primary/25 rounded-2xl p-6 md:p-8 shadow-sm">
                 <div class="flex items-center gap-3 mb-6">
                     <span class="material-icons text-primary">task_alt</span>
                     <h3 class="text-2xl font-bold text-slate-900 dark:text-white">Final Setup Check (Visual)</h3>
                 </div>
-                <p class="text-sm text-slate-500 dark:text-slate-400 mb-6">
+                <p class="text-sm text-slate-700 dark:text-slate-300 mb-6">
                     Use this quick check to confirm the ending logic is complete and the automation is ready.
                 </p>
                 <div class="grid md:grid-cols-2 gap-6 mb-6">
                     <div
-                        class="rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/30">
+                        class="rounded-xl overflow-hidden border border-primary/20 dark:border-primary/25 bg-slate-50 dark:bg-slate-800">
                         <img src="./assets/step_4.PNG" alt="Match action configuration preview"
                             class="w-full h-72 object-cover object-top" />
                         <div class="p-4">
                             <p class="text-sm font-semibold text-slate-900 dark:text-white">1. Match Action Added</p>
-                            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Regex is pasted and linked to
+                            <p class="text-xs text-slate-600 dark:text-slate-300 mt-1">Regex is pasted and linked to
                                 message input.</p>
                         </div>
                     </div>
                     <div
-                        class="rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/30">
+                        class="rounded-xl overflow-hidden border border-primary/20 dark:border-primary/25 bg-slate-50 dark:bg-slate-800">
                         <img src="./assets/step_5.PNG" alt="If, Otherwise and End If action configuration preview"
                             class="w-full h-72 object-cover object-top" />
                         <div class="p-4">
                             <p class="text-sm font-semibold text-slate-900 dark:text-white">2. If/Otherwise/End If
                                 Complete</p>
-                            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Show Alert exists only inside
+                            <p class="text-xs text-slate-600 dark:text-slate-300 mt-1">Show Alert exists only inside
                                 the If block.</p>
                         </div>
                     </div>
                 </div>
                 <div class="grid md:grid-cols-3 gap-4 text-xs">
                     <div
-                        class="p-4 rounded-lg border border-emerald-200 bg-emerald-50 dark:bg-emerald-500/10 dark:border-emerald-500/30">
-                        <p class="font-semibold text-emerald-700 dark:text-emerald-300 mb-1">Test Suspicious</p>
-                        <p class="text-emerald-700/80 dark:text-emerald-200/80"><code
+                        class="p-4 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
+                        <p class="font-semibold text-red-600 dark:text-red-400 mb-1">Test Suspicious</p>
+                        <p class="text-slate-700 dark:text-slate-200"><code
                                 class="font-mono">https://secure-login-update.top/verify</code> should show alert.</p>
                     </div>
                     <div
-                        class="p-4 rounded-lg border border-blue-200 bg-blue-50 dark:bg-blue-500/10 dark:border-blue-500/30">
-                        <p class="font-semibold text-blue-700 dark:text-blue-300 mb-1">Test Normal</p>
-                        <p class="text-blue-700/80 dark:text-blue-200/80"><code
+                        class="p-4 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
+                        <p class="font-semibold text-primary mb-1">Test Normal</p>
+                        <p class="text-slate-700 dark:text-slate-200"><code
                                 class="font-mono">https://www.apple.com</code> should not show alert.</p>
                     </div>
                     <div
-                        class="p-4 rounded-lg border border-amber-200 bg-amber-50 dark:bg-amber-500/10 dark:border-amber-500/30">
-                        <p class="font-semibold text-amber-700 dark:text-amber-300 mb-1">Trigger Setting</p>
-                        <p class="text-amber-700/80 dark:text-amber-200/80">Keep "Run Immediately" enabled for instant blocking.</p>
+                        class="p-4 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
+                        <p class="font-semibold text-primary mb-1">Trigger Setting</p>
+                        <p class="text-slate-700 dark:text-slate-200">Keep "Run Immediately" enabled for instant blocking.</p>
                     </div>
                 </div>
             </div>
@@ -584,7 +585,7 @@ End If</pre>
     </main>
 
     <footer
-        class="relative z-10 py-8 text-center border-t border-slate-200 dark:border-slate-800 mt-12 bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm">
+        class="relative z-10 py-8 text-center border-t border-slate-200 dark:border-slate-800 mt-12 bg-white/95 dark:bg-slate-900/92 backdrop-blur-sm">
         <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">
             &copy; 2026 Powertools. All rights reserved.
         </p>
@@ -635,18 +636,18 @@ End If</pre>
 
             const reduceMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
             const safeLinks = [
-                'https://www.apple.com',
-                'https://www.openai.com',
-                'https://www.icloud.com',
-                'https://support.apple.com',
-                'https://www.github.com'
+                { url: 'https://www.apple.com', tag: 'TRUSTED' },
+                { url: 'https://support.apple.com', tag: 'TRUSTED' },
+                { url: 'https://www.icloud.com', tag: 'TRUSTED' },
+                { url: 'https://www.github.com', tag: 'TRUSTED' },
+                { url: 'https://www.openai.com', tag: 'TRUSTED' }
             ];
             const riskyLinks = [
-                'http://185.44.10.22/login',
-                'https://bit.ly/win-reward',
-                'https://secure-update.top/verify',
-                'https://claim-bonus-link.xyz/pay',
-                'https://xn--pple-43d.com/icloud'
+                { url: 'http://185.44.10.22/login', tag: 'IP HOST' },
+                { url: 'https://bit.ly/win-reward', tag: 'SHORTENER' },
+                { url: 'https://secure-update.top/verify', tag: 'RISKY TLD' },
+                { url: 'https://claim-bonus-link.xyz/pay', tag: 'KEYWORD' },
+                { url: 'https://xn--pple-43d.com/icloud', tag: 'PUNYCODE' }
             ];
 
             const packets = [];
@@ -722,13 +723,15 @@ End If</pre>
 
             function createPacket(seedX) {
                 const risky = Math.random() < 0.35;
+                const sample = randomLink(risky);
                 return {
                     x: typeof seedX === 'number' ? seedX : Math.random() * width,
                     y: 50 + Math.random() * Math.max(80, height - 120),
                     speed: 0.22 + Math.random() * 0.3,
                     bobOffset: Math.random() * Math.PI * 2,
                     bobAmplitude: 1.2 + Math.random() * 2.2,
-                    label: randomLink(risky),
+                    label: sample.url,
+                    badge: sample.tag,
                     risky,
                     pulseCooldown: 0
                 };
@@ -741,7 +744,9 @@ End If</pre>
                 packet.bobOffset = Math.random() * Math.PI * 2;
                 packet.bobAmplitude = 1.2 + Math.random() * 2.2;
                 packet.risky = Math.random() < 0.35;
-                packet.label = randomLink(packet.risky);
+                const sample = randomLink(packet.risky);
+                packet.label = sample.url;
+                packet.badge = sample.tag;
                 packet.pulseCooldown = 0;
             }
 
@@ -788,6 +793,18 @@ End If</pre>
                 context.stroke();
             }
 
+            function fitLabel(text, maxWidth) {
+                if (context.measureText(text).width <= maxWidth) {
+                    return text;
+                }
+
+                let shortened = text;
+                while (shortened.length > 5 && context.measureText(shortened + '...').width > maxWidth) {
+                    shortened = shortened.slice(0, -1);
+                }
+                return shortened + '...';
+            }
+
             function drawPacket(packet, time, colors) {
                 if (!prefersReducedMotion()) {
                     packet.x += packet.speed;
@@ -804,7 +821,11 @@ End If</pre>
                 const textPaddingY = 7;
                 context.font = '12px "Plus Jakarta Sans", sans-serif';
                 const measured = context.measureText(packet.label);
-                const boxWidth = Math.min(290, measured.width + textPaddingX * 2 + (packet.risky ? 20 : 0));
+                context.font = '10px "Plus Jakarta Sans", sans-serif';
+                const badgeText = packet.risky ? packet.badge : 'SAFE';
+                const badgeWidth = context.measureText(badgeText).width + 12;
+                context.font = '12px "Plus Jakarta Sans", sans-serif';
+                const boxWidth = Math.min(330, measured.width + textPaddingX * 2 + badgeWidth + 12);
                 const boxHeight = 28;
                 const bob = Math.sin(time * 0.0012 + packet.bobOffset) * packet.bobAmplitude;
                 const y = packet.y + (prefersReducedMotion() ? 0 : bob);
@@ -824,8 +845,20 @@ End If</pre>
                 context.lineWidth = 1;
                 context.stroke();
 
+                const textSpace = Math.max(80, boxWidth - badgeWidth - 30);
+                const labelToDraw = fitLabel(packet.label, textSpace);
                 context.fillStyle = colors.text;
-                context.fillText(packet.label, packet.x + textPaddingX, y + textPaddingY + 9);
+                context.fillText(labelToDraw, packet.x + textPaddingX, y + textPaddingY + 9);
+
+                const badgeX = packet.x + boxWidth - badgeWidth - 8;
+                const badgeY = y + 6;
+                roundedRect(badgeX, badgeY, badgeWidth, 16, 6);
+                context.fillStyle = packet.risky ? 'rgba(244,63,94,0.75)' : 'rgba(13,166,242,0.7)';
+                context.fill();
+                context.font = '10px "Plus Jakarta Sans", sans-serif';
+                context.fillStyle = 'rgba(255,255,255,0.95)';
+                context.fillText(badgeText, badgeX + 6, badgeY + 11);
+                context.font = '12px "Plus Jakarta Sans", sans-serif';
 
                 if (packet.risky) {
                     const markerX = packet.x + boxWidth - 12;
