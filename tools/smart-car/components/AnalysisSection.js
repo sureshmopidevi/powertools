@@ -6,13 +6,13 @@ export const AnalysisSection = () => `
         </div>
 
         <!-- Monthly Cash Flow Table -->
-        <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden shadow-sm">
+        <div class="premium-table-container uppercase-header">
             <div class="bg-slate-50 dark:bg-slate-850 px-6 py-4 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center">
                 <h3 class="font-bold text-slate-700 dark:text-slate-200 text-sm uppercase tracking-wide">Monthly Cash Flow</h3>
                 <span class="text-xs text-slate-500 dark:text-slate-400 font-medium" id="fuelNote">*Includes estimated fuel costs</span>
             </div>
             <div class="overflow-x-auto">
-                <table class="w-full analysis-table">
+                <table class="w-full premium-table">
                     <thead>
                         <tr>
                             <th class="text-left">Strategy</th>
@@ -46,7 +46,7 @@ export const AnalysisSection = () => `
         </div>
 
         <!-- Asset Growth Table (Full Width) -->
-        <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden shadow-sm">
+        <div class="premium-table-container uppercase-header">
             <div class="bg-slate-50 dark:bg-slate-850 px-6 py-4 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center">
                 <h3 class="font-bold text-slate-700 dark:text-slate-200 text-sm uppercase tracking-wide flex items-center gap-2">
                     <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
@@ -55,7 +55,7 @@ export const AnalysisSection = () => `
                 <span class="text-xs text-emerald-600 dark:text-emerald-400 font-medium">@ <span id="invRateDisplay">15</span>% p.a. returns</span>
             </div>
             <div class="overflow-x-auto">
-                <table class="w-full analysis-table">
+                <table class="w-full premium-table">
                     <thead>
                         <tr>
                             <th class="text-left">Strategy</th>
@@ -89,7 +89,7 @@ export const AnalysisSection = () => `
         </div>
 
         <!-- Effective Cost Table (Full Width) -->
-        <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden shadow-sm">
+        <div class="premium-table-container uppercase-header">
             <div class="bg-slate-50 dark:bg-slate-850 px-6 py-4 border-b border-slate-200 dark:border-slate-700">
                 <h3 class="font-bold text-slate-700 dark:text-slate-200 text-sm uppercase tracking-wide flex items-center gap-2">
                     <svg class="w-4 h-4 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
@@ -97,7 +97,7 @@ export const AnalysisSection = () => `
                 </h3>
             </div>
             <div class="overflow-x-auto">
-                <table class="w-full analysis-table">
+                <table class="w-full premium-table">
                     <thead>
                         <tr>
                             <th class="text-left">Strategy</th>

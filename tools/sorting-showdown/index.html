@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sorting Algorithm Showdown | Powertools</title>
+
+    <script>
+        // Enforce trailing slash for directory URLs to ensure relative paths work.
+        if (!window.location.pathname.endsWith('/') && !window.location.pathname.endsWith('.html')) {
+            window.location.replace(window.location.pathname + '/' + window.location.search);
+        }
+
+        // Apply theme immediately to avoid FOUC.
+        (function () {
+            const savedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+            if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+                document.documentElement.classList.add('dark');
+                document.documentElement.classList.remove('light');
+            } else {
+                document.documentElement.classList.remove('dark');
+                document.documentElement.classList.add('light');
+            }
+        })();
+    </script>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        platinum: {
+                            500: '#a8b1bd',
+                            400: '#c2cad4'
+                        }
+                    }
+                }
+            }
+        };
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    <style>
+        .bars {
+            display: flex;
+            align-items: flex-end;
+            gap: 2px;
+            width: 100%;
+            height: 100%;
+        }
+
+        .bar {
+            flex: 1 1 auto;
+            border-radius: 6px 6px 0 0;
+            background: linear-gradient(180deg, #60a5fa 0%, #3b82f6 100%);
+            transition: height 120ms ease;
+        }
+
+        .bar.active {
+            background: linear-gradient(180deg, #fb7185 0%, #f43f5e 100%);
+        }
+
+        .bar.pivot {
+            background: linear-gradient(180deg, #fcd34d 0%, #f59e0b 100%);
+        }
+
+        .bar.sorted {
+            background: linear-gradient(180deg, #4ade80 0%, #22c55e 100%);
+        }
+    </style>
+</head>
+
+<body class="font-sans bg-slate-50 dark:bg-slate-950 text-slate-700 dark:text-slate-200 min-h-screen transition-colors">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+        <a href="../../index.html"
+            class="inline-flex items-center gap-2 px-3 py-1.5 mb-6 rounded-lg bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:text-violet-600 dark:hover:text-violet-400 hover:border-violet-300 dark:hover:border-violet-600 transition-all text-xs font-semibold no-underline w-fit">
+            <i class="fa-solid fa-arrow-left"></i>Home
+        </a>
+
+        <header class="mb-10">
+            <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+                Sorting Algorithm Showdown
+            </h1>
+            <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">
+                Compare Bubble, Quick, and Merge Sort with live bar animations.
+            </p>
+        </header>
+
+        <section
+            class="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 overflow-hidden shadow-sm">
+            <div
+                class="bg-slate-50 dark:bg-slate-900/50 px-6 py-4 border-b border-slate-200 dark:border-slate-700 flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
+                <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full lg:w-auto">
+                    <label class="text-xs font-semibold text-slate-500 dark:text-slate-400">
+                        Algorithm
+                        <select id="algorithmSelect"
+                            class="mt-1 w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-sm">
+                            <option value="quick">Quick Sort</option>
+                            <option value="merge">Merge Sort</option>
+                            <option value="bubble">Bubble Sort</option>
+                        </select>
+                    </label>
+                    <label class="text-xs font-semibold text-slate-500 dark:text-slate-400">
+                        Array Size
+                        <input id="sizeInput" type="range" min="10" max="100" value="50"
+                            class="mt-2 w-full accent-blue-500">
+                    </label>
+                    <label class="text-xs font-semibold text-slate-500 dark:text-slate-400">
+                        Speed
+                        <input id="speedInput" type="range" min="1" max="100" value="60"
+                            class="mt-2 w-full accent-rose-500">
+                    </label>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                    <button id="raceBtn"
+                        class="px-4 py-2 rounded-xl text-sm font-semibold border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
+                        Race Mode
+                    </button>
+                    <button id="resetBtn"
+                        class="px-4 py-2 rounded-xl text-sm font-semibold border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
+                        Generate New
+                    </button>
+                    <button id="startBtn"
+                        class="px-4 py-2 rounded-xl text-sm font-semibold text-white bg-blue-600 hover:bg-blue-500 transition-colors">
+                        Start Sorting
+                    </button>
+                </div>
+            </div>
+
+            <div class="p-4 sm:p-6">
+                <div id="singleView" class="space-y-4">
+                    <p id="currentAlgoLabel"
+                        class="text-[11px] uppercase tracking-[0.18em] font-bold text-platinum-500 dark:text-platinum-400">
+                        Quick Sort
+                    </p>
+                    <div class="h-[420px] sm:h-[460px] bg-slate-100 dark:bg-slate-900 rounded-2xl p-3">
+                        <div id="barsMain" class="bars"></div>
+                    </div>
+                </div>
+
+                <div id="raceView" class="hidden space-y-4">
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div class="rounded-2xl bg-slate-100 dark:bg-slate-900 p-3">
+                            <p class="text-xs font-bold text-blue-600 dark:text-blue-400 mb-2">Quick Sort O(n log n)</p>
+                            <div id="barsRaceA" class="bars h-[360px] sm:h-[420px]"></div>
+                        </div>
+                        <div class="rounded-2xl bg-slate-100 dark:bg-slate-900 p-3">
+                            <p class="text-xs font-bold text-rose-600 dark:text-rose-400 mb-2">Bubble Sort O(n²)</p>
+                            <div id="barsRaceB" class="bars h-[360px] sm:h-[420px]"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script type="module" src="./main.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,149 @@
+/* Global Theme Tokens & Utilities - "Nebula" System */
+:root {
+    --font-display: 'Plus Jakarta Sans', sans-serif;
+    --font-content: 'Inter', sans-serif;
+
+    /* Semantic Palette */
+    --color-gold: #eab308;
+    --color-emerald: #10b981;
+    --color-rose: #f43f5e;
+    --color-slate-500: #64748b;
+    --color-slate-900: #0f172a;
+}
+
+@layer base {
+    body {
+        @apply bg-slate-50 text-slate-900 dark:bg-[#0B0E14] dark:text-white antialiased font-content selection:bg-gold-500/30;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        @apply font-display tracking-tight text-slate-900 dark:text-white;
+    }
+}
+
+/* Nebula Components */
+
+.nebula-card {
+    @apply bg-white dark:bg-[#151921]/80 backdrop-blur-sm rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm dark:shadow-none transition-all duration-300;
+}
+
+.nebula-card:hover {
+    @apply shadow-md dark:shadow-white/5 dark:border-white/10 -translate-y-[1px];
+}
+
+/* Nebula Buttons */
+.nebula-btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl text-sm font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed;
+}
+
+.nebula-btn-primary {
+    @apply bg-slate-900 text-white hover:bg-slate-800 dark:bg-white dark:text-slate-900 hover:shadow-lg focus:ring-slate-900 dark:focus:ring-white px-5 py-2.5 shadow-sm;
+}
+
+.nebula-btn-secondary {
+    @apply bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200 focus:ring-slate-200 dark:focus:ring-slate-700 px-4 py-2 hover:shadow-sm;
+}
+
+.nebula-btn-ghost {
+    @apply text-slate-500 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 focus:ring-slate-200 dark:focus:ring-slate-800 px-3 py-2;
+}
+
+.nebula-btn-destructive {
+    @apply bg-rose-50 text-rose-600 hover:bg-rose-100 dark:bg-rose-900/20 dark:text-rose-400 focus:ring-rose-500 px-4 py-2;
+}
+
+/* Nebula Badges */
+.nebula-badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium;
+}
+
+.nebula-badge-neutral {
+    @apply bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300;
+}
+
+.nebula-badge-success {
+    @apply bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400;
+}
+
+.nebula-badge-warning {
+    @apply bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400;
+}
+
+
+/* Sidebar Utilities */
+.nav-link {
+    @apply flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-white transition-all cursor-pointer;
+}
+
+.nav-link.active {
+    @apply bg-white dark:bg-white/5 text-slate-900 dark:text-white shadow-sm dark:shadow-none font-semibold;
+}
+
+.nav-link.active i {
+    @apply text-gold-500;
+}
+
+/* Table Architecture */
+.nebula-table-container {
+    @apply rounded-2xl border border-slate-200 dark:border-white/5 overflow-hidden bg-white dark:bg-[#151921];
+}
+
+.nebula-table {
+    @apply w-full text-left border-collapse;
+}
+
+.nebula-table thead {
+    @apply bg-slate-50/50 dark:bg-white/5 border-b border-slate-100 dark:border-white/5;
+}
+
+.nebula-table th {
+    @apply px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500;
+}
+
+.nebula-table td {
+    @apply px-6 py-4 text-sm font-medium text-slate-700 dark:text-slate-300 border-b border-slate-100 dark:border-white/5 last:border-0 group-hover:bg-slate-50/50 dark:group-hover:bg-white/5 transition-colors;
+}
+
+.nebula-table tr {
+    @apply group transition-colors;
+}
+
+/* Inputs & Forms */
+.nebula-input {
+    @apply w-full bg-white dark:bg-[#0B0E14] border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-sm outline-none focus:border-gold-500 focus:ring-1 focus:ring-gold-500/20 text-slate-900 dark:text-white transition-all placeholder:text-slate-400 font-medium;
+}
+
+.nebula-label {
+    @apply block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5;
+}
+
+/* Typography Utilities */
+.text-label {
+    @apply text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-2 block;
+}
+
+.text-metric {
+    @apply text-3xl font-bold tracking-tight text-slate-900 dark:text-white tabular-nums;
+}
+
+/* Animation */
+.animate-enter {
+    animation: enter 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes enter {
+    0% {
+        opacity: 0;
+        transform: translateY(8px) scale(0.98);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}

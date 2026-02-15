@@ -1,429 +1,677 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Play, RotateCcw, Crosshair, Terminal, Zap, Settings2, BarChart3, X } from 'lucide-react';
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sorting Algorithm Showdown</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap');
 
-// --- Utility Functions ---
-const generateSortedArray = (size) => {
-  const arr = new Set();
-  const maxVal = size * 5; // Ensure spread
-  while (arr.size < size) {
-    arr.add(Math.floor(Math.random() * maxVal) + 10);
-  }
-  return Array.from(arr).sort((a, b) => a - b);
-};
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a;
+            color: #e2e8f0;
+            overflow: hidden;
+        }
 
-const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+        /* 3D Bar Effect */
+        .bar-container {
+            perspective: 1000px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            height: 100%;
+            width: 100%;
+            padding: 0 20px;
+            gap: 2px;
+        }
 
-export default function App() {
-  // --- Configuration State ---
-  const [arraySize, setArraySize] = useState(15);
-  const [speedMultiplier, setSpeedMultiplier] = useState(1);
-  const speedRef = useRef(800); // Default base speed: 800ms
-  
-  // --- Core State Management ---
-  const [array, setArray] = useState([]);
-  const [target, setTarget] = useState('');
-  const [isSearching, setIsSearching] = useState(false);
-  const [showMetrics, setShowMetrics] = useState(false);
+        .bar {
+            position: relative;
+            transform-style: preserve-3d;
+            transition: height 0.1s ease;
+            /* Base color - Blue/Purple gradient */
+            background: linear-gradient(to top, #3b82f6, #6366f1);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+            border-radius: 4px 4px 0 0;
+            opacity: 0.9;
+        }
 
-  const [linearState, setLinearState] = useState({
-    currentIndex: null, foundIndex: null, steps: 0, status: 'idle', log: 'READY.'
-  });
+        /* Side face for 3D effect */
+        .bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: -4px;
+            width: 4px;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            transform: skewY(-45deg);
+            transform-origin: left;
+            border-radius: 0 2px 0 0;
+        }
 
-  const [binaryState, setBinaryState] = useState({
-    left: null, right: null, mid: null, foundIndex: null, steps: 0, status: 'idle', log: 'READY.'
-  });
+        /* Top face for 3D effect */
+        .bar::before {
+            content: '';
+            position: absolute;
+            top: -4px;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.3);
+            transform: skewX(-45deg);
+            transform-origin: bottom;
+            border-radius: 2px 2px 0 0;
+        }
 
-  const searchIdRef = useRef(0);
+        .bar.active {
+            background: linear-gradient(to top, #ef4444, #f87171) !important; /* Red */
+        }
 
-  // --- Initialization & Hooks ---
-  useEffect(() => {
-    handleResetArray();
-  }, [arraySize]);
+        .bar.pivot {
+            background: linear-gradient(to top, #eab308, #facc15) !important; /* Yellow */
+        }
 
-  useEffect(() => {
-    // Update the ref so in-flight loops instantly adopt the new speed
-    speedRef.current = 800 / speedMultiplier;
-  }, [speedMultiplier]);
+        .bar.sorted {
+            background: linear-gradient(to top, #22c55e, #4ade80) !important; /* Green */
+            box-shadow: 0 0 10px #22c55e;
+        }
 
-  const handleResetArray = () => {
-    const newArr = generateSortedArray(arraySize);
-    setArray(newArr);
-    setTarget(newArr[Math.floor(Math.random() * newArr.length)]);
-    resetSearchStates();
-    setShowMetrics(false);
-  };
-
-  const resetSearchStates = () => {
-    setLinearState({ currentIndex: null, foundIndex: null, steps: 0, status: 'idle', log: 'AWAITING EXECUTION...' });
-    setBinaryState({ left: null, right: null, mid: null, foundIndex: null, steps: 0, status: 'idle', log: 'AWAITING EXECUTION...' });
-    setShowMetrics(false);
-  };
-
-  // --- Core Algorithms with Educational Logs ---
-  const runLinearSearch = async (targetValue, currentSearchId) => {
-    setLinearState((s) => ({ ...s, status: 'searching', steps: 0, log: 'INITIALIZING O(n) SEQUENTIAL SCAN...' }));
-    await sleep(speedRef.current / 2);
-    let steps = 0;
-
-    for (let i = 0; i < array.length; i++) {
-      if (searchIdRef.current !== currentSearchId) return;
-
-      steps++;
-      setLinearState((s) => ({ 
-        ...s, 
-        currentIndex: i, 
-        steps,
-        log: `STEP ${steps}: CHECKING INDEX [${i}]. VALUE = ${array[i]}`
-      }));
-      await sleep(speedRef.current);
-
-      if (array[i] === targetValue) {
-        if (searchIdRef.current !== currentSearchId) return;
-        setLinearState((s) => ({ 
-          ...s, 
-          foundIndex: i, 
-          status: 'found',
-          log: `SUCCESS: TARGET ${targetValue} MATCHES array[${i}]. EXITING.`
-        }));
-        return;
-      } else {
-        setLinearState((s) => ({ 
-          ...s, 
-          log: `FAILED: ${array[i]} != ${targetValue}. MOVING TO NEXT INDEX.`
-        }));
-        await sleep(speedRef.current / 2);
-      }
-    }
-
-    if (searchIdRef.current === currentSearchId) {
-      setLinearState((s) => ({ ...s, currentIndex: null, status: 'not_found', log: `END OF ARRAY. TARGET ${targetValue} NOT FOUND.` }));
-    }
-  };
-
-  const runBinarySearch = async (targetValue, currentSearchId) => {
-    setBinaryState((s) => ({ ...s, status: 'searching', steps: 0, left: 0, right: array.length - 1, log: 'INITIALIZING O(log n) BINARY SPLIT...' }));
-    await sleep(speedRef.current / 2);
-    let steps = 0;
-    let left = 0;
-    let right = array.length - 1;
-
-    while (left <= right) {
-      if (searchIdRef.current !== currentSearchId) return;
-
-      steps++;
-      let mid = Math.floor((left + right) / 2);
-      
-      setBinaryState((s) => ({ 
-        ...s, left, right, mid, steps,
-        log: `STEP ${steps}: RANGE [${left}, ${right}]. CALCULATING MID = FLOOR((${left} + ${right}) / 2) = ${mid}`
-      }));
-      await sleep(speedRef.current);
-
-      setBinaryState((s) => ({ ...s, log: `CHECKING MID INDEX [${mid}]. VALUE = ${array[mid]}` }));
-      await sleep(speedRef.current);
-
-      if (array[mid] === targetValue) {
-        if (searchIdRef.current !== currentSearchId) return;
-        setBinaryState((s) => ({ 
-          ...s, foundIndex: mid, status: 'found',
-          log: `SUCCESS: TARGET ${targetValue} MATCHES array[${mid}]. EXITING.`
-        }));
-        return;
-      }
-
-      if (array[mid] < targetValue) {
-        setBinaryState((s) => ({ ...s, log: `${array[mid]} < ${targetValue}. TARGET MUST BE IN RIGHT HALF. SETTING LEFT = ${mid + 1}` }));
-        left = mid + 1;
-      } else {
-        setBinaryState((s) => ({ ...s, log: `${array[mid]} > ${targetValue}. TARGET MUST BE IN LEFT HALF. SETTING RIGHT = ${mid - 1}` }));
-        right = mid - 1;
-      }
-      
-      await sleep(speedRef.current); 
-    }
-
-    if (searchIdRef.current === currentSearchId) {
-      setBinaryState((s) => ({ ...s, left: null, right: null, mid: null, status: 'not_found', log: `RANGE INVALID (LEFT > RIGHT). TARGET ${targetValue} NOT FOUND.` }));
-    }
-  };
-
-  const handleStartSearch = async () => {
-    const numTarget = parseInt(target, 10);
-    if (isNaN(numTarget)) return;
-
-    setIsSearching(true);
-    resetSearchStates();
-    searchIdRef.current += 1;
-    const currentSearchId = searchIdRef.current;
-
-    await Promise.all([
-      runLinearSearch(numTarget, currentSearchId),
-      runBinarySearch(numTarget, currentSearchId)
-    ]);
-
-    if (searchIdRef.current === currentSearchId) {
-      setIsSearching(false);
-      setShowMetrics(true);
-    }
-  };
-
-  // --- Futuristic 3D Rendering Helpers ---
-  const getLinearBlockClasses = (index) => {
-    const base = 'transition-all duration-300 transform-gpu flex items-center justify-center rounded-md font-bold border border-transparent flex-1 min-w-[1.5rem]';
-    if (linearState.foundIndex === index) 
-      return `${base} bg-green-900/80 border-green-400 text-green-300 shadow-[0_0_20px_rgba(74,222,128,0.6)] [transform:translateZ(30px)_scale(1.1)] z-20`;
-    if (linearState.currentIndex === index) 
-      return `${base} bg-cyan-900/80 border-cyan-400 text-cyan-300 shadow-[0_0_15px_rgba(34,211,238,0.6)] [transform:translateZ(20px)_scale(1.05)] z-10`;
-    return `${base} bg-gray-900/50 border-gray-700 text-gray-500 shadow-inner [transform:translateZ(0px)] z-0`;
-  };
-
-  const getBinaryBlockClasses = (index) => {
-    const { left, right, mid, foundIndex, status } = binaryState;
-    const base = 'transition-all duration-500 transform-gpu flex items-center justify-center rounded-md font-bold border border-transparent w-full aspect-square';
-    
-    if (foundIndex === index) 
-      return `${base} bg-green-900/80 border-green-400 text-green-300 shadow-[0_0_20px_rgba(74,222,128,0.6)] [transform:translateZ(30px)_scale(1.1)] z-20`;
-    
-    const isOutOfBounds = (left !== null && index < left) || (right !== null && index > right);
-    if (isOutOfBounds && status === 'searching') 
-      return `${base} bg-gray-950/40 border-gray-800 text-gray-700 opacity-20 [transform:translateZ(-40px)_rotateX(60deg)_scale(0.85)] z-0`;
-    
-    if (mid === index) 
-      return `${base} bg-fuchsia-900/80 border-fuchsia-400 text-fuchsia-300 shadow-[0_0_15px_rgba(232,121,249,0.6)] [transform:translateZ(20px)_scale(1.05)] z-10`;
-    
-    return `${base} bg-gray-900/50 border-gray-700 text-gray-400 shadow-inner [transform:translateZ(0px)] z-0`;
-  };
-
-  return (
-    <div className="h-screen w-screen overflow-hidden bg-gray-950 text-gray-200 font-mono flex flex-col relative selection:bg-cyan-900 selection:text-cyan-100">
-      
-      {/* Background Grid Effect */}
-      <div className="absolute inset-0 z-0 pointer-events-none opacity-20" 
-           style={{
-             backgroundImage: 'linear-gradient(rgba(34, 211, 238, 0.15) 1px, transparent 1px), linear-gradient(90deg, rgba(34, 211, 238, 0.15) 1px, transparent 1px)',
-             backgroundSize: '30px 30px',
-             transform: 'perspective(1000px) rotateX(60deg) translateY(-100px) translateZ(-200px)'
-           }}>
-      </div>
-
-      {/* Top Header & Educational Controls Area */}
-      <div className="z-10 bg-gray-900/90 backdrop-blur-md border-b border-gray-800 p-3 shrink-0 flex flex-col md:flex-row items-center justify-between gap-4 shadow-[0_10px_30px_rgba(0,0,0,0.5)]">
-        <div className="flex items-center gap-3 text-cyan-400">
-          <Terminal size={20} className="animate-pulse" />
-          <h1 className="text-lg md:text-xl font-black tracking-widest uppercase">
-            SYS.<span className="text-fuchsia-400">SEARCH</span>_VIS
-          </h1>
-        </div>
-
-        {/* Educational Controls */}
-        <div className="flex flex-wrap items-center justify-center gap-4 text-xs">
-          <div className="flex items-center gap-2 bg-gray-950/50 px-3 py-1.5 border border-gray-800 rounded">
-            <Settings2 size={14} className="text-gray-400" />
-            <label className="text-gray-400 tracking-widest">DATA_SIZE:</label>
-            <input 
-              type="range" min="7" max="31" step="2" value={arraySize} 
-              onChange={(e) => setArraySize(Number(e.target.value))}
-              disabled={isSearching}
-              className="w-24 accent-cyan-500 cursor-pointer disabled:opacity-50"
-            />
-            <span className="text-cyan-300 w-4">{arraySize}</span>
-          </div>
-
-          <div className="flex items-center gap-2 bg-gray-950/50 px-3 py-1.5 border border-gray-800 rounded">
-            <Settings2 size={14} className="text-gray-400" />
-            <label className="text-gray-400 tracking-widest">THROTTLE:</label>
-            <input 
-              type="range" min="0.5" max="3" step="0.5" value={speedMultiplier} 
-              onChange={(e) => setSpeedMultiplier(Number(e.target.value))}
-              className="w-24 accent-fuchsia-500 cursor-pointer"
-            />
-            <span className="text-fuchsia-300 w-6">{speedMultiplier}x</span>
-          </div>
-        </div>
-
-        {/* Execution Controls */}
-        <div className="flex items-center gap-2">
-          <div className="relative group">
-            <Crosshair className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-cyan-400 transition-colors" size={14} />
-            <input 
-              type="number" 
-              value={target}
-              onChange={(e) => setTarget(e.target.value)}
-              disabled={isSearching}
-              className="w-24 bg-gray-950/50 border border-gray-700 rounded pl-8 pr-2 py-1 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-all disabled:opacity-50 text-cyan-300 text-sm"
-              placeholder="TARGET"
-            />
-          </div>
-          
-          <button 
-            onClick={handleStartSearch}
-            disabled={isSearching || target === ''}
-            className="flex items-center gap-1.5 px-3 py-1 bg-cyan-950/50 border border-cyan-700 text-cyan-400 rounded hover:bg-cyan-900/50 hover:border-cyan-400 hover:shadow-[0_0_15px_rgba(34,211,238,0.4)] transition-all disabled:opacity-50 disabled:pointer-events-none"
-          >
-            <Play size={14} />
-            <span className="text-xs font-bold tracking-wider">EXECUTE</span>
-          </button>
-          
-          <button 
-            onClick={handleResetArray}
-            disabled={isSearching}
-            className="flex items-center gap-1.5 px-3 py-1 bg-gray-800/50 border border-gray-700 text-gray-400 rounded hover:bg-gray-700/50 hover:text-white transition-all disabled:opacity-50 disabled:pointer-events-none"
-          >
-            <RotateCcw size={14} />
-            <span className="text-xs tracking-wider">REBOOT</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Main Visualization Area */}
-      <div className="z-10 flex-1 flex flex-col p-3 gap-3 overflow-hidden">
+        /* Range Input Styling */
+        input[type=range] {
+            -webkit-appearance: none; 
+            background: transparent; 
+        }
         
-        {/* Linear Search Section */}
-        <div className="flex-1 bg-gray-900/40 backdrop-blur border border-gray-800/50 rounded-xl relative overflow-hidden flex flex-col shadow-lg shadow-black/50">
-          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-cyan-500 to-transparent opacity-50"></div>
-          
-          <div className="p-3 flex justify-between items-center shrink-0 border-b border-gray-800/50 bg-gray-900/30">
-            <div>
-              <h2 className="text-cyan-400 font-bold tracking-widest text-xs flex items-center gap-2">
-                <Zap size={14} /> O(n) SEQUENTIAL SCAN
-              </h2>
-            </div>
-            <div className="text-right flex items-center gap-3">
-              <div className="text-[10px] text-gray-500 tracking-widest">CYCLES COMPLETED</div>
-              <div className="text-xl font-black text-cyan-300 w-6 text-right font-mono">{linearState.steps}</div>
-            </div>
-          </div>
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 16px;
+            width: 16px;
+            border-radius: 50%;
+            background: #6366f1;
+            margin-top: -6px; 
+            cursor: pointer;
+        }
 
-          <div className="flex-1 flex flex-col justify-center p-4">
-            <div className="flex gap-1 w-full justify-center max-w-5xl mx-auto" style={{ perspective: '800px' }}>
-              {array.map((num, idx) => (
-                <div key={`linear-${idx}`} className={`aspect-square text-xs sm:text-sm ${getLinearBlockClasses(idx)}`}>
-                  {num}
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            cursor: pointer;
+            background: #334155;
+            border-radius: 2px;
+        }
+
+        /* Modal Animation */
+        .modal-enter {
+            opacity: 0;
+            transform: scale(0.9);
+        }
+        .modal-enter-active {
+            opacity: 1;
+            transform: scale(1);
+            transition: opacity 300ms, transform 300ms;
+        }
+        .modal-exit {
+            opacity: 1;
+        }
+        .modal-exit-active {
+            opacity: 0;
+            transform: scale(0.9);
+            transition: opacity 300ms, transform 300ms;
+        }
+    </style>
+</head>
+<body class="h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="h-16 border-b border-slate-800 bg-slate-900/50 backdrop-blur-md flex items-center justify-between px-6 z-10">
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-8 bg-indigo-500 rounded-lg flex items-center justify-center font-bold text-white shadow-lg shadow-indigo-500/30">S</div>
+            <h1 class="text-xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-cyan-400">SortVisualizer</h1>
+        </div>
+
+        <div class="flex items-center gap-6">
+            <div class="flex flex-col">
+                <label class="text-xs text-slate-400 font-semibold mb-1">Speed</label>
+                <input type="range" id="speedInput" min="1" max="100" value="60" class="w-32">
+            </div>
+            <div class="flex flex-col">
+                <label class="text-xs text-slate-400 font-semibold mb-1">Array Size</label>
+                <input type="range" id="sizeInput" min="10" max="100" value="50" class="w-32">
+            </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+            <button onclick="resetArray()" class="px-4 py-2 text-sm font-medium text-slate-300 hover:text-white transition-colors">Generate New</button>
+            <button id="startBtn" onclick="startSort()" class="px-6 py-2 text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-500 rounded-md shadow-lg shadow-indigo-600/20 transition-all hover:scale-105 active:scale-95">Start Sorting</button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex overflow-hidden relative">
+        
+        <!-- Sidebar Controls -->
+        <aside class="w-64 border-r border-slate-800 bg-slate-900 p-6 flex flex-col gap-6 z-10">
+            <div>
+                <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Algorithms</h3>
+                <div class="space-y-2">
+                    <button onclick="selectAlgo('quick')" class="algo-btn w-full text-left px-4 py-3 rounded-lg text-sm font-medium transition-all bg-indigo-600/20 text-indigo-300 border border-indigo-500/50" data-algo="quick">
+                        <div class="flex justify-between items-center">
+                            <span>Quick Sort</span>
+                            <span class="text-xs bg-indigo-900 text-indigo-300 px-2 py-0.5 rounded">O(n log n)</span>
+                        </div>
+                    </button>
+                    <button onclick="selectAlgo('merge')" class="algo-btn w-full text-left px-4 py-3 rounded-lg text-sm font-medium transition-all hover:bg-slate-800 text-slate-400 border border-transparent" data-algo="merge">
+                        <div class="flex justify-between items-center">
+                            <span>Merge Sort</span>
+                            <span class="text-xs bg-slate-800 text-slate-500 px-2 py-0.5 rounded">O(n log n)</span>
+                        </div>
+                    </button>
+                    <button onclick="selectAlgo('bubble')" class="algo-btn w-full text-left px-4 py-3 rounded-lg text-sm font-medium transition-all hover:bg-slate-800 text-slate-400 border border-transparent" data-algo="bubble">
+                        <div class="flex justify-between items-center">
+                            <span>Bubble Sort</span>
+                            <span class="text-xs bg-slate-800 text-slate-500 px-2 py-0.5 rounded">O(n²)</span>
+                        </div>
+                    </button>
                 </div>
-              ))}
             </div>
-          </div>
-          
-          {/* Linear Logic Terminal */}
-          <div className="shrink-0 bg-black/60 border-t border-gray-800 p-2 px-4 h-12 flex flex-col justify-center">
-             <div className="text-[10px] text-gray-500 uppercase tracking-widest mb-0.5">Runtime Logic Log:</div>
-             <div className="text-xs text-cyan-400 font-bold animate-pulse">{'>'} {linearState.log}</div>
-          </div>
-        </div>
 
-        {/* Binary Search Section */}
-        <div className="flex-1 bg-gray-900/40 backdrop-blur border border-gray-800/50 rounded-xl relative overflow-hidden flex flex-col shadow-lg shadow-black/50">
-           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-fuchsia-500 to-transparent opacity-50"></div>
-           
-           <div className="p-3 flex justify-between items-center shrink-0 border-b border-gray-800/50 bg-gray-900/30">
             <div>
-              <h2 className="text-fuchsia-400 font-bold tracking-widest text-xs flex items-center gap-2">
-                <Zap size={14} /> O(log n) BINARY SPLIT
-              </h2>
-            </div>
-            <div className="text-right flex items-center gap-3">
-              <div className="text-[10px] text-gray-500 tracking-widest">CYCLES COMPLETED</div>
-              <div className="text-xl font-black text-fuchsia-300 w-6 text-right font-mono">{binaryState.steps}</div>
-            </div>
-          </div>
-
-          <div className="flex-1 flex flex-col justify-center p-4">
-             <div className="flex gap-1 w-full justify-center max-w-5xl mx-auto" style={{ perspective: '1000px' }}>
-                {array.map((num, idx) => (
-                  <div key={`binary-${idx}`} className="flex flex-col items-center flex-1 min-w-[1.5rem]">
-                    <div className={`text-xs sm:text-sm ${getBinaryBlockClasses(idx)}`}>
-                      {num}
+                <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Modes</h3>
+                <button onclick="toggleRaceMode()" id="raceBtn" class="w-full text-left px-4 py-3 rounded-lg text-sm font-medium transition-all bg-slate-800 hover:bg-rose-900/20 border border-slate-700 hover:border-rose-500/50 text-slate-300 group">
+                    <div class="flex items-center gap-2">
+                        <span class="text-lg group-hover:scale-110 transition-transform">🏎️</span>
+                        <div>
+                            <span class="block text-white group-hover:text-rose-400">Race Mode</span>
+                            <span class="text-xs text-slate-500">Efficient vs Traditional</span>
+                        </div>
                     </div>
-                    {/* Dynamic Pointers Map */}
-                    <div className="mt-1 h-3 text-[9px] sm:text-[10px] font-black tracking-widest transition-opacity duration-300 flex gap-0.5">
-                      {binaryState.status === 'searching' && binaryState.left === idx && <span className="text-cyan-400 drop-shadow-[0_0_5px_rgba(34,211,238,0.8)]">L</span>}
-                      {binaryState.status === 'searching' && binaryState.mid === idx && <span className="text-fuchsia-400 drop-shadow-[0_0_5px_rgba(232,121,249,0.8)]">M</span>}
-                      {binaryState.status === 'searching' && binaryState.right === idx && <span className="text-cyan-400 drop-shadow-[0_0_5px_rgba(34,211,238,0.8)]">R</span>}
-                    </div>
-                  </div>
-                ))}
-              </div>
-          </div>
+                </button>
+            </div>
 
-          {/* Binary Logic Terminal */}
-          <div className="shrink-0 bg-black/60 border-t border-gray-800 p-2 px-4 h-12 flex flex-col justify-center">
-             <div className="text-[10px] text-gray-500 uppercase tracking-widest mb-0.5">Runtime Logic Log:</div>
-             <div className="text-xs text-fuchsia-400 font-bold animate-pulse">{'>'} {binaryState.log}</div>
-          </div>
-        </div>
-      </div>
+            <div class="mt-auto">
+                <div class="p-4 rounded-lg bg-slate-800/50 border border-slate-700 text-xs text-slate-400">
+                    <p class="mb-2"><span class="w-2 h-2 inline-block rounded-full bg-indigo-500 mr-2"></span>Default</p>
+                    <p class="mb-2"><span class="w-2 h-2 inline-block rounded-full bg-red-500 mr-2"></span>Comparing</p>
+                    <p class="mb-2"><span class="w-2 h-2 inline-block rounded-full bg-yellow-400 mr-2"></span>Pivot / Aux</p>
+                    <p><span class="w-2 h-2 inline-block rounded-full bg-green-500 mr-2"></span>Sorted</p>
+                </div>
+            </div>
+        </aside>
 
-      {/* Analytics Modal Overlay */}
-      {showMetrics && (linearState.status !== 'idle' && binaryState.status !== 'idle') && (
-        <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-300">
-          <div className="bg-gray-950 border border-gray-700 rounded-xl shadow-[0_0_50px_rgba(0,0,0,0.8)] max-w-2xl w-full p-6 relative flex flex-col max-h-[90vh]">
-            <button onClick={() => setShowMetrics(false)} className="absolute top-4 right-4 text-gray-500 hover:text-white transition-colors z-10">
-              <X size={20} />
-            </button>
+        <!-- Visualization Area -->
+        <div id="visualizer-container" class="flex-1 bg-slate-950 relative flex flex-col">
             
-            <div className="flex items-center gap-3 text-white mb-6 shrink-0 border-b border-gray-800 pb-4">
-              <BarChart3 className="text-fuchsia-400" size={28} />
-              <h3 className="text-xl md:text-2xl font-black tracking-widest uppercase">Execution Analytics</h3>
+            <!-- Comparison View (Hidden by default) -->
+            <div id="race-view" class="hidden flex-col h-full w-full">
+                <div class="flex-1 border-b border-slate-800 relative flex flex-col">
+                    <div class="absolute top-4 left-4 z-10 bg-indigo-600/90 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg">Quick Sort (O(n log n))</div>
+                    <div id="bars-container-1" class="bar-container pt-12 pb-2"></div>
+                </div>
+                <div class="flex-1 relative flex flex-col">
+                    <div class="absolute top-4 left-4 z-10 bg-rose-600/90 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg">Bubble Sort (O(n²))</div>
+                    <div id="bars-container-2" class="bar-container pt-12 pb-2"></div>
+                </div>
             </div>
 
-            {/* Scrollable Content Area */}
-            <div className="overflow-y-auto pr-2 space-y-6 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-gray-900 [&::-webkit-scrollbar-thumb]:bg-gray-700 [&::-webkit-scrollbar-thumb]:rounded-full">
-              
-              {/* Core Metrics */}
-              <div className="space-y-4 font-mono shrink-0">
-                 <div className="bg-gray-900/50 p-4 rounded-lg border border-gray-800 flex justify-between items-center">
-                    <div className="text-cyan-400 text-sm font-bold tracking-widest uppercase">Sequential O(n)</div>
-                    <div className="text-xl text-white font-black">{linearState.steps} <span className="text-xs text-gray-500">CYCLES</span></div>
-                 </div>
-                 
-                 <div className="bg-gray-900/50 p-4 rounded-lg border border-fuchsia-900/30 flex justify-between items-center">
-                    <div className="text-fuchsia-400 text-sm font-bold tracking-widest uppercase">Binary O(log n)</div>
-                    <div className="text-xl text-white font-black">{binaryState.steps} <span className="text-xs text-gray-500">CYCLES</span></div>
-                 </div>
-
-                 <div className="p-4 bg-green-900/10 border border-green-500/30 rounded-lg text-center">
-                    <div className="text-green-400 text-sm mb-1 uppercase tracking-widest">Efficiency Multiplier</div>
-                    <div className="text-3xl font-black text-green-300">
-                      {linearState.steps === 0 ? 'N/A' : (linearState.steps / Math.max(1, binaryState.steps)).toFixed(1)}x
-                    </div>
-                 </div>
-              </div>
-
-              {/* Educational Diagnostic Report */}
-              <div className="space-y-4 text-sm leading-relaxed text-gray-300 border-t border-gray-800 pt-6">
-                 <h4 className="text-white font-bold tracking-widest uppercase flex items-center gap-2">
-                   <Terminal size={16} className="text-gray-500"/> System Diagnostic Report
-                 </h4>
-                 
-                 <div className="space-y-4 pb-4">
-                    <p>
-                      <span className="text-cyan-400 font-bold tracking-wider">LINEAR SEARCH [O(n)]</span> operates via brute force. 
-                      It inspected elements sequentially starting from index 0. While simple and guaranteed to work on any dataset (sorted or unsorted), 
-                      its processing time scales linearly with the data size. If our array had 1,000,000 elements, it could theoretically take up to 1,000,000 cycles to find the target.
-                    </p>
-
-                    <p>
-                      <span className="text-fuchsia-400 font-bold tracking-wider">BINARY SEARCH [O(log n)]</span> utilizes a "divide-and-conquer" algorithm. 
-                      Because the dataset is pre-sorted, it calculates the precise midpoint first. By comparing the target to the midpoint, it instantly knows which half is entirely invalid. 
-                      <span className="text-white font-semibold"> It successfully prunes 50% of the remaining search space every single cycle.</span>
-                    </p>
-
-                    <div className="bg-gray-900/80 p-4 rounded border-l-4 border-fuchsia-500">
-                      <strong className="text-white block mb-2 tracking-widest uppercase text-xs">The Power of Logarithmic Scaling:</strong>
-                      <p className="text-xs text-gray-400">
-                        Notice how Binary Search completed in just <strong>{binaryState.steps} cycles</strong>. 
-                        Even if we expanded this array to 4,000,000,000 items, Binary Search would only take a maximum of <strong>32 cycles</strong> to find the target. 
-                        In modern software engineering, choosing O(log n) over O(n) is the difference between a query resolving instantly versus crashing a server.
-                      </p>
-                    </div>
-                 </div>
-              </div>
-
+            <!-- Single View -->
+            <div id="single-view" class="h-full w-full flex flex-col">
+                <div class="flex justify-center mt-4 mb-2">
+                    <span id="current-algo-label" class="text-2xl font-black text-slate-700 uppercase tracking-widest opacity-50 select-none">Quick Sort</span>
+                </div>
+                <div id="bars-container-main" class="bar-container pb-10 px-10"></div>
             </div>
-          </div>
+
         </div>
-      )}
 
+    </main>
+
+    <!-- Analysis Modal -->
+    <div id="analysis-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm hidden opacity-0 transition-opacity duration-300">
+        <div class="bg-slate-900 border border-slate-700 w-full max-w-2xl p-8 rounded-2xl shadow-2xl transform scale-95 transition-transform duration-300" id="modal-content">
+            <div class="flex items-start justify-between mb-6">
+                <div>
+                    <h2 class="text-2xl font-bold text-white mb-1">Performance Analysis</h2>
+                    <p class="text-indigo-400 text-sm font-medium">Why the winner won</p>
+                </div>
+                <button onclick="closeModal()" class="text-slate-400 hover:text-white transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+
+            <div class="grid grid-cols-2 gap-6 mb-8">
+                <div class="p-5 rounded-xl bg-slate-800/50 border border-slate-700">
+                    <h3 class="font-bold text-rose-400 mb-2 flex items-center gap-2">
+                        <span>Traditional (Bubble)</span>
+                        <span class="text-xs bg-rose-900/30 px-2 py-0.5 rounded border border-rose-800 text-rose-300">O(n²)</span>
+                    </h3>
+                    <p class="text-slate-300 text-sm leading-relaxed">
+                        Like checking every person in a line against the person behind them, over and over.
+                        <br><br>
+                        <span class="text-slate-500">For 100 items: ~10,000 operations.</span>
+                    </p>
+                </div>
+                <div class="p-5 rounded-xl bg-indigo-900/20 border border-indigo-500/30">
+                    <h3 class="font-bold text-indigo-400 mb-2 flex items-center gap-2">
+                        <span>Efficient (Quick/Merge)</span>
+                        <span class="text-xs bg-indigo-900/30 px-2 py-0.5 rounded border border-indigo-800 text-indigo-300">O(n log n)</span>
+                    </h3>
+                    <p class="text-slate-300 text-sm leading-relaxed">
+                        Uses <strong>Divide & Conquer</strong>. Breaks the line into smaller groups, sorts them instantly, and recombines.
+                        <br><br>
+                        <span class="text-slate-500">For 100 items: ~660 operations.</span>
+                    </p>
+                </div>
+            </div>
+
+            <div class="bg-green-900/10 border border-green-900/30 rounded-lg p-4 flex gap-4 items-center">
+                <div class="bg-green-500/20 p-2 rounded-full text-green-400">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                </div>
+                <div>
+                    <h4 class="font-bold text-green-400 text-sm">The Efficiency Gap</h4>
+                    <p class="text-slate-400 text-xs mt-1">
+                        As data grows, the gap widens exponentially. For 1 million items, Quick Sort might take <span class="text-white">seconds</span> while Bubble Sort could take <span class="text-white">days</span>.
+                    </p>
+                </div>
+            </div>
+
+            <div class="mt-8 flex justify-end">
+                <button onclick="closeModal()" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-bold rounded-lg shadow-lg shadow-indigo-600/20 transition-all">Understood</button>
+            </div>
+        </div>
     </div>
-  );
-}
+
+    <script>
+        // --- Configuration & State ---
+        let array = [];
+        let arrayCopy = []; // For race mode
+        let delay = 30;
+        let isSorting = false;
+        let currentAlgo = 'quick';
+        let isRaceMode = false;
+        let abortController = null; // To stop running sorts
+
+        // Elements
+        const barsContainerMain = document.getElementById('bars-container-main');
+        const barsContainer1 = document.getElementById('bars-container-1');
+        const barsContainer2 = document.getElementById('bars-container-2');
+        const speedInput = document.getElementById('speedInput');
+        const sizeInput = document.getElementById('sizeInput');
+        const singleView = document.getElementById('single-view');
+        const raceView = document.getElementById('race-view');
+        const algoLabel = document.getElementById('current-algo-label');
+
+        // --- Initialization ---
+        function init() {
+            resetArray();
+            setupEventListeners();
+        }
+
+        function setupEventListeners() {
+            speedInput.addEventListener('input', (e) => {
+                // Invert logic: Higher value = lower delay (faster)
+                // Range 1-100. 
+                // 100 -> 1ms
+                // 1 -> 500ms
+                const val = parseInt(e.target.value);
+                delay = Math.floor(5000 / (val * val + 1)); // Non-linear curve for better control
+            });
+
+            sizeInput.addEventListener('input', () => {
+                resetArray();
+            });
+        }
+
+        // --- Core Visual Logic ---
+
+        function generateArray(size) {
+            const arr = [];
+            for (let i = 0; i < size; i++) {
+                // Generate random height between 5 and 100
+                arr.push(Math.floor(Math.random() * 95) + 5);
+            }
+            return arr;
+        }
+
+        function drawBars(container, arr, colorStates = {}) {
+            container.innerHTML = '';
+            const width = 100 / arr.length;
+            
+            arr.forEach((height, i) => {
+                const bar = document.createElement('div');
+                bar.classList.add('bar');
+                bar.style.height = `${height}%`;
+                bar.style.width = `${width}%`; // Leave small gap handled by container gap
+                
+                // Max width clamp for aesthetics on small arrays
+                bar.style.maxWidth = '40px';
+
+                if (colorStates[i]) {
+                    bar.classList.add(colorStates[i]);
+                }
+
+                container.appendChild(bar);
+            });
+        }
+
+        async function updateBar(container, index, height, colorClass) {
+            const bars = container.children;
+            if (bars[index]) {
+                bars[index].style.height = `${height}%`;
+                bars[index].className = 'bar'; // reset
+                if (colorClass) bars[index].classList.add(colorClass);
+            }
+        }
+
+        async function highlightBars(container, indices, colorClass) {
+            const bars = container.children;
+            for (let i of indices) {
+                if (bars[i]) {
+                    bars[i].classList.add(colorClass);
+                }
+            }
+        }
+
+        async function clearHighlights(container, indices) {
+            const bars = container.children;
+            for (let i of indices) {
+                if (bars[i]) {
+                    bars[i].classList.remove('active', 'pivot', 'sorted');
+                }
+            }
+        }
+
+        function resetArray() {
+            if (isSorting) return; // Prevent reset while sorting
+            const size = parseInt(sizeInput.value);
+            array = generateArray(size);
+            arrayCopy = [...array];
+            
+            drawBars(barsContainerMain, array);
+            drawBars(barsContainer1, array);
+            drawBars(barsContainer2, arrayCopy);
+            
+            // Clean UI
+            document.querySelectorAll('.bar').forEach(b => b.classList.remove('sorted', 'active', 'pivot'));
+        }
+
+        function selectAlgo(algo) {
+            if (isSorting) return;
+            currentAlgo = algo;
+            
+            // Update UI buttons
+            document.querySelectorAll('.algo-btn').forEach(btn => {
+                btn.classList.remove('bg-indigo-600/20', 'text-indigo-300', 'border-indigo-500/50');
+                btn.classList.add('text-slate-400', 'border-transparent');
+                
+                if (btn.dataset.algo === algo) {
+                    btn.classList.add('bg-indigo-600/20', 'text-indigo-300', 'border-indigo-500/50');
+                    btn.classList.remove('text-slate-400', 'border-transparent');
+                }
+            });
+
+            // If in race mode, switch back to single
+            if (isRaceMode) toggleRaceMode();
+
+            // Update label
+            const names = { 'quick': 'Quick Sort', 'merge': 'Merge Sort', 'bubble': 'Bubble Sort' };
+            algoLabel.innerText = names[algo];
+        }
+
+        function toggleRaceMode() {
+            if (isSorting) return;
+            isRaceMode = !isRaceMode;
+            
+            const raceBtn = document.getElementById('raceBtn');
+            const singleView = document.getElementById('single-view');
+            const raceView = document.getElementById('race-view');
+
+            if (isRaceMode) {
+                raceBtn.classList.add('bg-rose-900/20', 'border-rose-500/50');
+                raceBtn.querySelector('span.block').classList.add('text-rose-400');
+                singleView.classList.add('hidden');
+                raceView.classList.remove('hidden');
+                raceView.classList.add('flex');
+            } else {
+                raceBtn.classList.remove('bg-rose-900/20', 'border-rose-500/50');
+                raceBtn.querySelector('span.block').classList.remove('text-rose-400');
+                singleView.classList.remove('hidden');
+                raceView.classList.remove('hidden'); // Fix flex toggle
+                raceView.classList.add('hidden');
+                raceView.classList.remove('flex');
+            }
+            resetArray();
+        }
+
+        // --- Helper for waiting ---
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        // --- Sorting Algorithms ---
+
+        // 1. Bubble Sort
+        async function bubbleSort(arr, container, signal) {
+            const n = arr.length;
+            for (let i = 0; i < n - 1; i++) {
+                if (signal.aborted) return;
+                for (let j = 0; j < n - i - 1; j++) {
+                    if (signal.aborted) return;
+                    
+                    // Highlight comparison
+                    await highlightBars(container, [j, j + 1], 'active');
+                    await sleep(delay);
+
+                    if (arr[j] > arr[j + 1]) {
+                        // Swap data
+                        let temp = arr[j];
+                        arr[j] = arr[j + 1];
+                        arr[j + 1] = temp;
+                        
+                        // Swap visuals
+                        updateBar(container, j, arr[j], 'active');
+                        updateBar(container, j + 1, arr[j + 1], 'active');
+                        await sleep(delay);
+                    }
+                    
+                    await clearHighlights(container, [j, j + 1]);
+                }
+                // Mark as sorted
+                updateBar(container, n - i - 1, arr[n - i - 1], 'sorted');
+            }
+            updateBar(container, 0, arr[0], 'sorted'); // Last one
+        }
+
+        // 2. Quick Sort
+        async function quickSort(arr, container, signal, start = 0, end = arr.length - 1) {
+            if (start >= end || signal.aborted) {
+                if(start === end) updateBar(container, start, arr[start], 'sorted');
+                return;
+            }
+
+            let index = await partition(arr, container, signal, start, end);
+            
+            // Parallel execution is tricky visually, sequential is better for comprehension
+            await Promise.all([
+                quickSort(arr, container, signal, start, index - 1),
+                quickSort(arr, container, signal, index + 1, end)
+            ]);
+            
+            // After returning, range is sorted
+            for(let i=start; i<=end; i++) {
+                 updateBar(container, i, arr[i], 'sorted');
+            }
+        }
+
+        async function partition(arr, container, signal, start, end) {
+            if (signal.aborted) return;
+            let pivotIndex = start;
+            let pivotValue = arr[end];
+            
+            // Visualize Pivot
+            updateBar(container, end, arr[end], 'pivot');
+            
+            for (let i = start; i < end; i++) {
+                if (signal.aborted) return;
+                
+                highlightBars(container, [i], 'active');
+                await sleep(delay);
+
+                if (arr[i] < pivotValue) {
+                    // Swap
+                    [arr[i], arr[pivotIndex]] = [arr[pivotIndex], arr[i]];
+                    updateBar(container, i, arr[i]);
+                    updateBar(container, pivotIndex, arr[pivotIndex], 'active');
+                    pivotIndex++;
+                }
+                
+                clearHighlights(container, [i]);
+            }
+            
+            // Swap pivot to correct place
+            [arr[pivotIndex], arr[end]] = [arr[end], arr[pivotIndex]];
+            updateBar(container, pivotIndex, arr[pivotIndex], 'sorted'); // Pivot is now sorted
+            updateBar(container, end, arr[end]);
+            
+            return pivotIndex;
+        }
+
+        // 3. Merge Sort
+        async function mergeSort(arr, container, signal, start = 0, end = arr.length - 1) {
+            if (start >= end || signal.aborted) return;
+
+            const mid = Math.floor((start + end) / 2);
+
+            await mergeSort(arr, container, signal, start, mid);
+            await mergeSort(arr, container, signal, mid + 1, end);
+
+            await merge(arr, container, signal, start, mid, end);
+        }
+
+        async function merge(arr, container, signal, start, mid, end) {
+            if (signal.aborted) return;
+            
+            // Create a copy for easy merging logic
+            let left = arr.slice(start, mid + 1);
+            let right = arr.slice(mid + 1, end + 1);
+            
+            let i = 0, j = 0, k = start;
+            
+            // Highlight the range being merged
+            for(let x = start; x <= end; x++) {
+                updateBar(container, x, arr[x], 'pivot');
+            }
+            await sleep(delay);
+
+            while (i < left.length && j < right.length) {
+                if (signal.aborted) return;
+                
+                // Visual comparison (not strictly accurate to algorithm steps but good for visuals)
+                await sleep(delay);
+                
+                if (left[i] <= right[j]) {
+                    arr[k] = left[i];
+                    updateBar(container, k, arr[k], 'active');
+                    i++;
+                } else {
+                    arr[k] = right[j];
+                    updateBar(container, k, arr[k], 'active');
+                    j++;
+                }
+                k++;
+            }
+
+            while (i < left.length) {
+                if (signal.aborted) return;
+                arr[k] = left[i];
+                updateBar(container, k, arr[k], 'active');
+                i++;
+                k++;
+                await sleep(delay);
+            }
+
+            while (j < right.length) {
+                if (signal.aborted) return;
+                arr[k] = right[j];
+                updateBar(container, k, arr[k], 'active');
+                j++;
+                k++;
+                await sleep(delay);
+            }
+            
+            // Mark section as semi-sorted (green)
+            for(let x = start; x <= end; x++) {
+                 updateBar(container, x, arr[x], 'sorted');
+            }
+        }
+
+
+        // --- Execution Control ---
+
+        async function startSort() {
+            if (isSorting) return;
+            isSorting = true;
+            document.getElementById('startBtn').disabled = true;
+            document.getElementById('startBtn').classList.add('opacity-50', 'cursor-not-allowed');
+            
+            // Controller for cancelling
+            abortController = new AbortController();
+            const signal = abortController.signal;
+
+            try {
+                if (isRaceMode) {
+                    // RACE MODE: Quick vs Bubble
+                    // We run them in parallel
+                    // Note: JS is single threaded, but await sleep() yields control allowing UI updates interleaved
+                    
+                    const p1 = quickSort(array, barsContainer1, signal);
+                    const p2 = bubbleSort(arrayCopy, barsContainer2, signal);
+                    
+                    await Promise.all([p1, p2]);
+                    if (!signal.aborted) showModal();
+
+                } else {
+                    // SINGLE MODE
+                    if (currentAlgo === 'bubble') await bubbleSort(array, barsContainerMain, signal);
+                    else if (currentAlgo === 'quick') await quickSort(array, barsContainerMain, signal);
+                    else if (currentAlgo === 'merge') await mergeSort(array, barsContainerMain, signal);
+                }
+            } catch (e) {
+                console.log("Sort aborted or failed", e);
+            } finally {
+                isSorting = false;
+                document.getElementById('startBtn').disabled = false;
+                document.getElementById('startBtn').classList.remove('opacity-50', 'cursor-not-allowed');
+                abortController = null;
+            }
+        }
+
+        // --- Modal Logic ---
+        function showModal() {
+            const modal = document.getElementById('analysis-modal');
+            modal.classList.remove('hidden');
+            // Trigger reflow
+            void modal.offsetWidth;
+            modal.classList.remove('opacity-0');
+            modal.querySelector('#modal-content').classList.remove('scale-95');
+            modal.querySelector('#modal-content').classList.add('scale-100');
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('analysis-modal');
+            modal.classList.add('opacity-0');
+            modal.querySelector('#modal-content').classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+
+        // Run Init
+        init();
+
+    </script>
+</body>
+</html>

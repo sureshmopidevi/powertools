@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Net Worth Tracker | Powertools</title>
+
+    <script>
+        // Enforce trailing slash for directory URLs
+        if (!window.location.pathname.endsWith('/') && !window.location.pathname.endsWith('.html')) {
+            window.location.replace(window.location.pathname + '/' + window.location.search);
+        }
+
+        // Theme initialization
+        (function () {
+            const savedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.add('light');
+            }
+        })();
+    </script>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        display: ['Plus Jakarta Sans', 'sans-serif'],
+                        content: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        gold: {
+                            50: '#fffdf0',
+                            100: '#fef9c3',
+                            200: '#fef08a',
+                            300: '#fde047',
+                            400: '#facc15',
+                            500: '#eab308',
+                            600: '#ca8a04',
+                            700: '#a16207',
+                            800: '#854d0e',
+                            900: '#713f12',
+                            950: '#422006',
+                        }
+                    },
+                    animation: {
+                        'enter': 'enter 0.6s ease-out forwards',
+                    },
+                    keyframes: {
+                        enter: {
+                            '0%': { opacity: '0', transform: 'translateY(10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&display=swap');
+    </style>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --panel-bg: #ffffff;
+            --panel-border: #e2e8f0;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --gold: #eab308;
+            --accent: #10a37f;
+        }
+
+        .dark {
+            --panel-bg: rgba(21, 25, 33, 0.85);
+            --panel-border: rgba(255, 255, 255, 0.08);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+
+        body {
+            font-family: 'Inter', 'Plus Jakarta Sans', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            text-rendering: optimizeLegibility;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            letter-spacing: -0.01em;
+        }
+
+        .nebula-card {
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 1rem;
+            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+            backdrop-filter: blur(10px);
+            transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+        }
+
+        .nebula-card:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 12px 28px rgba(15, 23, 42, 0.12);
+            border-color: rgba(16, 163, 127, 0.32);
+        }
+
+        .nebula-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: .5rem;
+            border-radius: .75rem;
+            font-size: .875rem;
+            font-weight: 700;
+            line-height: 1;
+            transition: all .18s ease;
+            cursor: pointer;
+        }
+
+        .nebula-btn:disabled {
+            opacity: .5;
+            cursor: not-allowed;
+        }
+
+        .nebula-btn-primary {
+            background: #111827;
+            color: #fff;
+            border: 1px solid transparent;
+            padding: .7rem 1.1rem;
+            box-shadow: 0 8px 18px rgba(17, 24, 39, 0.16);
+        }
+
+        .nebula-btn-primary:hover {
+            background: #0b1220;
+        }
+
+        .dark .nebula-btn-primary {
+            background: #f8fafc;
+            color: #0f172a;
+        }
+
+        .dark .nebula-btn-primary:hover {
+            background: #e2e8f0;
+        }
+
+        .nebula-btn-ghost {
+            color: #64748b;
+            padding: .6rem;
+            border-radius: .65rem;
+        }
+
+        .nebula-btn-ghost:hover {
+            color: #0f172a;
+            background: #f1f5f9;
+        }
+
+        .dark .nebula-btn-ghost {
+            color: #94a3b8;
+        }
+
+        .dark .nebula-btn-ghost:hover {
+            color: #f8fafc;
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .nebula-badge {
+            display: inline-flex;
+            align-items: center;
+            border-radius: .65rem;
+            font-size: .75rem;
+            font-weight: 700;
+            padding: .25rem .6rem;
+        }
+
+        .nebula-badge-warning {
+            background: rgba(234, 179, 8, 0.14);
+            color: #a16207;
+            border: 1px solid rgba(234, 179, 8, 0.25);
+        }
+
+        .dark .nebula-badge-warning {
+            color: #fcd34d;
+            border-color: rgba(250, 204, 21, 0.28);
+            background: rgba(234, 179, 8, 0.18);
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: .75rem;
+            width: 100%;
+            padding: .75rem .95rem;
+            border-radius: .8rem;
+            font-size: .875rem;
+            font-weight: 600;
+            color: #64748b;
+            transition: all .18s ease;
+            border: 1px solid transparent;
+            text-align: left;
+        }
+
+        .nav-link:hover {
+            background: #f8fafc;
+            color: #0f172a;
+            border-color: #e2e8f0;
+        }
+
+        .dark .nav-link {
+            color: #94a3b8;
+        }
+
+        .dark .nav-link:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.1);
+            color: #f8fafc;
+        }
+
+        .nav-link.active {
+            background: rgba(16, 163, 127, 0.1);
+            color: #065f46;
+            border-color: rgba(16, 163, 127, 0.25);
+        }
+
+        .nav-link.active i {
+            color: var(--accent);
+        }
+
+        .dark .nav-link.active {
+            background: rgba(16, 163, 127, 0.16);
+            color: #a7f3d0;
+            border-color: rgba(16, 163, 127, 0.28);
+        }
+
+        .nebula-table-container {
+            border-radius: 1rem;
+            border: 1px solid var(--panel-border);
+            overflow: hidden;
+            background: var(--panel-bg);
+        }
+
+        .nebula-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        .nebula-table thead {
+            background: rgba(148, 163, 184, 0.08);
+            border-bottom: 1px solid var(--panel-border);
+        }
+
+        .nebula-table th {
+            padding: 1rem 1.5rem;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: .13em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            white-space: nowrap;
+        }
+
+        .nebula-table td {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--panel-border);
+            vertical-align: middle;
+        }
+
+        .nebula-table tr:last-child td {
+            border-bottom: 0;
+        }
+
+        .nebula-table tbody tr:hover td {
+            background: rgba(148, 163, 184, 0.06);
+        }
+
+        .nebula-input {
+            width: 100%;
+            border-radius: .8rem;
+            border: 1px solid #cbd5e1;
+            background: #fff;
+            color: #0f172a;
+            padding: .75rem 1rem;
+            font-size: .9rem;
+            font-weight: 500;
+            transition: border-color .2s ease, box-shadow .2s ease;
+        }
+
+        .nebula-input:focus {
+            outline: none;
+            border-color: #10a37f;
+            box-shadow: 0 0 0 3px rgba(16, 163, 127, 0.18);
+        }
+
+        .dark .nebula-input {
+            border-color: rgba(255, 255, 255, 0.1);
+            background: rgba(2, 6, 23, 0.75);
+            color: #f8fafc;
+        }
+
+        .nebula-label {
+            display: block;
+            margin-bottom: .4rem;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+
+        .text-label {
+            display: block;
+            margin-bottom: .45rem;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+
+        .text-metric {
+            color: var(--text-main);
+            font-size: 2rem;
+            line-height: 1.1;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            font-variant-numeric: tabular-nums;
+        }
+    </style>
+
+    <!-- Dependencies -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <style>
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(148, 163, 184, 0.3);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(148, 163, 184, 0.5);
+        }
+
+        .custom-scrollbar {
+            scrollbar-width: thin;
+            scrollbar-color: rgba(148, 163, 184, 0.3) transparent;
+        }
+    </style>
+</head>
+
+<body
+    class="bg-[#F8FAFC] dark:bg-[#0F172A] text-slate-600 dark:text-slate-400 min-h-screen transition-colors duration-300">
+    <div id="app" class="flex flex-col md:flex-row min-h-screen">
+        <!-- Sidebar Navigation -->
+        <aside id="sidebar"
+            class="w-full md:w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex-shrink-0 z-40 hidden md:block">
+            <div class="h-full flex flex-col">
+                <!-- Sidebar Header -->
+                <div class="p-6 border-b border-slate-100 dark:border-slate-800/50">
+                    <div class="flex items-center gap-3">
+                        <div
+                            class="w-10 h-10 bg-gold-500 rounded-xl flex items-center justify-center shadow-lg shadow-gold-500/20">
+                            <i class="fa-solid fa-vault text-white text-lg"></i>
+                        </div>
+                        <div>
+                            <h1 class="font-bold text-slate-800 dark:text-white leading-none">NetWorth</h1>
+                            <span class="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Tracker</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation Links -->
+                <nav class="flex-1 p-4 space-y-1 overflow-y-auto custom-scrollbar">
+                    <button data-view="dashboard"
+                        class="nav-link active w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200">
+                        <i class="fa-solid fa-chart-line w-5"></i>
+                        <span class="font-semibold text-sm">Dashboard</span>
+                    </button>
+                    <button data-view="assets"
+                        class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200">
+                        <i class="fa-solid fa-arrow-up-right-dots w-5"></i>
+                        <span class="font-semibold text-sm">Assets</span>
+                    </button>
+                    <button data-view="liabilities"
+                        class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200">
+                        <i class="fa-solid fa-arrow-down-right-dots w-5"></i>
+                        <span class="font-semibold text-sm">Liabilities</span>
+                    </button>
+                    <button data-view="history"
+                        class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200">
+                        <i class="fa-solid fa-clock-rotate-left w-5"></i>
+                        <span class="font-semibold text-sm">History</span>
+                    </button>
+                </nav>
+
+                <!-- Sidebar Footer -->
+                <div class="p-4 border-t border-slate-100 dark:border-slate-800/50">
+                    <a href="../../index.html"
+                        class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-slate-900 dark:hover:text-white rounded-xl transition-all duration-200">
+                        <i class="fa-solid fa-house w-5"></i>
+                        <span class="font-semibold text-sm">Exit to Hub</span>
+                    </a>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main id="main-content" class="flex-1 overflow-y-auto h-screen bg-slate-50/50 dark:bg-slate-950/50 relative">
+            <!-- Top Mobile Bar -->
+            <header
+                class="md:hidden bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-4 py-3 flex justify-between items-center sticky top-0 z-30">
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 bg-gold-500 rounded-lg flex items-center justify-center">
+                        <i class="fa-solid fa-vault text-white text-sm"></i>
+                    </div>
+                </div>
+                <button id="mobile-menu-toggle" class="p-2 text-slate-500">
+                    <i class="fa-solid fa-bars text-xl"></i>
+                </button>
+            </header>
+
+            <div id="content-area" class="p-4 md:p-8 max-w-7xl mx-auto animate-enter">
+                <div class="flex items-center justify-center min-h-[60vh]">
+                    <div class="animate-pulse text-slate-400 font-medium">Loading View...</div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script type="module" src="./main.js"></script>
+</body>
+
+</html>

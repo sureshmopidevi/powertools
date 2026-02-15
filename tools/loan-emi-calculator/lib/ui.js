@@ -170,13 +170,7 @@ export class AppUI {
 
   renderInputGroup(id, label, min, max, step, suffix, inputId) {
     const value = this.state[id];
-    // Use text type for amount to allow commas, number for others
-    const isAmount = id === 'amount';
-    const inputType = isAmount ? 'text' : 'number';
-    const displayValue = isAmount ? this.formatInput(value) : value;
-
-    // Adjust width based on content length to prevent cutoff
-    const widthClass = isAmount ? 'w-32' : 'w-20';
+    const displayValue = id === 'amount' ? this.formatInput(value) : value;
 
     return `
       <div class="bg-white dark:bg-slate-800 p-6 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-700 transition-all hover:border-gold-200 dark:hover:border-gold-900/50">
@@ -187,10 +181,14 @@ export class AppUI {
           <div class="flex items-center bg-slate-50 dark:bg-slate-900/50 rounded-xl px-4 py-2 border border-slate-200 dark:border-slate-700 focus-within:ring-2 focus-within:ring-gold-500/50 transition-all">
             <input
               id="${inputId}"
-              type="${inputType}"
-              value="${displayValue}"
+              type="number"
+              inputmode="${id === 'amount' ? 'numeric' : 'decimal'}"
+              value="${value}"
+              min="${min}"
+              max="${max}"
               step="${step}"
-              class="${widthClass} bg-transparent text-right font-black text-slate-900 dark:text-white outline-none text-base tracking-tight"
+              data-field="${id}"
+              class="w-24 sm:w-28 bg-transparent text-right font-black text-slate-900 dark:text-white outline-none text-base tracking-tight"
               placeholder="0"
             />
             <span class="text-slate-400 dark:text-slate-500 font-bold ml-2 text-xs">${suffix}</span>
@@ -214,100 +212,83 @@ export class AppUI {
   }
 
   attachListeners() {
-    // Inputs and Sliders
+    // Input and Slider Listeners
     ['amount', 'rate', 'tenureYears'].forEach(id => {
-      const input = document.getElementById(id === 'amount' ? 'loan-amount' : id === 'rate' ? 'interest-rate' : 'loan-tenure');
+      const inputId = id === 'amount' ? 'loan-amount' : id === 'rate' ? 'interest-rate' : 'loan-tenure';
+      const input = document.getElementById(inputId);
       const slider = document.getElementById(`${id}Slider`);
 
-      const updateFunc = (val, isSlider = false) => {
-        this.state[id] = val;
+      if (!input || !slider) return;
 
-        // Update input field if change came from slider
-        if (isSlider && input) {
-          input.value = id === 'amount' ? this.formatInput(val) : val;
-        }
-        // Update slider if change came from input
-        else if (!isSlider && slider) {
-          slider.value = val;
+      const min = parseFloat(slider.getAttribute('min'));
+      const max = parseFloat(slider.getAttribute('max'));
+
+      // Helper to validate and constrain value
+      const constrainValue = (val) => {
+        let num = parseFloat(val);
+        if (isNaN(num)) return this.state[id];
+        return Math.max(min, Math.min(max, num));
+      };
+
+      // Input listener: live update while typing
+      input.addEventListener('input', (e) => {
+        const rawValue = e.target.value;
+        const constrained = constrainValue(rawValue);
+
+        // Update state and slider immediately
+        this.state[id] = constrained;
+        slider.value = constrained;
+
+        // Correct the input field to show constrained value if out of bounds
+        if (parseFloat(rawValue) !== constrained || isNaN(parseFloat(rawValue))) {
+          input.value = constrained;
         }
 
         this.update();
-      };
+      });
 
-      if (input) {
-        // Handle input events for formatting
-        input.addEventListener('input', (e) => {
-          let rawValue = e.target.value.replace(/,/g, '');
+      // When user leaves field, ensure it's properly constrained
+      input.addEventListener('blur', (e) => {
+        const constrained = constrainValue(e.target.value);
+        input.value = constrained;
+        this.state[id] = constrained;
+        slider.value = constrained;
+        this.update();
+      });
 
-          // Allow decimal point for rate
-          if (id === 'rate' && (rawValue.endsWith('.') || (rawValue.includes('.') && rawValue.endsWith('0')))) {
-            // Don't update state or format yet if user is typing decimal
-            return;
-          }
-
-          let val = parseFloat(rawValue);
-          if (isNaN(val)) val = 0;
-
-          // Enforce bounds
-          const max = parseFloat(slider.getAttribute('max'));
-          if (val > max) val = max;
-
-          this.state[id] = val;
-          if (slider) slider.value = val;
-
-          // Only re-format prompt if it's amount and user isn't actively deleting
-          if (id === 'amount') {
-            // Store cursor position to restore later if needed (simple approximation)
-            const start = input.selectionStart;
-            // Only format on blur or if complete number
-            // For live formatting we need more complex logic, let's format on blur mostly or simple cases
-            // Simple approach: unformatted on visual edit, formatted on blur?
-            // User asked for "adding 7500000... no comos added", implies they want to see commas while typing or at least have space
-            // Let's format and set value
-            input.value = this.formatInput(val);
-          }
-
-          this.update();
-        });
-
-        // Better approach: Format on blur, allow raw on focus
-        if (id === 'amount') {
-          input.addEventListener('focus', (e) => {
-            e.target.value = this.state[id]; // Show raw number on edit
-          });
-          input.addEventListener('blur', (e) => {
-            e.target.value = this.formatInput(this.state[id]); // Show formatted on exit
-          });
-        }
-      }
-
-      if (slider) {
-        slider.addEventListener('input', (e) => {
-          const val = parseFloat(e.target.value);
-          updateFunc(val, true);
-        });
-      }
+      // Slider listener: update input and state
+      slider.addEventListener('input', (e) => {
+        const val = parseFloat(e.target.value);
+        this.state[id] = val;
+        input.value = val;
+        this.update();
+      });
     });
 
-    // Toggle Schedule
+    // Schedule Toggle
     const toggleBtn = document.getElementById('toggleSchedule');
     const container = document.getElementById('scheduleContainer');
     const chevron = document.getElementById('scheduleChevron');
 
-    toggleBtn.addEventListener('click', () => {
-      this.state.showSchedule = !this.state.showSchedule;
-      if (this.state.showSchedule) {
-        container.style.maxHeight = '500px';
-        chevron.classList.add('rotate-180');
-      } else {
-        container.style.maxHeight = '0';
-        chevron.classList.remove('rotate-180');
-      }
-    });
+    if (toggleBtn && container && chevron) {
+      toggleBtn.addEventListener('click', () => {
+        this.state.showSchedule = !this.state.showSchedule;
+        if (this.state.showSchedule) {
+          container.style.maxHeight = '500px';
+          chevron.classList.add('rotate-180');
+        } else {
+          container.style.maxHeight = '0';
+          chevron.classList.remove('rotate-180');
+        }
+      });
+    }
 
-    // Copy Content
-    document.getElementById('copyButton').addEventListener('click', () => this.copyPlan());
-    document.getElementById('shareButton').addEventListener('click', () => this.sharePlan());
+    // Copy and Share Buttons
+    const copyBtn = document.getElementById('copyButton');
+    const shareBtn = document.getElementById('shareButton');
+
+    if (copyBtn) copyBtn.addEventListener('click', () => this.copyPlan());
+    if (shareBtn) shareBtn.addEventListener('click', () => this.sharePlan());
   }
 
   update() {
@@ -352,37 +333,47 @@ export class AppUI {
     );
 
     const container = document.getElementById('comparisons');
-    container.innerHTML = comparisons.map(comp => `
-      <button class="comparison-btn w-full text-left p-5 rounded-[1.5rem] border border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/30 hover:border-gold-300 dark:hover:border-gold-600 transition-all group" data-tenure="${comp.tenure}">
-        <div class="flex justify-between items-center mb-3">
-          <span class="font-bold text-slate-800 dark:text-white">${comp.tenure} Years</span>
-          <i class="fa-solid fa-arrow-right text-[10px] text-slate-300 group-hover:text-gold-500 group-hover:translate-x-1 transition-all"></i>
-        </div>
-        <div class="space-y-2">
-          <div class="flex justify-between text-[11px]">
-            <span class="text-slate-400">EMI</span>
-            <span class="${comp.diffEMI > 0 ? 'text-rose-500' : 'text-emerald-500'} font-bold tabular-nums">
-              ${comp.diffEMI > 0 ? '+' : ''}${this.formatCurrency(comp.diffEMI)}
-            </span>
+    if (!container) return;
+
+    container.innerHTML = comparisons.map(comp => {
+      const isActive = comp.tenure === this.state.tenureYears;
+      const activeClass = isActive ? 'border-gold-400 dark:border-gold-500 bg-gold-50 dark:bg-gold-500/10' : '';
+      return `
+        <button class="comparison-btn w-full text-left p-5 rounded-[1.5rem] border border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/30 hover:border-gold-300 dark:hover:border-gold-600 transition-all group ${activeClass}" data-tenure="${comp.tenure}">
+          <div class="flex justify-between items-center mb-3">
+            <span class="font-bold text-slate-800 dark:text-white">${comp.tenure} Years</span>
+            <i class="fa-solid ${isActive ? 'fa-check text-gold-500' : 'fa-arrow-right text-slate-300 group-hover:text-gold-500 group-hover:translate-x-1'} text-[10px] transition-all"></i>
           </div>
-          <div class="flex justify-between text-[11px]">
-            <span class="text-slate-400">Interest</span>
-            <span class="${comp.diffInterest > 0 ? 'text-rose-500' : 'text-emerald-500'} font-bold tabular-nums">
-              ${comp.diffInterest > 0 ? '+' : ''}${this.formatCurrency(comp.diffInterest)}
-            </span>
+          <div class="space-y-2">
+            <div class="flex justify-between text-[11px]">
+              <span class="text-slate-400">EMI</span>
+              <span class="${comp.diffEMI > 0 ? 'text-rose-500' : 'text-emerald-500'} font-bold tabular-nums">
+                ${comp.diffEMI > 0 ? '+' : ''}${this.formatCurrency(comp.diffEMI)}
+              </span>
+            </div>
+            <div class="flex justify-between text-[11px]">
+              <span class="text-slate-400">Interest</span>
+              <span class="${comp.diffInterest > 0 ? 'text-rose-500' : 'text-emerald-500'} font-bold tabular-nums">
+                ${comp.diffInterest > 0 ? '+' : ''}${this.formatCurrency(comp.diffInterest)}
+              </span>
+            </div>
           </div>
-        </div>
-      </button>
-    `).join('');
+        </button>
+      `;
+    }).join('');
 
     // Add listeners to comparison buttons
     container.querySelectorAll('.comparison-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         const tenure = parseInt(btn.dataset.tenure);
-        this.state.tenureYears = tenure;
-        document.getElementById('loan-tenure').value = tenure;
-        document.getElementById('tenureYearsSlider').value = tenure;
-        this.update();
+        if (tenure !== this.state.tenureYears) {
+          this.state.tenureYears = tenure;
+          const tenureInput = document.getElementById('loan-tenure');
+          const tenureSlider = document.getElementById('tenureYearsSlider');
+          if (tenureInput) tenureInput.value = tenure;
+          if (tenureSlider) tenureSlider.value = tenure;
+          this.update();
+        }
       });
     });
   }
@@ -417,99 +408,113 @@ export class AppUI {
     const isDark = document.documentElement.classList.contains('dark');
     const principalColor = '#10b981'; // Emerald 500
     const interestColor = '#f59e0b'; // Gold 500
+    const textColor = isDark ? '#94a3b8' : '#64748b';
+    const bgColor = isDark ? '#1e293b' : '#f8fafc';
 
-    // Pie Chart
-    if (this.charts.pie) this.charts.pie.destroy();
-    const pieCtx = document.getElementById('pieChart')?.getContext('2d');
-    if (!pieCtx || !window.Chart) {
-      console.warn('Pie Chart container or Chart.js missing');
+    // Verify Chart.js is available
+    if (!window.Chart) {
+      console.warn('Chart.js not loaded');
       return;
     }
 
-    this.charts.pie = new Chart(pieCtx, {
-      type: 'doughnut',
-      data: {
-        labels: ['Principal', 'Interest'],
-        datasets: [{
-          data: [principal, interest],
-          backgroundColor: [principalColor, interestColor],
-          borderWidth: 0,
-          hoverOffset: 4
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            position: 'bottom',
-            labels: {
-              usePointStyle: true,
-              padding: 20,
-              font: { family: 'Plus Jakarta Sans', size: 11, weight: 'bold' },
-              color: isDark ? '#94a3b8' : '#64748b'
+    // Pie Chart
+    const pieCtx = document.getElementById('pieChart');
+    if (pieCtx) {
+      if (this.charts.pie) this.charts.pie.destroy();
+
+      this.charts.pie = new Chart(pieCtx.getContext('2d'), {
+        type: 'doughnut',
+        data: {
+          labels: ['Principal', 'Interest'],
+          datasets: [{
+            data: [principal, interest],
+            backgroundColor: [principalColor, interestColor],
+            borderWidth: 0,
+            hoverOffset: 4
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: {
+                usePointStyle: true,
+                padding: 20,
+                font: { family: 'Plus Jakarta Sans', size: 11, weight: 'bold' },
+                color: textColor
+              }
+            },
+            tooltip: {
+              backgroundColor: 'rgba(15, 23, 42, 0.8)',
+              titleColor: '#fff',
+              bodyColor: '#fff',
+              callbacks: {
+                label: (ctx) => ` ${ctx.label}: ${this.formatCurrency(ctx.raw)}`
+              }
             }
           },
-          tooltip: {
-            callbacks: {
-              label: (ctx) => ` ${ctx.label}: ${this.formatCurrency(ctx.raw)}`
-            }
-          }
-        },
-        cutout: '70%'
-      }
-    });
+          cutout: '70%'
+        }
+      });
+    }
 
     // Area Chart
-    if (this.charts.area) this.charts.area.destroy();
-    const areaCtx = document.getElementById('areaChart')?.getContext('2d');
-    if (!areaCtx) return;
+    const areaCtx = document.getElementById('areaChart');
+    if (areaCtx) {
+      if (this.charts.area) this.charts.area.destroy();
 
-    const gradient = areaCtx.createLinearGradient(0, 0, 0, 150);
-    gradient.addColorStop(0, 'rgba(245, 158, 11, 0.2)');
-    gradient.addColorStop(1, 'rgba(245, 158, 11, 0)');
+      const ctx = areaCtx.getContext('2d');
+      const gradient = ctx.createLinearGradient(0, 0, 0, 150);
+      gradient.addColorStop(0, isDark ? 'rgba(245, 158, 11, 0.3)' : 'rgba(245, 158, 11, 0.2)');
+      gradient.addColorStop(1, isDark ? 'rgba(245, 158, 11, 0)' : 'rgba(245, 158, 11, 0)');
 
-    this.charts.area = new Chart(areaCtx, {
-      type: 'line',
-      data: {
-        labels: yearlyData.map(d => d.year),
-        datasets: [{
-          label: 'Balance',
-          data: yearlyData.map(d => d.balance),
-          borderColor: interestColor,
-          borderWidth: 3,
-          fill: true,
-          backgroundColor: gradient,
-          tension: 0.4,
-          pointRadius: 0,
-          pointHoverRadius: 6,
-          pointBackgroundColor: interestColor,
-          pointBorderColor: '#fff',
-          pointBorderWidth: 2
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: { display: false },
-          tooltip: {
-            mode: 'index',
-            intersect: false,
-            callbacks: {
-              label: (ctx) => ` Balance: ${this.formatCurrency(ctx.raw)}`
+      this.charts.area = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: yearlyData.map(d => d.year),
+          datasets: [{
+            label: 'Balance',
+            data: yearlyData.map(d => d.balance),
+            borderColor: interestColor,
+            borderWidth: 3,
+            fill: true,
+            backgroundColor: gradient,
+            tension: 0.4,
+            pointRadius: 0,
+            pointHoverRadius: 6,
+            pointBackgroundColor: interestColor,
+            pointBorderColor: '#fff',
+            pointBorderWidth: 2
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              mode: 'index',
+              intersect: false,
+              backgroundColor: 'rgba(15, 23, 42, 0.8)',
+              titleColor: '#fff',
+              bodyColor: '#fff',
+              callbacks: {
+                label: (ctx) => ` Balance: ${this.formatCurrency(ctx.raw)}`
+              }
+            }
+          },
+          scales: {
+            x: { display: false },
+            y: {
+              display: false,
+              beginAtZero: true
             }
           }
-        },
-        scales: {
-          x: { display: false },
-          y: {
-            display: false,
-            beginAtZero: true
-          }
         }
-      }
-    });
+      });
+    }
   }
 
   // Utilities

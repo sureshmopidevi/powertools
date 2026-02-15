@@ -5,21 +5,38 @@
  */
 export class LoanCalculator {
     static calculate(amount, rate, tenureYears) {
+        // Input validation and sanitization
+        amount = Math.max(0, parseFloat(amount) || 0);
+        rate = Math.max(0, parseFloat(rate) || 0);
+        tenureYears = Math.max(1, parseFloat(tenureYears) || 1);
+
+        // Edge case: zero principal
+        if (amount === 0) {
+            return {
+                emi: 0,
+                totalInterest: 0,
+                totalAmount: 0,
+                schedule: [],
+                yearlyData: [{ year: 'Start', balance: 0 }]
+            };
+        }
+
         const r = rate / 12 / 100;
         const n = tenureYears * 12;
 
         let emi = 0;
         if (rate === 0) {
-            emi = amount / (n || 1);
+            emi = amount / n;
         } else {
-            emi = amount * r * (Math.pow(1 + r, n) / (Math.pow(1 + r, n) - 1));
+            const numerator = Math.pow(1 + r, n);
+            emi = amount * r * (numerator / (numerator - 1));
         }
 
         // Handle NaN or Infinity edge cases
         if (!isFinite(emi) || isNaN(emi)) emi = 0;
 
         const totalAmount = emi * n;
-        const totalInterest = totalAmount - amount;
+        const totalInterest = Math.max(0, totalAmount - amount);
 
         // Generate Amortization Schedule
         let balance = amount;
@@ -40,23 +57,22 @@ export class LoanCalculator {
 
             schedule.push({
                 month: i,
-                principal: principalPayment,
-                interest: interestPayment,
-                balance: balance,
+                principal: Math.max(0, principalPayment),
+                interest: Math.max(0, interestPayment),
+                balance: Math.max(0, balance),
                 totalPayment: emi
             });
 
             // Aggregate for yearly chart
             const year = Math.ceil(i / 12);
-            // We want the balance at the END of the year
             yearMap.set(year, {
                 year: `Year ${year}`,
-                balance: Math.round(balance)
+                balance: Math.round(Math.max(0, balance))
             });
         }
 
         // Chart Data Preparation
-        const rawYearlyData = [{ year: 'Start', balance: amount }, ...Array.from(yearMap.values())];
+        const rawYearlyData = [{ year: 'Start', balance: Math.round(amount) }, ...Array.from(yearMap.values())];
 
         // Downsample data for cleaner charts if dataset is large
         const chartData = rawYearlyData.filter((_, idx) => {
@@ -75,19 +91,28 @@ export class LoanCalculator {
     }
 
     static getComparisons(amount, rate, tenureYears, currentEmi, currentTotalInterest) {
-        const variants = [tenureYears - 5, tenureYears + 5].filter(t => t > 0 && t <= 30 && t !== tenureYears);
+        amount = Math.max(0, parseFloat(amount) || 0);
+        rate = Math.max(0, parseFloat(rate) || 0);
+        tenureYears = Math.max(1, parseFloat(tenureYears) || 1);
+
+        const variants = [tenureYears - 5, tenureYears + 5]
+            .filter(t => t > 0 && t <= 30 && t !== tenureYears);
 
         return variants.map(t => {
-            const r = (rate || 0) / 12 / 100;
+            const r = rate / 12 / 100;
             const n = t * 12;
             let e = 0;
+
             if (rate === 0) {
-                e = (amount || 0) / (n || 1);
+                e = amount / n;
             } else {
-                e = (amount || 0) * r * (Math.pow(1 + r, n) / (Math.pow(1 + r, n) - 1));
+                const numerator = Math.pow(1 + r, n);
+                e = amount * r * (numerator / (numerator - 1));
             }
 
-            const totalI = (e * n) - (amount || 0);
+            if (!isFinite(e) || isNaN(e)) e = 0;
+
+            const totalI = (e * n) - amount;
 
             return {
                 tenure: t,

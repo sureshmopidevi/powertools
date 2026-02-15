@@ -70,3 +70,26 @@ The main dashboard is dynamic and driven by a JSON configuration file. When crea
   "color": "gold"           // Must match the Category Color Theme (gold, platinum, copper, silver)
 }
 ```
+
+## 6. Table & Card Patterns
+To maintain a premium feel, all tables and major sections MUST follow these styling rules:
+- **Containers**: Use `bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden shadow-sm`.
+- **Headers**: Table headers or section headers within cards should use `bg-slate-50 dark:bg-slate-900/50 px-6 py-4 border-b border-slate-200 dark:border-slate-700`.
+- **Tables**: Ensure `overflow-x-auto` on the wrapper and `w-full` on the table itself. Use `rounded-2xl` on the outer container combined with `overflow-hidden` to ensure table corners are correctly clipped.
+
+**Example (HTML):**
+```html
+<div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden shadow-sm">
+    <div class="overflow-x-auto">
+        <table class="w-full">
+            <thead class="bg-slate-50 dark:bg-slate-900/50">
+                <!-- ... -->
+            </thead>
+            <!-- ... -->
+        </table>
+    </div>
+</div>
+```
+
+## 7. Global Theme Integration
+Tools should leverage the shared utility classes defined in `src/styles/global.css` for consistent spacing, typography, and color tokens.
