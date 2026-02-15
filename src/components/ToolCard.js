@@ -3,22 +3,52 @@ export class ToolCard {
         this.tool = tool;
     }
 
+    isWithinRange(date, startDate, endDate) {
+        if (startDate && date < new Date(`${startDate}T00:00:00`)) return false;
+        if (endDate && date > new Date(`${endDate}T23:59:59`)) return false;
+        return true;
+    }
+
+    getActiveBadge() {
+        const now = new Date();
+        const badges = Array.isArray(this.tool.badges) ? this.tool.badges : [];
+
+        const activeBadges = badges
+            .filter(badge => badge && badge.label && badge.type)
+            .filter(badge => this.isWithinRange(now, badge.startDate, badge.endDate))
+            .sort((a, b) => (b.priority || 0) - (a.priority || 0));
+
+        if (activeBadges.length > 0) {
+            return activeBadges[0];
+        }
+
+        // Backward compatibility with legacy fields.
+        if (this.tool.badge && this.tool.badgeType) {
+            return { label: this.tool.badge, type: this.tool.badgeType };
+        }
+
+        return null;
+    }
+
     getBadgeHTML() {
-        if (!this.tool.badge) return '';
+        const badge = this.getActiveBadge();
+        if (!badge) return '';
 
         let badgeClass = '';
-        if (this.tool.badgeType === 'new') {
+        if (badge.type === 'new') {
             badgeClass = 'badge-new text-white';
-        } else if (this.tool.badgeType === 'popular') {
+        } else if (badge.type === 'popular') {
             badgeClass = 'badge-popular text-white';
-        } else if (this.tool.badgeType === 'updated') {
+        } else if (badge.type === 'updated') {
+            badgeClass = 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-300 border border-slate-200 dark:border-slate-600';
+        } else {
             badgeClass = 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-300 border border-slate-200 dark:border-slate-600';
         }
 
         return `
             <div class="absolute top-4 right-4 z-20">
                 <span class="${badgeClass} text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wide">
-                    ${this.tool.badge}
+                    ${badge.label}
                 </span>
             </div>
         `;

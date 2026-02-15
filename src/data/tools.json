@@ -8,8 +8,18 @@
         "description": "Analyze fuel vs. electric costs to find your perfect ride.",
         "icon": "fa-car",
         "url": "tools/smart-car/index.html",
-        "badge": "New",
-        "badgeType": "new",
+        "introducedOn": "2026-02-11",
+        "lastUpdatedOn": "2026-02-15",
+        "commitCount": 5,
+        "badges": [
+          {
+            "label": "Updated",
+            "type": "updated",
+            "startDate": "2026-02-15",
+            "endDate": "2026-03-15",
+            "priority": 2
+          }
+        ],
         "color": "gold"
       },
       {
@@ -18,8 +28,18 @@
         "description": "Calculate loans, interest, and visualize your savings path.",
         "icon": "fa-calculator",
         "url": "tools/emi-calculator/index.html",
-        "badge": "Updated",
-        "badgeType": "updated",
+        "introducedOn": "2026-02-11",
+        "lastUpdatedOn": "2026-02-15",
+        "commitCount": 2,
+        "badges": [
+          {
+            "label": "Updated",
+            "type": "updated",
+            "startDate": "2026-02-15",
+            "endDate": "2026-03-15",
+            "priority": 2
+          }
+        ],
         "color": "gold"
       },
       {
@@ -28,8 +48,18 @@
         "description": "Plan your loans with monthly breakdowns and amortization charts.",
         "icon": "fa-hand-holding-dollar",
         "url": "tools/loan-emi-calculator/index.html",
-        "badge": "New",
-        "badgeType": "new",
+        "introducedOn": "2026-02-13",
+        "lastUpdatedOn": "2026-02-15",
+        "commitCount": 4,
+        "badges": [
+          {
+            "label": "Updated",
+            "type": "updated",
+            "startDate": "2026-02-15",
+            "endDate": "2026-03-15",
+            "priority": 2
+          }
+        ],
         "color": "gold"
       },
       {
@@ -38,8 +68,18 @@
         "description": "Calculate total net worth with asset-liability snapshots and trend charts.",
         "icon": "fa-chart-pie",
         "url": "tools/net-worth-tracker/index.html",
-        "badge": "New",
-        "badgeType": "new",
+        "introducedOn": "2026-02-15",
+        "lastUpdatedOn": "2026-02-15",
+        "commitCount": 2,
+        "badges": [
+          {
+            "label": "New",
+            "type": "new",
+            "startDate": "2026-02-15",
+            "endDate": "2026-03-10",
+            "priority": 2
+          }
+        ],
         "color": "gold"
       }
     ]
@@ -53,8 +93,18 @@
         "description": "Visualize search complexities (O(n) vs O(log n)) in real-time.",
         "icon": "fa-code",
         "url": "tools/algorithm-visualizer/index.html",
-        "badge": "New",
-        "badgeType": "new",
+        "introducedOn": "2026-02-13",
+        "lastUpdatedOn": "2026-02-13",
+        "commitCount": 1,
+        "badges": [
+          {
+            "label": "New",
+            "type": "new",
+            "startDate": "2026-02-13",
+            "endDate": "2026-03-13",
+            "priority": 2
+          }
+        ],
         "color": "platinum"
       },
       {
@@ -63,8 +113,18 @@
         "description": "Watch Bubble, Quick, and Merge sort animate side-by-side.",
         "icon": "fa-arrow-down-a-z",
         "url": "tools/sorting-showdown/index.html",
-        "badge": "New",
-        "badgeType": "new",
+        "introducedOn": "2026-02-15",
+        "lastUpdatedOn": "2026-02-15",
+        "commitCount": 1,
+        "badges": [
+          {
+            "label": "New",
+            "type": "new",
+            "startDate": "2026-02-15",
+            "endDate": "2026-03-15",
+            "priority": 2
+          }
+        ],
         "color": "platinum"
       }
     ]
@@ -78,8 +138,18 @@
         "description": "Instantly verify suspicious URLs for spam and phishing.",
         "icon": "fa-shield-halved",
         "url": "tools/spam-link-detector/index.html",
-        "badge": "Popular",
-        "badgeType": "popular",
+        "introducedOn": "2026-02-11",
+        "lastUpdatedOn": "2026-02-15",
+        "commitCount": 6,
+        "badges": [
+          {
+            "label": "Updated",
+            "type": "updated",
+            "startDate": "2026-02-15",
+            "endDate": "2026-03-15",
+            "priority": 2
+          }
+        ],
         "color": "copper"
       }
     ]

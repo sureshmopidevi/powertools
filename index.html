@@ -4,8 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Powertools — Your Toolkit</title>
+    <title>Powertools</title>
     <meta name="description" content="Smart utilities for smarter decisions.">
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+    <link rel="alternate icon" href="./favicon.ico">
+    <link rel="apple-touch-icon" href="./favicon.svg">
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -194,15 +197,48 @@
     </main>
 
     <!-- Footer -->
-    <footer class="py-8 text-center relative z-10">
-        <div class="flex items-center justify-center gap-2 mb-2">
-            <a href="https://github.com/sureshmopidevi/powertools" target="_blank"
-                class="text-slate-400 hover:text-indigo-500 transition-colors"><i
-                    class="fa-brands fa-github text-lg"></i></a>
+    <footer class="relative z-10 border-t border-slate-200/70 dark:border-slate-800/80 bg-white/50 dark:bg-slate-950/40 backdrop-blur-sm">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 py-10">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-left">
+                <div>
+                    <div class="flex items-center gap-2 mb-3">
+                        <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-slate-700 to-slate-900 flex items-center justify-center text-white shadow-sm">
+                            <i class="fa-solid fa-bolt text-xs"></i>
+                        </div>
+                        <p class="text-sm font-bold text-slate-800 dark:text-white tracking-tight">Powertools</p>
+                    </div>
+                    <p class="text-xs leading-relaxed text-slate-500 dark:text-slate-400 max-w-xs">
+                        Utility-first tools for finance, algorithms, and security workflows.
+                    </p>
+                </div>
+
+                <div>
+                    <p class="text-[10px] uppercase tracking-[0.18em] font-bold text-slate-400 dark:text-slate-500 mb-3">Quick Links</p>
+                    <div class="flex flex-wrap gap-2">
+                        <a href="https://github.com/sureshmopidevi/powertools" target="_blank" rel="noopener noreferrer"
+                            class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:text-gold-600 dark:hover:text-gold-400 hover:border-gold-300 dark:hover:border-gold-600 transition-all text-xs font-semibold">
+                            <i class="fa-brands fa-github text-sm"></i>
+                            <span>Repository</span>
+                        </a>
+                    </div>
+                </div>
+
+                <div>
+                    <p class="text-[10px] uppercase tracking-[0.18em] font-bold text-slate-400 dark:text-slate-500 mb-3">Project Status</p>
+                    <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-800/40 text-emerald-700 dark:text-emerald-300 text-xs font-semibold">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                        Active Development
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-8 pt-4 border-t border-slate-200/70 dark:border-slate-800/70 flex flex-col sm:flex-row items-center justify-between gap-2">
+                <p class="text-xs text-slate-400 dark:text-slate-600 font-medium">
+                    Built with <i class="fa-solid fa-heart text-rose-500 mx-0.5"></i> for practical, everyday workflows.
+                </p>
+                <p class="text-[11px] text-slate-400 dark:text-slate-600">Powertools</p>
+            </div>
         </div>
-        <p class="text-xs text-slate-400 dark:text-slate-600 font-medium">
-            Built with <i class="fa-solid fa-heart text-rose-500 mx-0.5 animate-pulse"></i> by Powertools
-        </p>
     </footer>
 
     <script type="module" src="src/main.js"></script>
