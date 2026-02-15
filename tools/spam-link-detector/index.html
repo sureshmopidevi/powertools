@@ -55,6 +55,14 @@
             font-family: 'Plus Jakarta Sans', sans-serif;
         }
 
+        #particleCanvas {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 1;
+            opacity: 0.7;
+        }
+
         .code-syntax {
             color: #a5b3ce;
         }
@@ -89,12 +97,13 @@
 
 <body
     class="bg-background-light dark:bg-background-dark text-slate-800 dark:text-slate-200 font-display min-h-screen selection:bg-primary/30 transition-colors duration-300">
+    <canvas id="particleCanvas" aria-hidden="true"></canvas>
     <a href="../../index.html"
         class="absolute top-6 left-6 z-50 inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-primary hover:border-primary/30 transition-all text-xs font-semibold no-underline">
         <i class="fa-solid fa-arrow-left"></i>Home
     </a>
 
-    <main class="relative">
+    <main class="relative z-10">
         <section class="relative pt-20 pb-16 overflow-hidden" id="hero">
             <div
                 class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full max-w-7xl pointer-events-none opacity-20">
@@ -575,7 +584,7 @@ End If</pre>
     </main>
 
     <footer
-        class="py-8 text-center border-t border-slate-200 dark:border-slate-800 mt-12 bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm">
+        class="relative z-10 py-8 text-center border-t border-slate-200 dark:border-slate-800 mt-12 bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm">
         <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">
             &copy; 2026 Powertools. All rights reserved.
         </p>
@@ -611,6 +620,279 @@ End If</pre>
                 }, 1500);
             });
         });
+    </script>
+    <script>
+        (function initDetectorBackground() {
+            const canvas = document.getElementById('particleCanvas');
+            if (!canvas) {
+                return;
+            }
+
+            const context = canvas.getContext('2d');
+            if (!context) {
+                return;
+            }
+
+            const reduceMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+            const safeLinks = [
+                'https://www.apple.com',
+                'https://www.openai.com',
+                'https://www.icloud.com',
+                'https://support.apple.com',
+                'https://www.github.com'
+            ];
+            const riskyLinks = [
+                'http://185.44.10.22/login',
+                'https://bit.ly/win-reward',
+                'https://secure-update.top/verify',
+                'https://claim-bonus-link.xyz/pay',
+                'https://xn--pple-43d.com/icloud'
+            ];
+
+            const packets = [];
+            const pulses = [];
+            let width = 0;
+            let height = 0;
+            let beamX = 0;
+            let lastFrameTime = 0;
+
+            function isDarkMode() {
+                return document.documentElement.classList.contains('dark');
+            }
+
+            function prefersReducedMotion() {
+                return reduceMotionQuery.matches;
+            }
+
+            function getCount() {
+                if (window.innerWidth < 768) {
+                    return 9;
+                }
+                return 16;
+            }
+
+            function getColors() {
+                if (isDarkMode()) {
+                    return {
+                        beam: 'rgba(13,166,242,0.18)',
+                        beamEdge: 'rgba(13,166,242,0)',
+                        safeFill: 'rgba(13,166,242,0.14)',
+                        safeStroke: 'rgba(13,166,242,0.38)',
+                        riskyFill: 'rgba(244,63,94,0.16)',
+                        riskyStroke: 'rgba(244,63,94,0.5)',
+                        scannedSafe: 'rgba(16,185,129,0.24)',
+                        scannedRisky: 'rgba(244,63,94,0.3)',
+                        text: 'rgba(226,232,240,0.92)',
+                        pulse: 'rgba(244,63,94,0.6)'
+                    };
+                }
+                return {
+                    beam: 'rgba(13,166,242,0.12)',
+                    beamEdge: 'rgba(13,166,242,0)',
+                    safeFill: 'rgba(13,166,242,0.1)',
+                    safeStroke: 'rgba(13,166,242,0.26)',
+                    riskyFill: 'rgba(244,63,94,0.12)',
+                    riskyStroke: 'rgba(244,63,94,0.35)',
+                    scannedSafe: 'rgba(16,185,129,0.18)',
+                    scannedRisky: 'rgba(244,63,94,0.24)',
+                    text: 'rgba(15,23,42,0.75)',
+                    pulse: 'rgba(244,63,94,0.45)'
+                };
+            }
+
+            function roundedRect(x, y, w, h, r) {
+                const radius = Math.min(r, w / 2, h / 2);
+                context.beginPath();
+                context.moveTo(x + radius, y);
+                context.lineTo(x + w - radius, y);
+                context.quadraticCurveTo(x + w, y, x + w, y + radius);
+                context.lineTo(x + w, y + h - radius);
+                context.quadraticCurveTo(x + w, y + h, x + w - radius, y + h);
+                context.lineTo(x + radius, y + h);
+                context.quadraticCurveTo(x, y + h, x, y + h - radius);
+                context.lineTo(x, y + radius);
+                context.quadraticCurveTo(x, y, x + radius, y);
+                context.closePath();
+            }
+
+            function randomLink(isRisky) {
+                const source = isRisky ? riskyLinks : safeLinks;
+                return source[Math.floor(Math.random() * source.length)];
+            }
+
+            function createPacket(seedX) {
+                const risky = Math.random() < 0.35;
+                return {
+                    x: typeof seedX === 'number' ? seedX : Math.random() * width,
+                    y: 50 + Math.random() * Math.max(80, height - 120),
+                    speed: 0.22 + Math.random() * 0.3,
+                    bobOffset: Math.random() * Math.PI * 2,
+                    bobAmplitude: 1.2 + Math.random() * 2.2,
+                    label: randomLink(risky),
+                    risky,
+                    pulseCooldown: 0
+                };
+            }
+
+            function resetPacket(packet) {
+                packet.x = -220 - Math.random() * 200;
+                packet.y = 50 + Math.random() * Math.max(80, height - 120);
+                packet.speed = 0.22 + Math.random() * 0.3;
+                packet.bobOffset = Math.random() * Math.PI * 2;
+                packet.bobAmplitude = 1.2 + Math.random() * 2.2;
+                packet.risky = Math.random() < 0.35;
+                packet.label = randomLink(packet.risky);
+                packet.pulseCooldown = 0;
+            }
+
+            function seedPackets() {
+                packets.length = 0;
+                const count = getCount();
+                for (let index = 0; index < count; index += 1) {
+                    const x = (width / count) * index + Math.random() * 50;
+                    packets.push(createPacket(x));
+                }
+            }
+
+            function resizeCanvas() {
+                const dpr = Math.min(window.devicePixelRatio || 1, 2);
+                width = window.innerWidth;
+                height = window.innerHeight;
+                canvas.width = Math.floor(width * dpr);
+                canvas.height = Math.floor(height * dpr);
+                canvas.style.width = width + 'px';
+                canvas.style.height = height + 'px';
+                context.setTransform(dpr, 0, 0, dpr, 0, 0);
+                beamX = Math.min(beamX || width * 0.2, width);
+            }
+
+            function drawBeam(colors) {
+                const beamWidth = Math.max(90, Math.min(180, width * 0.15));
+                const gradient = context.createLinearGradient(beamX - beamWidth, 0, beamX + beamWidth, 0);
+                gradient.addColorStop(0, colors.beamEdge);
+                gradient.addColorStop(0.5, colors.beam);
+                gradient.addColorStop(1, colors.beamEdge);
+                context.fillStyle = gradient;
+                context.fillRect(beamX - beamWidth, 0, beamWidth * 2, height);
+            }
+
+            function drawPulse(colors, pulse) {
+                const alpha = Math.max(0, pulse.alpha);
+                if (alpha <= 0) {
+                    return;
+                }
+                context.beginPath();
+                context.strokeStyle = colors.pulse.replace(/[\d.]+\)$/, alpha.toFixed(3) + ')');
+                context.lineWidth = 2;
+                context.arc(pulse.x, pulse.y, pulse.radius, 0, Math.PI * 2);
+                context.stroke();
+            }
+
+            function drawPacket(packet, time, colors) {
+                if (!prefersReducedMotion()) {
+                    packet.x += packet.speed;
+                }
+                if (packet.x > width + 260) {
+                    resetPacket(packet);
+                }
+
+                if (packet.pulseCooldown > 0) {
+                    packet.pulseCooldown -= 1;
+                }
+
+                const textPaddingX = 10;
+                const textPaddingY = 7;
+                context.font = '12px "Plus Jakarta Sans", sans-serif';
+                const measured = context.measureText(packet.label);
+                const boxWidth = Math.min(290, measured.width + textPaddingX * 2 + (packet.risky ? 20 : 0));
+                const boxHeight = 28;
+                const bob = Math.sin(time * 0.0012 + packet.bobOffset) * packet.bobAmplitude;
+                const y = packet.y + (prefersReducedMotion() ? 0 : bob);
+                const scanDistance = Math.abs((packet.x + boxWidth / 2) - beamX);
+                const scanned = scanDistance < 90;
+
+                let fill = packet.risky ? colors.riskyFill : colors.safeFill;
+                let stroke = packet.risky ? colors.riskyStroke : colors.safeStroke;
+                if (scanned) {
+                    fill = packet.risky ? colors.scannedRisky : colors.scannedSafe;
+                }
+
+                roundedRect(packet.x, y, boxWidth, boxHeight, 8);
+                context.fillStyle = fill;
+                context.fill();
+                context.strokeStyle = stroke;
+                context.lineWidth = 1;
+                context.stroke();
+
+                context.fillStyle = colors.text;
+                context.fillText(packet.label, packet.x + textPaddingX, y + textPaddingY + 9);
+
+                if (packet.risky) {
+                    const markerX = packet.x + boxWidth - 12;
+                    const markerY = y + boxHeight / 2;
+                    context.beginPath();
+                    context.fillStyle = scanned ? 'rgba(244,63,94,0.9)' : 'rgba(244,63,94,0.6)';
+                    context.arc(markerX, markerY, 4, 0, Math.PI * 2);
+                    context.fill();
+
+                    if (scanned && packet.pulseCooldown <= 0) {
+                        pulses.push({ x: markerX, y: markerY, radius: 5, alpha: 0.55 });
+                        packet.pulseCooldown = 28;
+                    }
+                }
+            }
+
+            function animate(frameTime) {
+                if (document.hidden) {
+                    requestAnimationFrame(animate);
+                    return;
+                }
+
+                const colors = getColors();
+                context.clearRect(0, 0, width, height);
+
+                if (!prefersReducedMotion()) {
+                    const delta = lastFrameTime ? Math.min(40, frameTime - lastFrameTime) : 16;
+                    beamX += (delta * 0.085);
+                    if (beamX > width + 120) {
+                        beamX = -120;
+                    }
+                } else {
+                    beamX = width * 0.5;
+                }
+                lastFrameTime = frameTime;
+
+                drawBeam(colors);
+
+                for (let index = 0; index < packets.length; index += 1) {
+                    drawPacket(packets[index], frameTime, colors);
+                }
+
+                for (let i = pulses.length - 1; i >= 0; i -= 1) {
+                    const pulse = pulses[i];
+                    pulse.radius += prefersReducedMotion() ? 0.2 : 0.6;
+                    pulse.alpha -= prefersReducedMotion() ? 0.015 : 0.02;
+                    drawPulse(colors, pulse);
+                    if (pulse.alpha <= 0) {
+                        pulses.splice(i, 1);
+                    }
+                }
+
+                requestAnimationFrame(animate);
+            }
+
+            resizeCanvas();
+            seedPackets();
+            requestAnimationFrame(animate);
+
+            window.addEventListener('resize', () => {
+                resizeCanvas();
+                seedPackets();
+            });
+            reduceMotionQuery.addEventListener('change', () => {
+                seedPackets();
+            });
+        })();
     </script>
 </body>
 
