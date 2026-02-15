@@ -10,6 +10,7 @@ export class AppUI {
       view: 'dashboard',
       items: [],
       snapshots: [],
+      recurring: [],
       currency: '₹',
       ageGroup: '30-35'
     };
@@ -33,6 +34,7 @@ export class AppUI {
   async loadData() {
     this.state.items = await this.storage.getAllItems();
     this.state.snapshots = await this.storage.getAllSnapshots();
+    this.state.recurring = await this.storage.getAllRecurring();
     // Default items if empty
     if (this.state.items.length === 0 && this.state.snapshots.length === 0) {
       await this.seedInitialData();
@@ -102,6 +104,9 @@ export class AppUI {
         break;
       case 'liabilities':
         this.renderItemList('liability');
+        break;
+      case 'recurring':
+        this.renderRecurring();
         break;
       case 'history':
         this.renderHistory();
@@ -345,7 +350,214 @@ export class AppUI {
     });
   }
 
+  // --- Recurring Transactions View ---
+  renderRecurring() {
+    const recurring = this.state.recurring;
+    const totalMonthlyOutflow = this.getMonthlyRecurringTotal('expense');
+    const totalMonthlyInflow = this.getMonthlyRecurringTotal('income');
+
+    this.contentArea.innerHTML = `
+            <div class="space-y-8">
+                <header class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+                    <div>
+                        <h2 class="text-3xl font-black text-slate-900 dark:text-white tracking-tight">Recurring Transactions</h2>
+                        <p class="text-slate-500 dark:text-slate-400 font-medium">Track subscriptions, SIPs, EMIs and automated flows</p>
+                    </div>
+                    <button id="addRecurringBtn" class="nebula-btn nebula-btn-primary">
+                        <i class="fa-solid fa-plus"></i> Add recurring
+                    </button>
+                </header>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="nebula-card p-6">
+                        <p class="text-label">Total Active</p>
+                        <h3 class="text-metric">${recurring.filter(r => r.status === 'active').length}</h3>
+                        <p class="mt-2 text-xs text-slate-400">Recurring items running now</p>
+                    </div>
+                    <div class="nebula-card p-6">
+                        <p class="text-label">Monthly Outflow</p>
+                        <h3 class="text-metric text-rose-500">${this.formatVal(totalMonthlyOutflow)}</h3>
+                        <p class="mt-2 text-xs text-slate-400">Subscriptions, SIPs, EMIs, etc.</p>
+                    </div>
+                    <div class="nebula-card p-6">
+                        <p class="text-label">Monthly Inflow</p>
+                        <h3 class="text-metric text-emerald-500">${this.formatVal(totalMonthlyInflow)}</h3>
+                        <p class="mt-2 text-xs text-slate-400">Salary, rent, and other recurring credits</p>
+                    </div>
+                </div>
+
+                <div class="nebula-table-container overflow-x-auto">
+                    <table class="nebula-table w-full">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Type</th>
+                                <th>Direction</th>
+                                <th>Cycle</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                                <th class="text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${recurring.map(entry => `
+                                <tr>
+                                    <td>
+                                        <p class="font-bold text-slate-800 dark:text-white">${entry.name}</p>
+                                        <p class="text-xs text-slate-400">${entry.note || ''}</p>
+                                    </td>
+                                    <td><span class="px-2 py-1 bg-slate-100 dark:bg-slate-800 rounded text-[10px] font-bold text-slate-500 uppercase">${entry.type}</span></td>
+                                    <td class="${entry.direction === 'income' ? 'text-emerald-500' : 'text-rose-500'} font-bold uppercase text-xs">${entry.direction}</td>
+                                    <td class="uppercase text-xs font-bold text-slate-500">${entry.cycle}</td>
+                                    <td class="font-mono font-bold text-slate-900 dark:text-white">${this.formatVal(entry.amount)}</td>
+                                    <td>
+                                        <span class="nebula-badge ${entry.status === 'active' ? 'nebula-badge-warning' : 'nebula-badge-neutral'}">${entry.status}</span>
+                                    </td>
+                                    <td class="text-right space-x-2">
+                                        <button data-id="${entry.id}" class="edit-recurring nebula-btn-ghost">
+                                            <i class="fa-solid fa-pen-to-square"></i>
+                                        </button>
+                                        <button data-id="${entry.id}" class="delete-recurring nebula-btn-ghost hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-900/20">
+                                            <i class="fa-solid fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                            ${recurring.length === 0 ? `<tr><td colspan="7" class="text-center py-12 text-slate-400 italic">No recurring transactions yet.</td></tr>` : ''}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="recurringModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center hidden">
+                <div class="bg-white dark:bg-slate-900 w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden animate-enter mx-4">
+                    <div class="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
+                        <h3 class="font-black text-xl text-slate-800 dark:text-white" id="recurringModalTitle">Add Recurring</h3>
+                        <button id="closeRecurringModal" class="nebula-btn-ghost"><i class="fa-solid fa-times"></i></button>
+                    </div>
+                    <form id="recurringForm" class="p-6 space-y-4">
+                        <input type="hidden" id="recurringId">
+                        <div class="form-field">
+                            <label class="nebula-label">Name</label>
+                            <input id="recurringName" class="nebula-input" required placeholder="Netflix, SIP - Nifty 50, Home EMI">
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div class="form-field">
+                                <label class="nebula-label">Type</label>
+                                <select id="recurringType" class="nebula-input">
+                                    <option value="subscription">Subscription</option>
+                                    <option value="sip">SIP</option>
+                                    <option value="emi">EMI</option>
+                                    <option value="insurance">Insurance</option>
+                                    <option value="salary">Salary</option>
+                                    <option value="rent">Rent</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                            <div class="form-field">
+                                <label class="nebula-label">Direction</label>
+                                <select id="recurringDirection" class="nebula-input">
+                                    <option value="expense">Expense</option>
+                                    <option value="income">Income</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div class="form-field">
+                                <label class="nebula-label">Cycle</label>
+                                <select id="recurringCycle" class="nebula-input">
+                                    <option value="monthly">Monthly</option>
+                                    <option value="quarterly">Quarterly</option>
+                                    <option value="yearly">Yearly</option>
+                                </select>
+                            </div>
+                            <div class="form-field">
+                                <label class="nebula-label">Status</label>
+                                <select id="recurringStatus" class="nebula-input">
+                                    <option value="active">Active</option>
+                                    <option value="paused">Paused</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-field">
+                            <label class="nebula-label">Amount (${this.state.currency})</label>
+                            <input id="recurringAmount" type="number" min="0" step="0.01" class="nebula-input font-mono" required>
+                        </div>
+                        <div class="form-field">
+                            <label class="nebula-label">Note (optional)</label>
+                            <input id="recurringNote" class="nebula-input" placeholder="Paid on 5th of every month">
+                        </div>
+                        <button class="w-full nebula-btn nebula-btn-primary" type="submit">Save recurring transaction</button>
+                    </form>
+                </div>
+            </div>
+        `;
+
+    this.attachRecurringListeners();
+  }
+
   // --- Actions & Helpers ---
+  attachRecurringListeners() {
+    const modal = document.getElementById('recurringModal');
+    const form = document.getElementById('recurringForm');
+
+    document.getElementById('addRecurringBtn').addEventListener('click', () => {
+      form.reset();
+      document.getElementById('recurringId').value = '';
+      document.getElementById('recurringStatus').value = 'active';
+      document.getElementById('recurringModalTitle').textContent = 'Add Recurring';
+      modal.classList.remove('hidden');
+    });
+
+    document.getElementById('closeRecurringModal').addEventListener('click', () => modal.classList.add('hidden'));
+
+    document.querySelectorAll('.edit-recurring').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const entry = this.state.recurring.find(r => r.id === btn.dataset.id);
+        if (!entry) return;
+        document.getElementById('recurringId').value = entry.id;
+        document.getElementById('recurringName').value = entry.name;
+        document.getElementById('recurringType').value = entry.type;
+        document.getElementById('recurringDirection').value = entry.direction;
+        document.getElementById('recurringCycle').value = entry.cycle;
+        document.getElementById('recurringStatus').value = entry.status;
+        document.getElementById('recurringAmount').value = entry.amount;
+        document.getElementById('recurringNote').value = entry.note || '';
+        document.getElementById('recurringModalTitle').textContent = 'Edit Recurring';
+        modal.classList.remove('hidden');
+      });
+    });
+
+    document.querySelectorAll('.delete-recurring').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        if (confirm('Delete this recurring transaction?')) {
+          await this.storage.deleteRecurring(btn.dataset.id);
+          await this.loadData();
+          this.renderView();
+        }
+      });
+    });
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const entry = {
+        id: document.getElementById('recurringId').value || null,
+        name: document.getElementById('recurringName').value.trim(),
+        type: document.getElementById('recurringType').value,
+        direction: document.getElementById('recurringDirection').value,
+        cycle: document.getElementById('recurringCycle').value,
+        status: document.getElementById('recurringStatus').value,
+        amount: parseFloat(document.getElementById('recurringAmount').value) || 0,
+        note: document.getElementById('recurringNote').value.trim()
+      };
+
+      await this.storage.saveRecurring(entry);
+      await this.loadData();
+      modal.classList.add('hidden');
+      this.renderView();
+    });
+  }
+
   attachItemListeners(type) {
     const modal = document.getElementById('itemModal');
     const form = document.getElementById('itemForm');
@@ -484,5 +696,15 @@ export class AppUI {
       currency: 'INR',
       maximumFractionDigits: 0,
     }).format(val || 0);
+  }
+
+  getMonthlyRecurringTotal(direction) {
+    const factor = { monthly: 1, quarterly: 1 / 3, yearly: 1 / 12 };
+    return this.state.recurring
+      .filter(entry => entry.status === 'active' && entry.direction === direction)
+      .reduce((sum, entry) => {
+        const cycleFactor = factor[entry.cycle] || 1;
+        return sum + (entry.amount * cycleFactor);
+      }, 0);
   }
 }

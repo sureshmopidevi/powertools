@@ -29,12 +29,12 @@ export class AppUI {
             
             <!-- Header -->
             <div class="mb-10 md:mb-14">
-                <a href="../../index.html" class="inline-flex items-center gap-2 px-3 py-1.5 mb-6 rounded-lg bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:text-violet-600 dark:hover:text-violet-400 hover:border-violet-300 dark:hover:border-violet-600 transition-all text-xs font-semibold no-underline w-fit">
+                <a href="../../index.html" class="inline-flex items-center gap-2 px-3 py-1.5 mb-6 rounded-lg bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:text-gold-600 dark:hover:text-gold-400 hover:border-gold-300 dark:hover:border-gold-600 transition-all text-xs font-semibold no-underline w-fit">
                     <i class="fa-solid fa-arrow-left"></i>Home
                 </a>
                 <div class="flex items-center justify-between mb-4">
                     <div class="flex items-center gap-3">
-                        <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-violet-500 to-fuchsia-600 flex items-center justify-center text-white shadow-lg shadow-violet-500/20">
+                        <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-gold-500 to-amber-600 flex items-center justify-center text-white shadow-lg shadow-gold-500/20">
                             <i class="fa-solid fa-calculator text-xl"></i>
                         </div>
                         <div>
@@ -53,7 +53,7 @@ export class AppUI {
                     </button>
                 </div>
                 <p class="text-base text-slate-600 dark:text-slate-300 max-w-3xl leading-relaxed">
-                     Compare "No Cost EMI" schemes against upfront payments. Uncover hidden interest costs (GST) and calculate the opportunity cost of your money.
+                     Compare "No Cost EMI" against upfront purchase using true effective cost, tax impact, and reinvestment assumptions.
                 </p>
             </div>
 
@@ -64,7 +64,7 @@ export class AppUI {
                     <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-xl shadow-slate-200/50 dark:shadow-black/20 border border-slate-100 dark:border-slate-700 p-6 md:p-8 sticky top-6 z-10">
                         
                         <div class="flex items-center gap-3 mb-6 pb-4 border-b border-slate-100 dark:border-slate-700">
-                             <div class="w-10 h-10 rounded-full bg-violet-100 dark:bg-violet-900/30 text-violet-600 dark:text-violet-400 flex items-center justify-center text-lg">
+                             <div class="w-10 h-10 rounded-full bg-gold-100 dark:bg-gold-900/30 text-gold-600 dark:text-gold-400 flex items-center justify-center text-lg">
                                 <i class="fa-solid fa-sliders"></i>
                             </div>
                             <div>
@@ -91,7 +91,7 @@ export class AppUI {
                             </div>
 
                              <div class="pt-4 border-t border-slate-100 dark:border-slate-700">
-                                <button id="advancedToggle" class="w-full flex items-center justify-between text-sm font-semibold text-slate-600 dark:text-slate-400 hover:text-violet-600 dark:hover:text-violet-400 transition-colors">
+                                <button id="advancedToggle" class="w-full flex items-center justify-between text-sm font-semibold text-slate-600 dark:text-slate-400 hover:text-gold-600 dark:hover:text-gold-400 transition-colors">
                                     <span>Advanced Options</span>
                                     <i class="fa-solid fa-chevron-down transition-transform duration-300 ${this.state.showAdvanced ? 'rotate-180' : ''}"></i>
                                 </button>
@@ -110,8 +110,8 @@ export class AppUI {
                     <!-- Recommendation Card -->
                     <div id="recommendationCard" class="relative overflow-hidden rounded-3xl p-8 md:p-10 text-white shadow-2xl transition-all duration-500 bg-slate-900 border border-slate-800">
                          <!-- Backgrounds -->
-                        <div id="recBgEmi" class="absolute inset-0 bg-gradient-to-br from-[#431407] via-[#7c2d12] to-[#451a03] transition-opacity duration-700 opacity-0"></div> <!-- Muted Deep Copper for EMI -->
-                        <div id="recBgUpfront" class="absolute inset-0 bg-gradient-to-br from-[#422006] via-[#713f12] to-[#452207] transition-opacity duration-700 opacity-0"></div> <!-- Muted Deep Gold for Upfront -->
+                        <div id="recBgEmi" class="absolute inset-0 bg-gradient-to-br from-[#1f2937] via-[#0f172a] to-[#020617] transition-opacity duration-700 opacity-0"></div>
+                        <div id="recBgUpfront" class="absolute inset-0 bg-gradient-to-br from-[#422006] via-[#713f12] to-[#452207] transition-opacity duration-700 opacity-100"></div>
                         
                         <!-- Content -->
                         <div class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
@@ -192,14 +192,14 @@ export class AppUI {
                             ${this.renderMetric('Monthly EMI', 'monthlyEmiMetric', 'tenureMetric')}
                             ${this.renderMetric('Interest Earned', 'interestMetric', null, 'text-emerald-600 dark:text-emerald-400')}
                             ${this.renderMetric('Processing Fee', 'processMetric', null, 'text-rose-600 dark:text-rose-400')}
-                            ${this.renderMetric('GST on Interest', 'gstMetric', null, 'text-rose-600 dark:text-rose-400')}
+                            ${this.renderMetric('Break-even APY', 'gstMetric', null, 'text-gold-600 dark:text-gold-400')}
                         </div>
                     </div>
 
-                     <div class="bg-blue-50 dark:bg-blue-900/10 rounded-2xl p-4 border border-blue-100 dark:border-blue-900/30 flex gap-3 text-sm text-blue-800 dark:text-blue-300">
+                     <div class="bg-gold-50 dark:bg-gold-900/10 rounded-2xl p-4 border border-gold-100 dark:border-gold-900/30 flex gap-3 text-sm text-gold-900 dark:text-gold-300">
                         <i class="fa-solid fa-circle-info mt-0.5"></i>
                         <p>
-                            <strong>How this works:</strong> "No Cost EMI" schemes discount the product price equal to the interest amount. However, you still pay 18% GST on that interest component. By paying upfront, you get the discount directly throughout the product cost.
+                            <strong>Decision rule:</strong> Choose EMI only if your expected return is above break-even APY and liquidity benefits matter for your cashflow.
                         </p>
                     </div>
 
@@ -225,7 +225,7 @@ export class AppUI {
                     id="${id}"
                     value="${this.state[id]}"
                     ${disabled ? 'disabled' : ''}
-                    class="w-full ${prefix ? 'pl-8' : 'pl-4'} pr-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl font-bold text-slate-800 dark:text-slate-100 text-sm focus:outline-none focus:bg-white dark:focus:bg-slate-950 focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 transition-all ${disabled ? 'opacity-60 cursor-not-allowed' : ''}"
+                    class="w-full ${prefix ? 'pl-8' : 'pl-4'} pr-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl font-bold text-slate-800 dark:text-slate-100 text-sm focus:outline-none focus:bg-white dark:focus:bg-slate-950 focus:ring-2 focus:ring-gold-500/20 focus:border-gold-500 transition-all ${disabled ? 'opacity-60 cursor-not-allowed' : ''}"
                 />
             </div>
              ${helper ? `<p class="text-[10px] text-slate-400 mt-1.5 ml-1">${helper}</p>` : ''}
@@ -238,7 +238,7 @@ export class AppUI {
         <div class="group">
             <div class="flex justify-between items-center mb-2">
                 <label class="text-sm font-semibold text-slate-700 dark:text-slate-300">${label}</label>
-                <div class="font-bold text-violet-600 dark:text-violet-400 text-sm tabular-nums">
+                <div class="font-bold text-gold-600 dark:text-gold-400 text-sm tabular-nums">
                     <span id="${id}Display">${this.state[id]}</span>${suffix ? ` <span class="text-xs text-slate-400 font-normal">${suffix}</span>` : ''}
                 </div>
             </div>
@@ -250,7 +250,7 @@ export class AppUI {
                 max="${max}"
                 step="${step}"
                 value="${this.state[id]}"
-                class="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-violet-600"
+                class="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-gold-600"
             />
              ${helper ? `<p class="text-[10px] text-slate-400 mt-2">${helper}</p>` : ''}
         </div>
@@ -266,7 +266,7 @@ export class AppUI {
             </div>
              <label class="relative inline-flex items-center cursor-pointer">
                 <input type="checkbox" id="${id}" class="sr-only peer" ${this.state[id] ? 'checked' : ''}>
-                <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-violet-300 dark:peer-focus:ring-violet-800 rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-violet-600"></div>
+                <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-gold-300 dark:peer-focus:ring-gold-800 rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-gold-600"></div>
             </label>
         </div>
         `;
@@ -367,15 +367,15 @@ export class AppUI {
         if (result.isEmiBetter) {
             recBgEmi.classList.remove('opacity-0');
             recBgUpfront.classList.add('opacity-0');
-            recLabel.textContent = 'Strategic Alpha';
-            recTitle.innerHTML = 'Leverage EMI';
-            recDesc.textContent = "Your capital works harder when invested. The return on liquidity (Apeiron) outperforms the upfront discount cost.";
+            recLabel.textContent = 'Recommendation';
+            recTitle.innerHTML = 'Choose EMI';
+            recDesc.textContent = "Expected investment returns offset fees and GST, making EMI the lower effective-cost option.";
         } else {
             recBgEmi.classList.add('opacity-0');
             recBgUpfront.classList.remove('opacity-0');
-            recLabel.textContent = 'Net Savings';
-            recTitle.innerHTML = 'Direct Purchase';
-            recDesc.textContent = "Immediate ownership provides the highest net-present-value. The upfront discount creates a risk-free margin of safety.";
+            recLabel.textContent = 'Recommendation';
+            recTitle.innerHTML = 'Pay Upfront';
+            recDesc.textContent = "Under current assumptions, upfront purchase has lower net cash outflow and avoids fee drag.";
         }
 
         recAmount.textContent = fmtDec(Math.abs(result.savings));
@@ -418,6 +418,11 @@ export class AppUI {
         document.getElementById('tenureMetric').textContent = `x ${this.state.tenure} mo`;
         document.getElementById('interestMetric').textContent = fmt(result.totalInterestEarned);
         document.getElementById('processMetric').textContent = fmt(this.state.processingFee);
-        document.getElementById('gstMetric').textContent = fmt(result.gstCost);
+        const breakEvenNode = document.getElementById('gstMetric');
+        if (breakEvenNode) {
+            breakEvenNode.textContent = result.breakEvenReturnRate === null
+                ? '> 40% APY'
+                : `${result.breakEvenReturnRate.toFixed(2)}%`;
+        }
     }
 }

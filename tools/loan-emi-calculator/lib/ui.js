@@ -107,7 +107,7 @@ export class AppUI {
           <section class="lg:col-span-5 space-y-6">
             
             <!-- Primary Result Card -->
-            <div class="bg-white dark:bg-slate-800 rounded-[2rem] shadow-2xl shadow-slate-200/50 dark:shadow-black/40 border border-gold-100 dark:border-slate-700 p-8 relative overflow-hidden group">
+            <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl shadow-slate-200/50 dark:shadow-black/40 border border-gold-100 dark:border-slate-700 p-8 relative overflow-hidden group">
               <div class="absolute -top-10 -right-10 w-40 h-40 bg-gold-500/5 rounded-full blur-3xl group-hover:bg-gold-500/10 transition-colors"></div>
               
               <div class="relative z-10 text-center mb-8">
@@ -130,6 +130,17 @@ export class AppUI {
                 </div>
               </div>
 
+              <div class="grid grid-cols-2 gap-4 mt-4 relative z-10">
+                <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-700">
+                  <p class="text-[10px] text-slate-400 uppercase tracking-wider font-bold mb-1">Interest / Principal</p>
+                  <p id="interestRatioDisplay" class="text-lg font-bold text-slate-900 dark:text-white tabular-nums">0.00x</p>
+                </div>
+                <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-700">
+                  <p class="text-[10px] text-slate-400 uppercase tracking-wider font-bold mb-1">Payout Multiple</p>
+                  <p id="payMultipleDisplay" class="text-lg font-bold text-slate-900 dark:text-white tabular-nums">0.00x</p>
+                </div>
+              </div>
+
               <div class="flex gap-3 mt-8 relative z-10">
                 <button id="shareButton" class="flex-1 flex items-center justify-center gap-2 bg-slate-900 dark:bg-gold-600 hover:bg-black dark:hover:bg-gold-500 text-white dark:text-slate-900 py-4 rounded-2xl font-bold transition-all shadow-lg active:scale-[0.98]">
                   <i class="fa-solid fa-share-nodes"></i>
@@ -142,7 +153,7 @@ export class AppUI {
             </div>
 
             <!-- Visualizations -->
-            <div class="bg-white dark:bg-slate-800 rounded-[2rem] shadow-sm border border-slate-100 dark:border-slate-700 p-8">
+            <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-700 p-8">
               <h3 class="font-bold text-slate-800 dark:text-white mb-8 text-center uppercase tracking-widest text-xs">Payment Breakdown</h3>
               
               <div class="relative h-56 mb-8">
@@ -311,7 +322,11 @@ export class AppUI {
     document.getElementById('totalAmountDisplay').textContent = this.formatCurrency(totalAmount);
 
     const interestPercent = totalAmount > 0 ? (totalInterest / totalAmount) * 100 : 0;
+    const interestRatio = this.state.amount > 0 ? totalInterest / this.state.amount : 0;
+    const payoutMultiple = this.state.amount > 0 ? totalAmount / this.state.amount : 0;
     document.getElementById('interestPercentDisplay').textContent = `${interestPercent.toFixed(1)}% of total`;
+    document.getElementById('interestRatioDisplay').textContent = `${interestRatio.toFixed(2)}x`;
+    document.getElementById('payMultipleDisplay').textContent = `${payoutMultiple.toFixed(2)}x`;
 
     // Comparisons
     this.renderComparisons(emi, totalInterest);
@@ -339,7 +354,7 @@ export class AppUI {
       const isActive = comp.tenure === this.state.tenureYears;
       const activeClass = isActive ? 'border-gold-400 dark:border-gold-500 bg-gold-50 dark:bg-gold-500/10' : '';
       return `
-        <button class="comparison-btn w-full text-left p-5 rounded-[1.5rem] border border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/30 hover:border-gold-300 dark:hover:border-gold-600 transition-all group ${activeClass}" data-tenure="${comp.tenure}">
+        <button class="comparison-btn w-full text-left p-5 rounded-2xl border border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/30 hover:border-gold-300 dark:hover:border-gold-600 transition-all group ${activeClass}" data-tenure="${comp.tenure}">
           <div class="flex justify-between items-center mb-3">
             <span class="font-bold text-slate-800 dark:text-white">${comp.tenure} Years</span>
             <i class="fa-solid ${isActive ? 'fa-check text-gold-500' : 'fa-arrow-right text-slate-300 group-hover:text-gold-500 group-hover:translate-x-1'} text-[10px] transition-all"></i>
@@ -549,7 +564,7 @@ export class AppUI {
       `💰 Principal: ${this.formatCurrency(this.state.amount)}\n` +
       `📉 Interest Rate: ${this.state.rate}%\n` +
       `⏳ Tenure: ${this.state.tenureYears} Years\n\n` +
-      `� Monthly EMI: ${this.formatCurrency(emi)}\n` +
+      `💵 Monthly EMI: ${this.formatCurrency(emi)}\n` +
       `💸 Total Interest: ${this.formatCurrency(totalInterest)}\n` +
       `🏦 Total Payable: ${this.formatCurrency(totalAmount)}`;
 
