@@ -308,28 +308,49 @@
 
         .blackhole {
             position: absolute;
-            left: 28%;
-            top: 56%;
-            width: 120px;
-            height: 120px;
-            margin-left: -60px;
-            margin-top: -60px;
+            right: 9%;
+            bottom: 10%;
+            width: 92px;
+            height: 92px;
             border-radius: 9999px;
-            background: radial-gradient(circle at 45% 42%, #020617 0%, #000 44%, #030712 62%, rgba(99, 102, 241, 0.42) 100%);
+            background:
+                conic-gradient(from 10deg,
+                    rgba(34, 211, 238, 0.34),
+                    rgba(99, 102, 241, 0.48),
+                    rgba(17, 24, 39, 0.96),
+                    rgba(251, 191, 36, 0.22),
+                    rgba(34, 211, 238, 0.34)),
+                radial-gradient(circle at 46% 44%, #01040a 0%, #000 46%, #030712 66%, rgba(99, 102, 241, 0.3) 100%);
             box-shadow:
-                0 0 24px rgba(99, 102, 241, 0.42),
-                0 0 56px rgba(56, 189, 248, 0.24);
-            animation: blackhole-spin 10s linear infinite;
+                0 0 30px rgba(99, 102, 241, 0.48),
+                0 0 56px rgba(56, 189, 248, 0.26);
+            animation: blackhole-spin 9s linear infinite, blackhole-pulse 4.8s ease-in-out infinite;
         }
 
         .blackhole::before {
             content: '';
             position: absolute;
-            inset: -14px;
+            inset: -10px;
             border-radius: 9999px;
             border: 1px solid rgba(148, 163, 184, 0.24);
             box-shadow: 0 0 24px rgba(56, 189, 248, 0.2) inset;
-            animation: blackhole-ring 6s linear infinite;
+            animation: blackhole-ring 5.2s linear infinite;
+        }
+
+        .blackhole::after {
+            content: '';
+            position: absolute;
+            inset: -18px;
+            border-radius: 9999px;
+            background: conic-gradient(from 0deg,
+                    transparent 0deg,
+                    rgba(34, 211, 238, 0.52) 86deg,
+                    rgba(99, 102, 241, 0.5) 180deg,
+                    rgba(251, 191, 36, 0.34) 248deg,
+                    transparent 360deg);
+            filter: blur(10px);
+            opacity: 0.78;
+            animation: blackhole-shimmer 4.4s linear infinite;
         }
 
         .rocket-field {
@@ -382,37 +403,37 @@
         .rocket-lr-a {
             --rocket-angle: 44deg;
             animation-name: rocket-lr-a;
-            animation-duration: 16s;
-            animation-delay: -2.6s;
+            animation-duration: 30s;
+            animation-delay: 0s;
         }
 
         .rocket-lr-b {
             --rocket-angle: 46deg;
             animation-name: rocket-lr-b;
-            animation-duration: 21s;
-            animation-delay: -9.2s;
+            animation-duration: 30s;
+            animation-delay: 0s;
             opacity: 0.9;
         }
 
         .rocket-rl-a {
             --rocket-angle: 224deg;
             animation-name: rocket-rl-a;
-            animation-duration: 18s;
-            animation-delay: -5.1s;
+            animation-duration: 30s;
+            animation-delay: 0s;
         }
 
         .rocket-hole-a {
             --rocket-angle: 24deg;
             animation-name: rocket-hole-a;
-            animation-duration: 15s;
-            animation-delay: -1.8s;
+            animation-duration: 30s;
+            animation-delay: 0s;
         }
 
         .rocket-hole-b {
             --rocket-angle: 158deg;
             animation-name: rocket-hole-b;
-            animation-duration: 19s;
-            animation-delay: -7.4s;
+            animation-duration: 30s;
+            animation-delay: 0s;
         }
 
         .mini-ship {
@@ -548,91 +569,116 @@
         }
 
         @keyframes rocket-lr-a {
-            0% {
+            0%,
+            1% {
                 transform: translate3d(-14vw, 78vh, -40px) scale(0.84);
                 opacity: 0;
             }
 
-            8% {
-                opacity: 0.95;
+            3% {
+                opacity: 0.9;
             }
 
-            100% {
+            18% {
                 transform: translate3d(112vw, 28vh, 90px) scale(0.98);
+                opacity: 0.9;
+            }
+
+            20%,
+            100% {
+                transform: translate3d(114vw, 26vh, 100px) scale(0.98);
                 opacity: 0;
             }
         }
 
         @keyframes rocket-lr-b {
-            0% {
+            0%,
+            38% {
                 transform: translate3d(-16vw, 24vh, -20px) scale(0.74);
                 opacity: 0;
             }
 
-            10% {
-                opacity: 0.92;
+            40% {
+                opacity: 0.88;
             }
 
-            100% {
+            56% {
                 transform: translate3d(114vw, 68vh, 70px) scale(0.88);
+                opacity: 0.88;
+            }
+
+            58%,
+            100% {
+                transform: translate3d(116vw, 70vh, 76px) scale(0.88);
                 opacity: 0;
             }
         }
 
         @keyframes rocket-rl-a {
-            0% {
+            0%,
+            56% {
                 transform: translate3d(114vw, 72vh, 30px) scale(0.86);
                 opacity: 0;
             }
 
-            10% {
-                opacity: 0.94;
+            58% {
+                opacity: 0.9;
             }
 
-            100% {
+            74% {
                 transform: translate3d(-16vw, 22vh, 92px) scale(0.98);
+                opacity: 0.9;
+            }
+
+            76%,
+            100% {
+                transform: translate3d(-18vw, 20vh, 102px) scale(0.98);
                 opacity: 0;
             }
         }
 
         @keyframes rocket-hole-a {
-            0% {
+            0%,
+            18% {
                 transform: translate3d(-14vw, 18vh, -30px) scale(0.8);
                 opacity: 0;
             }
 
-            14% {
-                opacity: 0.95;
+            20% {
+                opacity: 0.88;
             }
 
-            78% {
-                transform: translate3d(24vw, 54vh, 68px) scale(0.78);
-                opacity: 0.92;
+            34% {
+                transform: translate3d(84vw, 60vh, 72px) scale(0.82);
+                opacity: 0.88;
             }
 
+            36%,
             100% {
-                transform: translate3d(28vw, 56vh, 120px) scale(0.22);
+                transform: translate3d(90vw, 74vh, 120px) scale(0.24);
                 opacity: 0;
             }
         }
 
         @keyframes rocket-hole-b {
-            0% {
+            0%,
+            74% {
                 transform: translate3d(112vw, 14vh, -20px) scale(0.8);
                 opacity: 0;
             }
 
-            16% {
-                opacity: 0.95;
-            }
-
-            80% {
-                transform: translate3d(36vw, 48vh, 72px) scale(0.8);
+            76% {
                 opacity: 0.9;
             }
 
+            92% {
+                transform: translate3d(-10vw, 62vh, 80px) scale(0.84);
+                opacity: 0.88;
+            }
+
+            94%,
             100% {
-                transform: translate3d(28vw, 56vh, 126px) scale(0.2);
+                transform: translate3d(-14vw, 66vh, 100px) scale(0.74);
                 opacity: 0;
             }
         }
@@ -668,6 +714,37 @@
             50% {
                 transform: scale(1.08);
                 opacity: 0.82;
+            }
+        }
+
+        @keyframes blackhole-shimmer {
+            from {
+                transform: rotate(0deg) scale(1);
+                opacity: 0.66;
+            }
+
+            50% {
+                opacity: 0.92;
+            }
+
+            to {
+                transform: rotate(360deg) scale(1);
+                opacity: 0.66;
+            }
+        }
+
+        @keyframes blackhole-pulse {
+            0%,
+            100% {
+                box-shadow:
+                    0 0 34px rgba(99, 102, 241, 0.52),
+                    0 0 72px rgba(56, 189, 248, 0.32);
+            }
+
+            50% {
+                box-shadow:
+                    0 0 42px rgba(99, 102, 241, 0.6),
+                    0 0 74px rgba(56, 189, 248, 0.38);
             }
         }
 
@@ -713,8 +790,8 @@
             }
 
             .blackhole {
-                left: 24%;
-                top: 58%;
+                right: 6%;
+                bottom: 8%;
                 transform: scale(0.9);
             }
         }
@@ -737,12 +814,10 @@
             }
 
             .blackhole {
-                left: 26%;
-                top: 62%;
-                width: 92px;
-                height: 92px;
-                margin-left: -46px;
-                margin-top: -46px;
+                right: 4%;
+                bottom: 6%;
+                width: 76px;
+                height: 76px;
             }
 
             .mini-ship {
@@ -758,6 +833,7 @@
             .star-pulse,
             .blackhole,
             .blackhole::before,
+            .blackhole::after,
             .mini-ship {
                 animation: none !important;
             }
