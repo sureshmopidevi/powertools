@@ -1,17 +1,20 @@
-
 import { EMICalculator } from './calculator.js';
 
 export class AppUI {
     constructor() {
         this.state = {
             productPrice: 80000,
-            tenure: 6,
+            tenure: 9,
             processingFee: 199,
-            returnRate: 7.0,
-            foregoneDiscount: 2500,
+            returnRate: 10,
+            upfrontDiscount: 5000,
+            emiDiscount: 2500,
             gstOnInterest: true,
-            showAdvanced: false,
-            bankInterestRate: 15
+            showAdvanced: true,
+            bankInterestRate: 15,
+            emiStrategy: 'no_cost_subvention',
+            subventionShare: 100,
+            downPayment: 0
         };
         this.app = document.getElementById('app');
     }
@@ -25,248 +28,203 @@ export class AppUI {
 
     getHTML() {
         return `
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 py-8 md:py-12 font-sans text-slate-600 dark:text-slate-400">
-            
-            <!-- Header -->
-            <div class="mb-10 md:mb-14">
-                <a href="../../index.html" class="inline-flex items-center gap-2 px-3 py-1.5 mb-6 rounded-lg bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:text-gold-600 dark:hover:text-gold-400 hover:border-gold-300 dark:hover:border-gold-600 transition-all text-xs font-semibold no-underline w-fit">
-                    <i class="fa-solid fa-arrow-left"></i>Home
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 py-8 md:py-12 font-inter text-slate-700 dark:text-slate-300 space-y-8">
+            <header class="space-y-4">
+                <a href="../../index.html" class="inline-flex items-center gap-2 h-11 px-4 rounded-xl bg-white/90 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:text-gold-600 dark:hover:text-gold-400 transition-colors no-underline text-sm font-semibold">
+                    <i class="fa-solid fa-arrow-left"></i> Home
                 </a>
-                <div class="flex items-center justify-between mb-4">
-                    <div class="flex items-center gap-3">
-                        <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-gold-500 to-amber-600 flex items-center justify-center text-white shadow-lg shadow-gold-500/20">
-                            <i class="fa-solid fa-calculator text-xl"></i>
-                        </div>
-                        <div>
-                            <h1 class="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white tracking-tight">
-                                EMI Analyzer
-                            </h1>
-                            <p class="text-sm font-medium text-slate-500 dark:text-slate-400">
-                                True Cost Calculator
-                            </p>
-                        </div>
+
+                <div class="flex items-start justify-between gap-4">
+                    <div class="space-y-1">
+                        <p class="text-xs font-semibold uppercase tracking-wider text-gold-700 dark:text-gold-400">Finance Tool</p>
+                        <h1 class="text-3xl md:text-4xl font-sans font-bold text-slate-900 dark:text-white tracking-tight">EMI Discount Analyzer</h1>
+                        <p class="text-sm md:text-base max-w-3xl text-slate-600 dark:text-slate-400">Compare upfront vs EMI with both-side discounts, bank-style EMI strategies, and opportunity-return impact.</p>
                     </div>
-                     <!-- Theme Toggle Placeholder -->
-                    <button id="themeToggle" class="w-10 h-10 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all shadow-sm hover:shadow-md">
+                    <button id="themeToggle" class="h-11 w-11 shrink-0 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all">
                         <i class="fa-solid fa-moon dark:hidden"></i>
                         <i class="fa-solid fa-sun hidden dark:inline"></i>
                     </button>
                 </div>
-                <p class="text-base text-slate-600 dark:text-slate-300 max-w-3xl leading-relaxed">
-                     Compare "No Cost EMI" against upfront purchase using true effective cost, tax impact, and reinvestment assumptions.
-                </p>
-            </div>
+            </header>
 
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-                
-                <!-- Configuration Panel -->
-                <div class="lg:col-span-4 space-y-6 animate-enter delay-100">
-                    <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-xl shadow-slate-200/50 dark:shadow-black/20 border border-slate-100 dark:border-slate-700 p-6 md:p-8 sticky top-6 z-10">
-                        
-                        <div class="flex items-center gap-3 mb-6 pb-4 border-b border-slate-100 dark:border-slate-700">
-                             <div class="w-10 h-10 rounded-full bg-gold-100 dark:bg-gold-900/30 text-gold-600 dark:text-gold-400 flex items-center justify-center text-lg">
-                                <i class="fa-solid fa-sliders"></i>
-                            </div>
+            <section class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <div class="lg:col-span-8 space-y-6">
+                    <article id="recommendationCard" class="rounded-3xl p-6 md:p-8 border border-slate-200 dark:border-slate-700 bg-gradient-to-br from-slate-900 to-slate-800 text-white shadow-xl">
+                        <p class="text-[11px] font-semibold uppercase tracking-wider text-white/70 mb-2">Decision</p>
+                        <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
                             <div>
-                                <h2 class="text-lg font-bold text-slate-900 dark:text-white leading-tight">Configuration</h2>
-                                <p class="text-xs text-slate-400 font-medium">Input details</p>
+                        <h2 id="recTitle" class="text-3xl md:text-4xl font-sans font-bold">Analyzing...</h2>
+                                <p id="recDesc" class="text-sm text-white/80 mt-2 max-w-2xl">Computing current scenario with your assumptions.</p>
+                            </div>
+                            <div class="rounded-2xl px-4 py-3 bg-white/10 border border-white/20 min-w-[180px]">
+                                <p class="text-[11px] uppercase tracking-wider text-white/70">Net Difference</p>
+                                <p id="recAmount" class="text-3xl font-bold tabular-nums">₹0</p>
+                                <p id="recPercent" class="text-xs text-white/70">0%</p>
                             </div>
                         </div>
+                    </article>
 
-                        <div class="space-y-5">
-                            ${this.renderInputGroup('productPrice', 'Product Price', '₹')}
-                            
-                            <div class="grid grid-cols-2 gap-4">
-                                ${this.renderInputGroup('processingFee', 'Processing Fee', '₹')}
-                                ${this.renderInputGroup('foregoneDiscount', 'Discount Lost', '₹', 'If paying upfront')}
-                            </div>
-
-                            <div class="pt-2 space-y-6 border-t border-slate-100 dark:border-slate-700">
-                                ${this.renderSlider('tenure', 'EMI Duration', 3, 24, 1, ' months')}
-                                ${this.renderSlider('returnRate', 'Expected Return Rate (APY)', 0, 15, 0.5, '%', 'Your investment return rate')}
-                            </div>
-
-                             <div class="pt-4 border-t border-slate-100 dark:border-slate-700">
-                                ${this.renderToggle('gstOnInterest', 'Include GST on Interest', '18% GST is applicable on the interest component of EMI')}
-                            </div>
-
-                             <div class="pt-4 border-t border-slate-100 dark:border-slate-700">
-                                <button id="advancedToggle" class="w-full flex items-center justify-between text-sm font-semibold text-slate-600 dark:text-slate-400 hover:text-gold-600 dark:hover:text-gold-400 transition-colors">
-                                    <span>Advanced Options</span>
-                                    <i class="fa-solid fa-chevron-down transition-transform duration-300 ${this.state.showAdvanced ? 'rotate-180' : ''}"></i>
-                                </button>
-
-                                <div id="advancedPanel" class="overflow-hidden transition-all duration-300 ease-in-out ${this.state.showAdvanced ? 'max-h-24 opacity-100 pt-4' : 'max-h-0 opacity-0'}">
-                                     ${this.renderInputGroup('bankInterestRate', 'Bank Interest Rate (Approx)', '%', null, true)}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Results Panel -->
-                <div class="lg:col-span-8 space-y-6 animate-enter delay-200">
-                    
-                    <!-- Recommendation Card -->
-                    <div id="recommendationCard" class="relative overflow-hidden rounded-3xl p-8 md:p-10 text-white shadow-2xl transition-all duration-500 bg-slate-900 border border-slate-800">
-                         <!-- Backgrounds -->
-                        <div id="recBgEmi" class="absolute inset-0 bg-gradient-to-br from-[#1f2937] via-[#0f172a] to-[#020617] transition-opacity duration-700 opacity-0"></div>
-                        <div id="recBgUpfront" class="absolute inset-0 bg-gradient-to-br from-[#422006] via-[#713f12] to-[#452207] transition-opacity duration-700 opacity-100"></div>
-                        
-                        <!-- Content -->
-                        <div class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-                            <div>
-                                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 backdrop-blur-sm border border-white/20 mb-4">
-                                     <i class="fa-solid fa-lightbulb text-yellow-300 text-xs"></i>
-                                     <span class="text-xs font-bold tracking-wide">RECOMMENDATION</span>
-                                </div>
-                                <h2 id="recTitle" class="text-3xl md:text-4xl font-bold mb-2 leading-tight">Calculating...</h2>
-                                <p id="recDesc" class="text-white/80 font-medium max-w-lg text-sm md:text-base leading-relaxed">
-                                    Analysis pending...
-                                </p>
-                            </div>
-                            
-                            <div class="bg-white/10 backdrop-blur-md rounded-2xl p-4 min-w-[140px] border border-white/10 text-center">
-                                <div id="recLabel" class="text-xs font-bold text-white/60 mb-1 uppercase tracking-wider">Savings</div>
-                                <div id="recAmount" class="text-3xl font-bold tabular-nums mb-1">₹0</div>
-                                <div id="recPercent" class="text-[10px] font-medium text-white/70">0%</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Comparison Cards -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <!-- Upfront Card -->
-                        <div id="optionACard" class="bg-white dark:bg-slate-800 rounded-3xl p-6 border-2 transition-all duration-300 border-slate-100 dark:border-slate-700">
-                            <div class="flex justify-between items-start mb-4">
+                        <article id="optionACard" class="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 p-6 space-y-4">
+                            <div class="flex items-center justify-between">
                                 <div>
-                                    <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Option A</span>
-                                    <h3 class="text-lg font-bold text-slate-900 dark:text-white">Pay Upfront</h3>
+                                    <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Option A</p>
+                                    <h3 class="text-xl font-sans font-bold text-slate-900 dark:text-white">Pay Upfront</h3>
                                 </div>
-                                <div id="checkA" class="hidden w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-white shadow-sm">
-                                    <i class="fa-solid fa-check text-xs"></i>
-                                </div>
+                                <span id="checkA" class="hidden h-7 w-7 rounded-full bg-emerald-500 text-white items-center justify-center"><i class="fa-solid fa-check text-xs"></i></span>
                             </div>
-                            
-                            <div class="mb-6 pb-6 border-b border-slate-100 dark:border-slate-700">
-                                <div class="text-3xl font-bold text-slate-900 dark:text-white tabular-nums mb-1" id="costA">₹0</div>
-                                <div class="text-xs font-medium text-slate-500">Total effective cost</div>
+                            <div>
+                                <p id="costA" class="text-3xl font-bold tabular-nums text-slate-900 dark:text-white">₹0</p>
+                                <p class="text-xs text-slate-500">Effective cash outflow</p>
                             </div>
+                            <div class="space-y-2 text-sm">
+                                ${this.renderStatRow('Base price', 'basePriceVal')}
+                                ${this.renderStatRow('Upfront discount', 'upfrontDiscountVal', 'text-emerald-600 dark:text-emerald-400')}
+                            </div>
+                        </article>
 
-                            <div class="space-y-3">
-                                ${this.renderStatRow('Base Price', 'basePriceVal')}
-                                ${this.renderStatRow('Instant Discount', 'discountVal', 'text-emerald-600 dark:text-emerald-400')}
-                            </div>
-                        </div>
-
-                        <!-- EMI Card -->
-                        <div id="optionBCard" class="bg-white dark:bg-slate-800 rounded-3xl p-6 border-2 transition-all duration-300 border-slate-100 dark:border-slate-700">
-                            <div class="flex justify-between items-start mb-4">
+                        <article id="optionBCard" class="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 p-6 space-y-4">
+                            <div class="flex items-center justify-between">
                                 <div>
-                                    <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Option B</span>
-                                    <h3 class="text-lg font-bold text-slate-900 dark:text-white">No Cost EMI</h3>
+                                    <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Option B</p>
+                                    <h3 class="text-xl font-sans font-bold text-slate-900 dark:text-white">EMI Plan</h3>
                                 </div>
-                                <div id="checkB" class="hidden w-6 h-6 bg-emerald-500 rounded-full flex items-center justify-center text-white shadow-sm">
-                                    <i class="fa-solid fa-check text-xs"></i>
-                                </div>
+                                <span id="checkB" class="hidden h-7 w-7 rounded-full bg-emerald-500 text-white items-center justify-center"><i class="fa-solid fa-check text-xs"></i></span>
                             </div>
-
-                            <div class="mb-6 pb-6 border-b border-slate-100 dark:border-slate-700">
-                                <div class="text-3xl font-bold text-slate-900 dark:text-white tabular-nums mb-1" id="costB">₹0</div>
-                                <div class="text-xs font-medium text-slate-500">Total effective cost</div>
+                            <div>
+                                <p id="costB" class="text-3xl font-bold tabular-nums text-slate-900 dark:text-white">₹0</p>
+                                <p class="text-xs text-slate-500">Net effective cost after return offset</p>
                             </div>
-
-                            <div class="space-y-3">
-                                ${this.renderStatRow('Total Payments', 'totalEmiVal')}
-                                ${this.renderStatRow('Investment Returns', 'returnsVal', 'text-emerald-600 dark:text-emerald-400')}
-                                ${this.renderStatRow('Fees & Taxes', 'feesVal', 'text-rose-600 dark:text-rose-400')}
+                            <div class="space-y-2 text-sm">
+                                ${this.renderStatRow('Total EMI payments', 'totalEmiVal')}
+                                ${this.renderStatRow('EMI discount', 'emiDiscountVal', 'text-emerald-600 dark:text-emerald-400')}
+                                ${this.renderStatRow('Opportunity returns', 'returnsVal', 'text-emerald-600 dark:text-emerald-400')}
+                                ${this.renderStatRow('Fees + GST', 'feesVal', 'text-rose-600 dark:text-rose-400')}
                             </div>
-                        </div>
+                        </article>
                     </div>
 
-                    <!-- Detailed Breakdown -->
-                    <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-700 p-6 md:p-8">
-                        <h3 class="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider mb-6">Detailed Breakdown</h3>
-                        
+                    <article class="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 p-6 md:p-8">
+                        <h3 class="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-5">Decision Surface</h3>
                         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                            ${this.renderMetric('Monthly EMI', 'monthlyEmiMetric', 'tenureMetric')}
-                            ${this.renderMetric('Interest Earned', 'interestMetric', null, 'text-emerald-600 dark:text-emerald-400')}
-                            ${this.renderMetric('Processing Fee', 'processMetric', null, 'text-rose-600 dark:text-rose-400')}
-                            ${this.renderMetric('Break-even APY', 'gstMetric', null, 'text-gold-600 dark:text-gold-400')}
+                            ${this.renderMetric('Monthly EMI', 'monthlyEmiMetric', 'based on strategy')}
+                            ${this.renderMetric('Interest Charged', 'interestMetric', 'customer share')}
+                            ${this.renderMetric('Break-even APY', 'breakEvenMetric', 'required return')}
+                            ${this.renderMetric('Snapshot', 'snapshotMetric', 'local time')}
                         </div>
-                    </div>
-
-                     <div class="bg-gold-50 dark:bg-gold-900/10 rounded-2xl p-4 border border-gold-100 dark:border-gold-900/30 flex gap-3 text-sm text-gold-900 dark:text-gold-300">
-                        <i class="fa-solid fa-circle-info mt-0.5"></i>
-                        <p>
-                            <strong>Decision rule:</strong> Choose EMI only if your expected return is above break-even APY and liquidity benefits matter for your cashflow.
-                        </p>
-                    </div>
-
+                    </article>
                 </div>
-            </div>
-             <div class="mt-12 pt-8 border-t border-slate-200 dark:border-slate-800 text-center">
-                <p class="text-xs text-slate-400 dark:text-slate-500">
-                    Calculations are estimates. Actual values may vary based on bank policies.
-                </p>
-            </div>
+
+                <div class="lg:col-span-4 space-y-6">
+                    <section class="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 p-6 md:p-8 space-y-5">
+                        <div>
+                            <h2 class="text-xl font-sans font-bold text-slate-900 dark:text-white">Inputs</h2>
+                            <p class="text-xs text-slate-500">All values normalized to monthly cashflow logic.</p>
+                        </div>
+
+                        ${this.renderInputGroup('productPrice', 'Product Price', '₹')}
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            ${this.renderInputGroup('upfrontDiscount', 'Upfront Discount', '₹', 'Offer valid on full payment')}
+                            ${this.renderInputGroup('emiDiscount', 'EMI Discount', '₹', 'Instant cashback/offer on EMI')}
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            ${this.renderInputGroup('processingFee', 'Processing Fee', '₹')}
+                            ${this.renderInputGroup('downPayment', 'Down Payment', '₹')}
+                        </div>
+
+                        ${this.renderSlider('tenure', 'Tenure (Months)', 3, 36, 1, 'mo')}
+                        ${this.renderSlider('returnRate', 'Expected Return (APY)', 0, 24, 0.25, '%')}
+
+                        ${this.renderToggle('gstOnInterest', 'Include GST on interest', '18% GST is usually applied on interest component.')}
+
+                        <div class="pt-2 border-t border-slate-100 dark:border-slate-700 space-y-4">
+                            <button id="advancedToggle" class="w-full h-11 inline-flex items-center justify-between text-sm font-semibold text-slate-700 dark:text-slate-200 hover:text-gold-600 dark:hover:text-gold-400">
+                                <span>Advanced Settings</span>
+                                <i class="fa-solid fa-chevron-down transition-transform ${this.state.showAdvanced ? 'rotate-180' : ''}"></i>
+                            </button>
+
+                            <div id="advancedPanel" class="space-y-4 overflow-hidden transition-all duration-300 ${this.state.showAdvanced ? 'max-h-[460px] opacity-100' : 'max-h-0 opacity-0'}">
+                                ${this.renderSelectGroup('emiStrategy', 'EMI Strategy', [
+                                    { value: 'no_cost_subvention', label: 'No-cost EMI (subvention)' },
+                                    { value: 'reducing_balance', label: 'Reducing balance EMI' },
+                                    { value: 'flat_rate', label: 'Flat-rate EMI' }
+                                ])}
+                                ${this.renderInputGroup('bankInterestRate', 'Annual Interest Rate', '%')}
+                                ${this.renderSlider('subventionShare', 'Interest Subsidy Share', 0, 100, 5, '%', 'Used in no-cost EMI mode')}
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="bg-gold-50 dark:bg-gold-900/20 rounded-3xl border border-gold-100 dark:border-gold-900/40 p-6 space-y-3 text-sm text-gold-900 dark:text-gold-300">
+                        <h3 class="text-xs font-semibold uppercase tracking-wider">Method</h3>
+                        <p id="formulaText">EMI formula is selected dynamically based on strategy.</p>
+                        <p id="assumptionText" class="text-xs text-gold-800 dark:text-gold-400">Assumptions loading...</p>
+                    </section>
+                </div>
+            </section>
         </div>
         `;
     }
 
-    renderInputGroup(id, label, prefix, helper, disabled = false) {
+    renderInputGroup(id, label, prefix, helper) {
         return `
-        <div class="group">
-            <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">${label}</label>
+        <div>
+            <label for="${id}" class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5">${label}</label>
             <div class="relative">
-                ${prefix ? `<span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">${prefix}</span>` : ''}
+                ${prefix ? `<span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm font-semibold">${prefix}</span>` : ''}
                 <input
                     type="number"
                     id="${id}"
                     value="${this.state[id]}"
-                    ${disabled ? 'disabled' : ''}
-                    class="w-full ${prefix ? 'pl-8' : 'pl-4'} pr-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl font-bold text-slate-800 dark:text-slate-100 text-sm focus:outline-none focus:bg-white dark:focus:bg-slate-950 focus:ring-2 focus:ring-gold-500/20 focus:border-gold-500 transition-all ${disabled ? 'opacity-60 cursor-not-allowed' : ''}"
+                    class="w-full h-11 ${prefix ? 'pl-8' : 'pl-3'} pr-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm font-semibold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-gold-500/30"
                 />
             </div>
-             ${helper ? `<p class="text-[10px] text-slate-400 mt-1.5 ml-1">${helper}</p>` : ''}
+            ${helper ? `<p class="text-[11px] text-slate-500 mt-1">${helper}</p>` : ''}
         </div>
         `;
     }
 
     renderSlider(id, label, min, max, step, suffix, helper) {
         return `
-        <div class="group">
-            <div class="flex justify-between items-center mb-2">
-                <label class="text-sm font-semibold text-slate-700 dark:text-slate-300">${label}</label>
-                <div class="font-bold text-gold-600 dark:text-gold-400 text-sm tabular-nums">
-                    <span id="${id}Display">${this.state[id]}</span>${suffix ? ` <span class="text-xs text-slate-400 font-normal">${suffix}</span>` : ''}
-                </div>
+        <div>
+            <div class="flex items-center justify-between mb-1.5">
+                <label for="${id}" class="text-xs font-semibold uppercase tracking-wider text-slate-500">${label}</label>
+                <span class="text-sm font-bold text-slate-900 dark:text-white tabular-nums"><span id="${id}Display">${this.state[id]}</span>${suffix ? ` ${suffix}` : ''}</span>
             </div>
-            
-            <input
-                type="range"
-                id="${id}"
-                min="${min}"
-                max="${max}"
-                step="${step}"
-                value="${this.state[id]}"
-                class="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-gold-600"
-            />
-             ${helper ? `<p class="text-[10px] text-slate-400 mt-2">${helper}</p>` : ''}
+            <input type="range" id="${id}" min="${min}" max="${max}" step="${step}" value="${this.state[id]}" class="w-full accent-gold-600" />
+            ${helper ? `<p class="text-[11px] text-slate-500 mt-1">${helper}</p>` : ''}
+        </div>
+        `;
+    }
+
+    renderSelectGroup(id, label, options) {
+        const optionsHtml = options
+            .map((opt) => `<option value="${opt.value}" ${this.state[id] === opt.value ? 'selected' : ''}>${opt.label}</option>`)
+            .join('');
+
+        return `
+        <div>
+            <label for="${id}" class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5">${label}</label>
+            <select id="${id}" class="w-full h-11 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm font-semibold text-slate-900 dark:text-white px-3 focus:outline-none focus:ring-2 focus:ring-gold-500/30">
+                ${optionsHtml}
+            </select>
         </div>
         `;
     }
 
     renderToggle(id, label, description) {
         return `
-        <div class="flex items-start justify-between gap-4 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+        <div class="flex items-start justify-between gap-3 rounded-xl border border-slate-100 dark:border-slate-700 p-3">
             <div>
-                 <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 cursor-pointer" for="${id}">${label}</label>
-                 <p class="text-[10px] text-slate-400 mt-0.5">${description}</p>
+                <label for="${id}" class="block text-xs font-semibold uppercase tracking-wider text-slate-500">${label}</label>
+                <p class="text-[11px] text-slate-500 mt-1">${description}</p>
             </div>
-             <label class="relative inline-flex items-center cursor-pointer">
+            <label class="relative inline-flex items-center cursor-pointer">
                 <input type="checkbox" id="${id}" class="sr-only peer" ${this.state[id] ? 'checked' : ''}>
-                <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-gold-300 dark:peer-focus:ring-gold-800 rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-gold-600"></div>
+                <span class="w-11 h-6 rounded-full bg-slate-200 dark:bg-slate-700 peer-checked:bg-gold-600 transition-colors"></span>
+                <span class="absolute left-0.5 top-0.5 w-5 h-5 rounded-full bg-white shadow peer-checked:translate-x-5 transition-transform"></span>
             </label>
         </div>
         `;
@@ -274,76 +232,83 @@ export class AppUI {
 
     renderStatRow(label, valueId, colorClass = 'text-slate-900 dark:text-white') {
         return `
-        <div class="flex justify-between items-center py-2 text-sm border-b border-slate-50 dark:border-slate-700/50 last:border-0 last:pb-0">
-            <span class="text-slate-500 dark:text-slate-400 font-medium">${label}</span>
-            <span id="${valueId}" class="font-bold tabular-nums ${colorClass}">-</span>
+        <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-700 pb-2 last:border-0 last:pb-0">
+            <span class="text-slate-500">${label}</span>
+            <span id="${valueId}" class="font-semibold tabular-nums ${colorClass}">-</span>
         </div>
         `;
     }
 
-    renderMetric(label, valueId, sublabelId, colorClass = 'text-slate-900 dark:text-white') {
+    renderMetric(label, valueId, hint) {
         return `
-        <div class="p-4 bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-slate-100 dark:border-slate-800/50">
-            <div class="text-[10px] uppercase font-bold text-slate-400 mb-1 tracking-wider">${label}</div>
-            <div id="${valueId}" class="text-lg font-bold tabular-nums leading-tight ${colorClass}">-</div>
-            ${sublabelId ? `<div id="${sublabelId}" class="text-[10px] text-slate-400 mt-1 font-medium"></div>` : ''}
+        <div class="rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50/80 dark:bg-slate-900/50 p-4">
+            <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-500">${label}</p>
+            <p id="${valueId}" class="text-lg font-bold tabular-nums text-slate-900 dark:text-white mt-1">-</p>
+            <p class="text-[11px] text-slate-500 mt-1">${hint}</p>
         </div>
         `;
     }
 
     attachListeners() {
-        // Floating Inputs
-        ['productPrice', 'processingFee', 'foregoneDiscount'].forEach(id => {
+        const numericInputIds = [
+            'productPrice',
+            'upfrontDiscount',
+            'emiDiscount',
+            'processingFee',
+            'downPayment',
+            'bankInterestRate'
+        ];
+
+        numericInputIds.forEach((id) => {
             const input = document.getElementById(id);
-            if (input) {
-                input.addEventListener('input', (e) => {
-                    this.state[id] = Number(e.target.value);
-                    this.updateAnalysis();
-                });
-            }
+            if (!input) return;
+            input.addEventListener('input', (e) => {
+                this.state[id] = Number(e.target.value);
+                this.updateAnalysis();
+            });
         });
 
-        // Sliders
-        ['tenure', 'returnRate'].forEach(id => {
+        ['tenure', 'returnRate', 'subventionShare'].forEach((id) => {
             const slider = document.getElementById(id);
             const display = document.getElementById(`${id}Display`);
+            if (!slider) return;
 
-            if (slider) {
-                slider.addEventListener('input', (e) => {
-                    const val = Number(e.target.value);
-                    this.state[id] = val;
-                    if (display) display.textContent = val;
-                    this.updateAnalysis();
-                });
-            }
+            slider.addEventListener('input', (e) => {
+                const value = Number(e.target.value);
+                this.state[id] = value;
+                if (display) display.textContent = value;
+                this.updateAnalysis();
+            });
         });
 
-        // Toggle Switch
-        const toggleBtn = document.getElementById('gstOnInterest');
-        if (toggleBtn) {
-            toggleBtn.addEventListener('change', (e) => {
+        const gstToggle = document.getElementById('gstOnInterest');
+        if (gstToggle) {
+            gstToggle.addEventListener('change', (e) => {
                 this.state.gstOnInterest = e.target.checked;
                 this.updateAnalysis();
             });
         }
 
-        // Advanced Toggle
+        const strategySelect = document.getElementById('emiStrategy');
+        if (strategySelect) {
+            strategySelect.addEventListener('change', (e) => {
+                this.state.emiStrategy = e.target.value;
+                this.updateAnalysis();
+            });
+        }
+
         const advancedBtn = document.getElementById('advancedToggle');
         const advancedPanel = document.getElementById('advancedPanel');
-        const chevron = advancedBtn.querySelector('.fa-chevron-down');
+        const chevron = advancedBtn?.querySelector('.fa-chevron-down');
 
-        if (advancedBtn) {
+        if (advancedBtn && advancedPanel && chevron) {
             advancedBtn.addEventListener('click', () => {
                 this.state.showAdvanced = !this.state.showAdvanced;
-                if (this.state.showAdvanced) {
-                    advancedPanel.classList.remove('max-h-0', 'opacity-0');
-                    advancedPanel.classList.add('max-h-24', 'opacity-100', 'pt-4');
-                    chevron.classList.add('rotate-180');
-                } else {
-                    advancedPanel.classList.add('max-h-0', 'opacity-0');
-                    advancedPanel.classList.remove('max-h-24', 'opacity-100', 'pt-4');
-                    chevron.classList.remove('rotate-180');
-                }
+                advancedPanel.classList.toggle('max-h-0', !this.state.showAdvanced);
+                advancedPanel.classList.toggle('opacity-0', !this.state.showAdvanced);
+                advancedPanel.classList.toggle('max-h-[460px]', this.state.showAdvanced);
+                advancedPanel.classList.toggle('opacity-100', this.state.showAdvanced);
+                chevron.classList.toggle('rotate-180', this.state.showAdvanced);
             });
         }
     }
@@ -351,78 +316,85 @@ export class AppUI {
     updateAnalysis() {
         const result = EMICalculator.calculate(this.state);
 
-        // Formatter
-        const fmt = (v) => '₹' + Math.round(v).toLocaleString('en-IN');
-        const fmtDec = (v) => '₹' + v.toLocaleString('en-IN', { maximumFractionDigits: 0 });
+        const fmt = (v) => `₹${Math.round(v).toLocaleString('en-IN')}`;
+        const fmtSigned = (v) => `${v < 0 ? '-' : '+'} ₹${Math.abs(Math.round(v)).toLocaleString('en-IN')}`;
 
-        // Update Recommendation Section
-        const recBgEmi = document.getElementById('recBgEmi');
-        const recBgUpfront = document.getElementById('recBgUpfront');
-        const recLabel = document.getElementById('recLabel');
-        const recAmount = document.getElementById('recAmount');
-        const recPercent = document.getElementById('recPercent');
+        const recCard = document.getElementById('recommendationCard');
         const recTitle = document.getElementById('recTitle');
         const recDesc = document.getElementById('recDesc');
 
         if (result.isEmiBetter) {
-            recBgEmi.classList.remove('opacity-0');
-            recBgUpfront.classList.add('opacity-0');
-            recLabel.textContent = 'Recommendation';
-            recTitle.innerHTML = 'Choose EMI';
-            recDesc.textContent = "Expected investment returns offset fees and GST, making EMI the lower effective-cost option.";
+            recCard.className = 'rounded-3xl p-6 md:p-8 border border-emerald-200/30 bg-gradient-to-br from-emerald-700 to-emerald-900 text-white shadow-xl';
+            recTitle.textContent = 'Choose EMI';
+            recDesc.textContent = 'EMI-side discounts and expected returns outweigh fees under current assumptions.';
         } else {
-            recBgEmi.classList.add('opacity-0');
-            recBgUpfront.classList.remove('opacity-0');
-            recLabel.textContent = 'Recommendation';
-            recTitle.innerHTML = 'Pay Upfront';
-            recDesc.textContent = "Under current assumptions, upfront purchase has lower net cash outflow and avoids fee drag.";
+            recCard.className = 'rounded-3xl p-6 md:p-8 border border-amber-200/30 bg-gradient-to-br from-amber-700 to-amber-900 text-white shadow-xl';
+            recTitle.textContent = 'Choose Upfront';
+            recDesc.textContent = 'Upfront payment remains cheaper after accounting for discounts, fees, and modeled returns.';
         }
 
-        recAmount.textContent = fmtDec(Math.abs(result.savings));
-        recPercent.textContent = `${result.savingsPercentage.toFixed(1)}%`;
+        document.getElementById('recAmount').textContent = fmt(Math.abs(result.savings));
+        document.getElementById('recPercent').textContent = `${result.savingsPercentage.toFixed(1)}% of base price`;
 
-        // Card Highlights
         const optionACard = document.getElementById('optionACard');
         const optionBCard = document.getElementById('optionBCard');
         const checkA = document.getElementById('checkA');
         const checkB = document.getElementById('checkB');
 
-        const activeClass = 'border-2 border-emerald-500 ring-4 ring-emerald-500/10 dark:ring-emerald-500/20';
-        const inactiveClass = 'border-slate-100 dark:border-slate-700';
+        optionACard.classList.toggle('ring-2', !result.isEmiBetter);
+        optionACard.classList.toggle('ring-emerald-400', !result.isEmiBetter);
+        optionBCard.classList.toggle('ring-2', result.isEmiBetter);
+        optionBCard.classList.toggle('ring-emerald-400', result.isEmiBetter);
 
-        // Reset
-        optionACard.className = `bg-white dark:bg-slate-800 rounded-3xl p-6 border-2 transition-all duration-300 ${!result.isEmiBetter ? activeClass : inactiveClass}`;
-        optionBCard.className = `bg-white dark:bg-slate-800 rounded-3xl p-6 border-2 transition-all duration-300 ${result.isEmiBetter ? activeClass : inactiveClass}`;
+        checkA.classList.toggle('hidden', result.isEmiBetter);
+        checkA.classList.toggle('flex', !result.isEmiBetter);
+        checkB.classList.toggle('hidden', !result.isEmiBetter);
+        checkB.classList.toggle('flex', result.isEmiBetter);
 
-        if (result.isEmiBetter) {
-            checkA.classList.add('hidden');
-            checkB.classList.remove('hidden');
-        } else {
-            checkA.classList.remove('hidden');
-            checkB.classList.add('hidden');
-        }
+        document.getElementById('costA').textContent = fmt(result.upfrontCost);
+        document.getElementById('costB').textContent = fmt(result.effectiveEmiCost);
 
-        // Stats Option A
-        document.getElementById('costA').textContent = fmtDec(result.upfrontCost);
-        document.getElementById('basePriceVal').textContent = fmt(this.state.productPrice);
-        document.getElementById('discountVal').textContent = '- ' + fmt(this.state.foregoneDiscount);
-
-        // Stats Option B
-        document.getElementById('costB').textContent = fmtDec(result.effectiveEmiCost);
+        document.getElementById('basePriceVal').textContent = fmt(result.productPrice);
+        document.getElementById('upfrontDiscountVal').textContent = fmtSigned(-result.upfrontDiscount);
         document.getElementById('totalEmiVal').textContent = fmt(result.totalEmiPayment);
-        document.getElementById('returnsVal').textContent = '+ ' + fmt(result.totalInterestEarned);
-        document.getElementById('feesVal').textContent = '- ' + fmt(result.processingFee + result.gstCost);
+        document.getElementById('emiDiscountVal').textContent = fmtSigned(-result.emiDiscount);
+        document.getElementById('returnsVal').textContent = fmtSigned(result.totalInterestEarned);
+        document.getElementById('feesVal').textContent = fmt(result.processingFee + result.gstCost);
 
-        // Metrics
         document.getElementById('monthlyEmiMetric').textContent = fmt(result.monthlyEMI);
-        document.getElementById('tenureMetric').textContent = `x ${this.state.tenure} mo`;
-        document.getElementById('interestMetric').textContent = fmt(result.totalInterestEarned);
-        document.getElementById('processMetric').textContent = fmt(this.state.processingFee);
-        const breakEvenNode = document.getElementById('gstMetric');
-        if (breakEvenNode) {
-            breakEvenNode.textContent = result.breakEvenReturnRate === null
-                ? '> 40% APY'
-                : `${result.breakEvenReturnRate.toFixed(2)}%`;
+        document.getElementById('interestMetric').textContent = fmt(result.customerInterest);
+
+        const breakEvenNode = document.getElementById('breakEvenMetric');
+        breakEvenNode.textContent = result.breakEvenReturnRate === null
+            ? '> 60%'
+            : `${result.breakEvenReturnRate.toFixed(2)}%`;
+
+        const now = new Date();
+        document.getElementById('snapshotMetric').textContent = now.toLocaleString('en-IN', {
+            day: '2-digit',
+            month: 'short',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+
+        const formulaText = document.getElementById('formulaText');
+        const assumptionText = document.getElementById('assumptionText');
+        const subventionSlider = document.getElementById('subventionShare');
+        if (subventionSlider) {
+            const isNoCost = result.emiStrategy === 'no_cost_subvention';
+            subventionSlider.disabled = !isNoCost;
+            subventionSlider.classList.toggle('opacity-50', !isNoCost);
+            subventionSlider.classList.toggle('cursor-not-allowed', !isNoCost);
         }
+
+        if (result.emiStrategy === 'reducing_balance') {
+            formulaText.textContent = 'Formula: EMI = P*r*(1+r)^n / ((1+r)^n - 1) using monthly reducing balance.';
+        } else if (result.emiStrategy === 'flat_rate') {
+            formulaText.textContent = 'Formula: Flat EMI = (P + P*R*T) / n, where R is annual rate and T is years.';
+        } else {
+            formulaText.textContent = 'No-cost EMI: reducing-balance interest is computed first, then subsidy share reduces customer interest.';
+        }
+
+        assumptionText.textContent = `Assumptions: ${result.tenure} months, ${result.bankInterestRate.toFixed(2)}% annual rate, ${result.subventionShare.toFixed(0)}% subsidy, GST ${result.gstOnInterest ? 'included' : 'excluded'}.`;
     }
 }
