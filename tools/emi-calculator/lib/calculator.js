@@ -18,7 +18,10 @@ export class EMICalculator {
             subventionShare: params.subventionShare
         });
 
-        const gstCost = params.gstOnInterest ? charge.customerInterest * 0.18 : 0;
+        const gstBaseInterest = params.emiStrategy === 'no_cost_subvention'
+            ? charge.totalInterestAccrued
+            : charge.customerInterest;
+        const gstCost = params.gstOnInterest ? gstBaseInterest * (params.gstRate / 100) : 0;
         const totalEmiPaymentsExcludingUpfront = charge.customerPrincipalAndInterest + gstCost;
         const monthlyOutflow = params.tenure > 0 ? totalEmiPaymentsExcludingUpfront / params.tenure : 0;
 
@@ -74,6 +77,7 @@ export class EMICalculator {
             upfrontDiscount: Math.max(Number(input.upfrontDiscount ?? input.foregoneDiscount) || 0, 0),
             emiDiscount: Math.max(Number(input.emiDiscount) || 0, 0),
             gstOnInterest: Boolean(input.gstOnInterest),
+            gstRate: this.clamp(Number(input.gstRate) || 18, 0, 50),
             bankInterestRate: Math.max(Number(input.bankInterestRate) || 0, 0),
             emiStrategy: input.emiStrategy || 'no_cost_subvention',
             subventionShare: this.clamp(Number(input.subventionShare) || 100, 0, 100),

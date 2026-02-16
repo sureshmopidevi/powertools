@@ -10,10 +10,11 @@ export class AppUI {
             upfrontDiscount: 5000,
             emiDiscount: 2500,
             gstOnInterest: true,
+            gstRate: 18,
             showAdvanced: true,
             bankInterestRate: 15,
-            emiStrategy: 'no_cost_subvention',
-            subventionShare: 100,
+            emiStrategy: 'reducing_balance',
+            subventionShare: 0,
             downPayment: 0
         };
         this.app = document.getElementById('app');
@@ -49,14 +50,14 @@ export class AppUI {
 
             <section class="grid grid-cols-1 lg:grid-cols-12 gap-6">
                 <div class="lg:col-span-8 space-y-6">
-                    <article id="recommendationCard" class="rounded-3xl p-6 md:p-8 border border-slate-200 dark:border-slate-700 bg-gradient-to-br from-slate-900 to-slate-800 text-white shadow-xl">
+                    <article id="recommendationCard" class="rounded-2xl p-6 md:p-8 border border-slate-200 dark:border-slate-700 bg-gradient-to-br from-slate-900 to-slate-800 text-white shadow-xl">
                         <p class="text-[11px] font-semibold uppercase tracking-wider text-white/70 mb-2">Decision</p>
                         <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
                             <div>
                         <h2 id="recTitle" class="text-3xl md:text-4xl font-sans font-bold">Analyzing...</h2>
                                 <p id="recDesc" class="text-sm text-white/80 mt-2 max-w-2xl">Computing current scenario with your assumptions.</p>
                             </div>
-                            <div class="rounded-2xl px-4 py-3 bg-white/10 border border-white/20 min-w-[180px]">
+                            <div class="rounded-xl px-4 py-3 bg-white/10 border border-white/20 min-w-[180px]">
                                 <p class="text-[11px] uppercase tracking-wider text-white/70">Net Difference</p>
                                 <p id="recAmount" class="text-3xl font-bold tabular-nums">₹0</p>
                                 <p id="recPercent" class="text-xs text-white/70">0%</p>
@@ -65,7 +66,7 @@ export class AppUI {
                     </article>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <article id="optionACard" class="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 p-6 space-y-4">
+                        <article id="optionACard" class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-6 space-y-4">
                             <div class="flex items-center justify-between">
                                 <div>
                                     <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Option A</p>
@@ -83,7 +84,7 @@ export class AppUI {
                             </div>
                         </article>
 
-                        <article id="optionBCard" class="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 p-6 space-y-4">
+                        <article id="optionBCard" class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-6 space-y-4">
                             <div class="flex items-center justify-between">
                                 <div>
                                     <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Option B</p>
@@ -104,7 +105,7 @@ export class AppUI {
                         </article>
                     </div>
 
-                    <article class="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 p-6 md:p-8">
+                    <article class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-6 md:p-8">
                         <h3 class="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-5">Decision Surface</h3>
                         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                             ${this.renderMetric('Monthly EMI', 'monthlyEmiMetric', 'based on strategy')}
@@ -116,7 +117,7 @@ export class AppUI {
                 </div>
 
                 <div class="lg:col-span-4 space-y-6">
-                    <section class="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 p-6 md:p-8 space-y-5">
+                    <section class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-6 md:p-8 space-y-5">
                         <div>
                             <h2 class="text-xl font-sans font-bold text-slate-900 dark:text-white">Inputs</h2>
                             <p class="text-xs text-slate-500">All values normalized to monthly cashflow logic.</p>
@@ -135,9 +136,7 @@ export class AppUI {
                         </div>
 
                         ${this.renderSlider('tenure', 'Tenure (Months)', 3, 36, 1, 'mo')}
-                        ${this.renderSlider('returnRate', 'Expected Return (APY)', 0, 24, 0.25, '%')}
-
-                        ${this.renderToggle('gstOnInterest', 'Include GST on interest', '18% GST is usually applied on interest component.')}
+                        ${this.renderSlider('returnRate', 'Expected Return (%/year)', 0, 24, 0.25, '%')}
 
                         <div class="pt-2 border-t border-slate-100 dark:border-slate-700 space-y-4">
                             <button id="advancedToggle" class="w-full h-11 inline-flex items-center justify-between text-sm font-semibold text-slate-700 dark:text-slate-200 hover:text-gold-600 dark:hover:text-gold-400">
@@ -145,19 +144,20 @@ export class AppUI {
                                 <i class="fa-solid fa-chevron-down transition-transform ${this.state.showAdvanced ? 'rotate-180' : ''}"></i>
                             </button>
 
-                            <div id="advancedPanel" class="space-y-4 overflow-hidden transition-all duration-300 ${this.state.showAdvanced ? 'max-h-[460px] opacity-100' : 'max-h-0 opacity-0'}">
-                                ${this.renderSelectGroup('emiStrategy', 'EMI Strategy', [
-                                    { value: 'no_cost_subvention', label: 'No-cost EMI (subvention)' },
-                                    { value: 'reducing_balance', label: 'Reducing balance EMI' },
-                                    { value: 'flat_rate', label: 'Flat-rate EMI' }
+                            <div id="advancedPanel" class="space-y-4 overflow-hidden transition-all duration-300 ${this.state.showAdvanced ? 'max-h-[620px] opacity-100' : 'max-h-0 opacity-0'}">
+                                ${this.renderSelectGroup('emiStrategy', 'EMI Type', [
+                                    { value: 'no_cost_subvention', label: 'No-cost EMI' },
+                                    { value: 'reducing_balance', label: 'Normal bank EMI' },
+                                    { value: 'flat_rate', label: 'Flat EMI' }
                                 ])}
-                                ${this.renderInputGroup('bankInterestRate', 'Annual Interest Rate', '%')}
-                                ${this.renderSlider('subventionShare', 'Interest Subsidy Share', 0, 100, 5, '%', 'Used in no-cost EMI mode')}
+                                ${this.renderSlider('bankInterestRate', 'Bank Interest (%/year)', 0, 36, 0.1, '%')}
+                                ${this.renderToggle('gstOnInterest', 'Add GST on EMI interest', 'Use this if your lender charges GST on interest.')}
+                                ${this.renderSlider('gstRate', 'GST Rate on Interest', 0, 28, 1, '%')}
                             </div>
                         </div>
                     </section>
 
-                    <section class="bg-gold-50 dark:bg-gold-900/20 rounded-3xl border border-gold-100 dark:border-gold-900/40 p-6 space-y-3 text-sm text-gold-900 dark:text-gold-300">
+                    <section class="bg-gold-50 dark:bg-gold-900/20 rounded-2xl border border-gold-100 dark:border-gold-900/40 p-6 space-y-3 text-sm text-gold-900 dark:text-gold-300">
                         <h3 class="text-xs font-semibold uppercase tracking-wider">Method</h3>
                         <p id="formulaText">EMI formula is selected dynamically based on strategy.</p>
                         <p id="assumptionText" class="text-xs text-gold-800 dark:text-gold-400">Assumptions loading...</p>
@@ -255,8 +255,7 @@ export class AppUI {
             'upfrontDiscount',
             'emiDiscount',
             'processingFee',
-            'downPayment',
-            'bankInterestRate'
+            'downPayment'
         ];
 
         numericInputIds.forEach((id) => {
@@ -268,7 +267,7 @@ export class AppUI {
             });
         });
 
-        ['tenure', 'returnRate', 'subventionShare'].forEach((id) => {
+        ['tenure', 'returnRate', 'bankInterestRate', 'gstRate'].forEach((id) => {
             const slider = document.getElementById(id);
             const display = document.getElementById(`${id}Display`);
             if (!slider) return;
@@ -293,6 +292,7 @@ export class AppUI {
         if (strategySelect) {
             strategySelect.addEventListener('change', (e) => {
                 this.state.emiStrategy = e.target.value;
+                this.state.subventionShare = e.target.value === 'no_cost_subvention' ? 100 : 0;
                 this.updateAnalysis();
             });
         }
@@ -306,7 +306,7 @@ export class AppUI {
                 this.state.showAdvanced = !this.state.showAdvanced;
                 advancedPanel.classList.toggle('max-h-0', !this.state.showAdvanced);
                 advancedPanel.classList.toggle('opacity-0', !this.state.showAdvanced);
-                advancedPanel.classList.toggle('max-h-[460px]', this.state.showAdvanced);
+                advancedPanel.classList.toggle('max-h-[620px]', this.state.showAdvanced);
                 advancedPanel.classList.toggle('opacity-100', this.state.showAdvanced);
                 chevron.classList.toggle('rotate-180', this.state.showAdvanced);
             });
@@ -324,11 +324,11 @@ export class AppUI {
         const recDesc = document.getElementById('recDesc');
 
         if (result.isEmiBetter) {
-            recCard.className = 'rounded-3xl p-6 md:p-8 border border-emerald-200/30 bg-gradient-to-br from-emerald-700 to-emerald-900 text-white shadow-xl';
+            recCard.className = 'rounded-2xl p-6 md:p-8 border border-emerald-200/30 bg-gradient-to-br from-emerald-700 to-emerald-900 text-white shadow-xl';
             recTitle.textContent = 'Choose EMI';
             recDesc.textContent = 'EMI-side discounts and expected returns outweigh fees under current assumptions.';
         } else {
-            recCard.className = 'rounded-3xl p-6 md:p-8 border border-amber-200/30 bg-gradient-to-br from-amber-700 to-amber-900 text-white shadow-xl';
+            recCard.className = 'rounded-2xl p-6 md:p-8 border border-amber-200/30 bg-gradient-to-br from-amber-700 to-amber-900 text-white shadow-xl';
             recTitle.textContent = 'Choose Upfront';
             recDesc.textContent = 'Upfront payment remains cheaper after accounting for discounts, fees, and modeled returns.';
         }
@@ -379,22 +379,24 @@ export class AppUI {
 
         const formulaText = document.getElementById('formulaText');
         const assumptionText = document.getElementById('assumptionText');
-        const subventionSlider = document.getElementById('subventionShare');
-        if (subventionSlider) {
-            const isNoCost = result.emiStrategy === 'no_cost_subvention';
-            subventionSlider.disabled = !isNoCost;
-            subventionSlider.classList.toggle('opacity-50', !isNoCost);
-            subventionSlider.classList.toggle('cursor-not-allowed', !isNoCost);
+        const gstRateSlider = document.getElementById('gstRate');
+        if (gstRateSlider) {
+            gstRateSlider.disabled = !result.gstOnInterest;
+            gstRateSlider.classList.toggle('opacity-50', !result.gstOnInterest);
+            gstRateSlider.classList.toggle('cursor-not-allowed', !result.gstOnInterest);
         }
 
         if (result.emiStrategy === 'reducing_balance') {
-            formulaText.textContent = 'Formula: EMI = P*r*(1+r)^n / ((1+r)^n - 1) using monthly reducing balance.';
+            formulaText.textContent = 'Normal bank EMI formula: EMI = P*r*(1+r)^n / ((1+r)^n - 1).';
         } else if (result.emiStrategy === 'flat_rate') {
-            formulaText.textContent = 'Formula: Flat EMI = (P + P*R*T) / n, where R is annual rate and T is years.';
+            formulaText.textContent = 'Flat EMI formula: (Principal + Principal*Rate*Time) / months.';
         } else {
-            formulaText.textContent = 'No-cost EMI: reducing-balance interest is computed first, then subsidy share reduces customer interest.';
+            formulaText.textContent = 'No-cost EMI: interest is waived, but GST may still apply on computed interest.';
         }
 
-        assumptionText.textContent = `Assumptions: ${result.tenure} months, ${result.bankInterestRate.toFixed(2)}% annual rate, ${result.subventionShare.toFixed(0)}% subsidy, GST ${result.gstOnInterest ? 'included' : 'excluded'}.`;
+        const noCostRateNote = result.emiStrategy === 'no_cost_subvention' && !result.gstOnInterest
+            ? ' In this mode, bank rate affects only GST; with GST off, payable EMI stays flat.'
+            : '';
+        assumptionText.textContent = `Assumptions: ${result.tenure} months, ${result.bankInterestRate.toFixed(2)}% yearly rate, GST ${result.gstOnInterest ? `${result.gstRate.toFixed(0)}% included` : 'excluded'}.${noCostRateNote}`;
     }
 }
