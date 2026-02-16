@@ -55,7 +55,7 @@ export const formatCurrency = (num) => new Intl.NumberFormat('en-IN', {
     style: 'currency',
     currency: 'INR',
     maximumFractionDigits: 0
-}).format(num);
+}).format(Number.isFinite(num) ? num : 0);
 
 /**
  * Calculates the remaining loan balance.
@@ -66,6 +66,7 @@ export const formatCurrency = (num) => new Intl.NumberFormat('en-IN', {
  * @returns {number}
  */
 export const calculateLoanBalance = (p, r, n, m) => {
+    if (p <= 0 || n <= 0) return 0;
     if (m <= 0) return p;
     if (m >= n) return 0;
     const i = r / 1200;
@@ -81,8 +82,9 @@ export const calculateLoanBalance = (p, r, n, m) => {
  * @returns {number}
  */
 export const calculateEMI = (p, r, n) => {
-    if (p <= 0) return 0;
+    if (p <= 0 || n <= 0) return 0;
     const rate = r / 1200;
+    if (rate === 0) return p / n;
     return (p * rate * Math.pow(1 + rate, n)) / (Math.pow(1 + rate, n) - 1);
 };
 
@@ -94,6 +96,7 @@ export const calculateEMI = (p, r, n) => {
  * @returns {number}
  */
 export const fvSIP = (amt, r, n) => {
+    if (amt <= 0 || n <= 0) return 0;
     if (r === 0) return amt * n;
     const i = r / 1200;
     return amt * ((Math.pow(1 + i, n) - 1) / i) * (1 + i);
@@ -107,6 +110,9 @@ export const fvSIP = (amt, r, n) => {
  * @returns {number}
  */
 export const fvLumpsum = (amt, r, n_months) => {
+    if (amt <= 0) return 0;
+    if (n_months <= 0) return amt;
+    if (r === 0) return amt;
     const i = r / 1200;
     return amt * Math.pow(1 + i, n_months);
 };

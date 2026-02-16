@@ -303,7 +303,7 @@ export class App {
         if (this.elements.assetInvB) this.elements.assetInvB.innerText = fmt(totalInvestmentB);
         if (this.elements.assetTotalB) this.elements.assetTotalB.innerText = fmt(totalAssetsB);
         if (this.elements.costDpB) this.elements.costDpB.innerText = fmt(dpB);
-        if (this.elements.costEmiPaidB) this.elements.costEmiPaidB.innerText = fmt(totalEmiPaidB + sipPrincipalB);
+        if (this.elements.costEmiPaidB) this.elements.costEmiPaidB.innerText = fmt(totalEmiPaidB);
         if (this.elements.costIntB) this.elements.costIntB.innerText = fmt(interestB);
         if (this.elements.costNetB) this.elements.costNetB.innerText = fmt(netCostB);
 
@@ -329,7 +329,7 @@ export class App {
         if (this.elements.assetInvC) this.elements.assetInvC.innerText = fmt(totalInvestmentC);
         if (this.elements.assetTotalC) this.elements.assetTotalC.innerText = fmt(totalAssetsC);
         if (this.elements.costDpC) this.elements.costDpC.innerText = fmt(dpA);
-        if (this.elements.costEmiPaidC) this.elements.costEmiPaidC.innerText = fmt(totalEmiPaidA + sipPrincipalC);
+        if (this.elements.costEmiPaidC) this.elements.costEmiPaidC.innerText = fmt(totalEmiPaidA);
         if (this.elements.costIntC) this.elements.costIntC.innerText = fmt(interestA);
         if (this.elements.costNetC) this.elements.costNetC.innerText = fmt(netCostC);
 
