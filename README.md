@@ -1,19 +1,60 @@
-# Powertools
+<p align="center">
+  <img src="assets/images/banner.png" width="100%" alt="Powertools Banner" />
+</p>
 
-Powertools is a lightweight dashboard of decision tools (finance, lifestyle, algorithms, utilities) built with vanilla JavaScript and Tailwind-inspired styles. It favors fast interactions, responsive layouts, and purposeful micro-animations so every tool feels premium without a heavy framework.
+# ⚡ Powertools
+### A Premium Dashboard of Targeted Decision Utilities
 
-## What’s New
-- **Home list performance:** Caching, skeleton loaders, and restored scroll/search state keep the dashboard instant when you return from a tool.
-- **Smooth animations:** Theme toggles now briefly suppress transitions, adding deliberate “settle” motion and preventing flicker while dark/light styles repaint.
-- **Live filtering:** The search bar filters cards by title/description without rerendering the grid, and empty categories disappear for a cleaner experience.
-- **BMI calculator:** Added the new BMI tool plus PRD, dual-unit logic, and educational guidance content.
+**Powertools** is a high-performance, utility-first suite designed for everyday workflows. From financial calculations to algorithm visualizations, every tool is crafted with a focus on **speed**, **ux-first design**, and **instant interactions**.
 
-## Quick Links
-- **GitHub Pages:** https://sureshmopidevi.github.io/powertools/
+---
 
+## 🌟 Key Features
 
-## Running
-Open `index.html` in a browser to explore the tools hub. Each tool lives under `tools/*` with its own `index.html` entry point and shared `src/` helpers.
+| 🚀 **Instant Performance** | 🎨 **Premium Aesthetics** | 🌗 **Native Dark Mode** |
+| :--- | :--- | :--- |
+| Zero-frame loading with static skeletons & snapshot caching. | Hand-crafted glassmorphism and smooth, purposeful micro-animations. | Fully synchronized theme switching with settle-motion transitions. |
 
-## Contribution
-Follow the existing Vanilla JS + utility CSS patterns, keep scripts in `tools/` subfolders, and register new tools in `src/data/tools.json` so the dashboard picks them up automatically.
+---
+
+## 🛠️ Tool Categories
+
+<details open>
+<summary><b>💰 Finance & Planning</b></summary>
+Tools for calculated growth and tracking.
+- **BMI Calculator**: Precision health metric tracking with dual-unit support.
+- **Loan EMI Calculator**: Visual payment scheduling and interest analysis.
+- **Net Worth Tracker**: Holistic asset-liability visualization.
+- **Smart Car Expense Tracker**: Comprehensive vehicle cost management.
+</details>
+
+<details open>
+<summary><b>🧩 Logic & Algorithms</b></summary>
+Visualizing the invisible.
+- **Algorithm Visualizer**: Step-by-step interactive sorting and searching analysis.
+- **Regex Tester**: Real-time pattern validation with edge-case detection.
+</details>
+
+<details>
+<summary><b>🛠️ Utilities & DevTools</b></summary>
+Purpose-built helpers for technical tasks.
+- **JSON Formatter**: Clean, syntax-highlighted data structure viewing.
+- **Base64 Converter**: Fast, bidirectional encoding tools.
+</details>
+
+---
+
+## 🔗 Quick Start
+1. **Explore Online**: **[sureshmopidevi.github.io/powertools](https://sureshmopidevi.github.io/powertools/)**
+2. **Run Locally**: Clone the repo and open `index.html` in any modern browser.
+
+---
+
+## ✨ Design Philosophy
+Powertools favors **Vanilla JavaScript** and **Custom CSS** over heavy frameworks. This allows for near-instant interaction times, minimal bundle sizes, and complete control over the visual "settle" and "shimmer" effects that define the premium experience.
+
+---
+
+<p align="center">
+  Built with <i class="fa-solid fa-heart text-rose-500 mx-0.5"></i> for practical, everyday workflows.
+</p>
