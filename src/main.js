@@ -11,6 +11,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!appContainer) return;
 
     let allCategories = [];
+    let hasAnimatedInitialRender = false;
+    let searchDebounceTimer = null;
 
     const normalizeQuery = (query) => (query || '').trim().toLowerCase();
     const escapeHtml = (value) => String(value)
@@ -36,6 +38,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const renderCategories = (query = '') => {
         const normalizedQuery = normalizeQuery(query);
+        const shouldAnimate = !hasAnimatedInitialRender && normalizedQuery.length === 0;
         let delay = 100;
         let hasAnySection = false;
         let html = '';
@@ -45,7 +48,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 title: category.title,
                 tools: category.tools,
                 delay,
-                query: normalizedQuery
+                query: normalizedQuery,
+                animate: shouldAnimate
             });
             const sectionHTML = section.render();
             if (sectionHTML) {
@@ -56,6 +60,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
 
         appContainer.innerHTML = hasAnySection ? html : getNoResultsHTML(query.trim());
+        if (shouldAnimate) hasAnimatedInitialRender = true;
 
         if (searchClear) {
             searchClear.classList.toggle('hidden', normalizeQuery(query).length === 0);
@@ -64,7 +69,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (searchInput) {
         searchInput.addEventListener('input', (event) => {
-            renderCategories(event.target.value);
+            const nextQuery = event.target.value;
+            if (searchDebounceTimer) clearTimeout(searchDebounceTimer);
+            searchDebounceTimer = setTimeout(() => {
+                renderCategories(nextQuery);
+            }, 90);
         });
     }
 

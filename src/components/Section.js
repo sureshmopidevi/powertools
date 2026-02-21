@@ -1,11 +1,12 @@
 import { ToolCard } from './ToolCard.js';
 
 export class Section {
-    constructor({ title, tools, delay = 0, query = '' }) {
+    constructor({ title, tools, delay = 0, query = '', animate = false }) {
         this.title = title;
         this.tools = Array.isArray(tools) ? tools : [];
         this.delay = delay;
         this.query = (query || '').trim().toLowerCase();
+        this.animate = Boolean(animate);
     }
 
     getFilteredTools() {
@@ -28,9 +29,10 @@ export class Section {
         }).join('');
 
         const delayClass = this.delay > 0 ? `delay-${this.delay}` : '';
+        const animationClass = this.animate ? `animate-fade-in-up ${delayClass}` : '';
 
         return `
-            <section class="mb-12 animate-fade-in-up ${delayClass}">
+            <section class="mb-12 ${animationClass}">
                 <div class="relative z-20 flex items-center gap-3 mb-7 px-1">
                     <div class="h-px bg-gradient-to-r from-transparent via-slate-300 dark:via-slate-700 to-transparent w-full"></div>
                     <span class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest whitespace-nowrap">
