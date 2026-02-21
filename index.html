@@ -466,16 +466,228 @@
 
         .tool-card {
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            width: min(80vw, 286px);
+            min-height: 220px;
+            flex: 0 0 auto;
         }
 
         .tool-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            transform: none;
+            box-shadow: 0 14px 24px -10px rgb(0 0 0 / 0.12), 0 6px 8px -6px rgb(0 0 0 / 0.1);
         }
 
         .dark .tool-card:hover {
-            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.5), 0 8px 10px -6px rgb(0 0 0 / 0.5);
+            box-shadow: 0 14px 24px -10px rgb(0 0 0 / 0.55), 0 6px 8px -6px rgb(0 0 0 / 0.45);
             border-color: rgba(99, 102, 241, 0.5);
+        }
+
+        .squircle-card {
+            --sq-r: clamp(1.75rem, 1.9vw, 2.35rem);
+            --sq-tl: clamp(2.2rem, 2.8vw, 3rem);
+            --sq-tr: clamp(1.9rem, 2.2vw, 2.6rem);
+            --sq-br: clamp(2.2rem, 2.8vw, 3rem);
+            --sq-bl: clamp(1.9rem, 2.2vw, 2.6rem);
+            --sq-inset: 8px;
+
+            border-radius: var(--sq-r);
+            border-top-left-radius: var(--sq-tl);
+            border-top-right-radius: var(--sq-tr);
+            border-bottom-right-radius: var(--sq-br);
+            border-bottom-left-radius: var(--sq-bl);
+            isolation: isolate;
+        }
+
+        .squircle-card::before {
+            content: '';
+            position: absolute;
+            inset: 0.5px;
+            border-radius: inherit;
+            pointer-events: none;
+            border: 1px solid rgba(255, 255, 255, 0.36);
+            opacity: 0.62;
+            mix-blend-mode: soft-light;
+        }
+
+        .squircle-card::after {
+            content: '';
+            position: absolute;
+            inset: var(--sq-inset);
+            border-radius: calc(var(--sq-r) - var(--sq-inset));
+            border-top-left-radius: calc(var(--sq-tl) - var(--sq-inset));
+            border-top-right-radius: calc(var(--sq-tr) - var(--sq-inset));
+            border-bottom-right-radius: calc(var(--sq-br) - var(--sq-inset));
+            border-bottom-left-radius: calc(var(--sq-bl) - var(--sq-inset));
+            pointer-events: none;
+            border: 1px solid rgba(148, 163, 184, 0.18);
+            opacity: 0.45;
+            z-index: 0;
+        }
+
+        .tool-card > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        .horizontal-row {
+            scrollbar-width: thin;
+            scrollbar-color: rgba(148, 163, 184, 0.55) transparent;
+        }
+
+        .horizontal-row::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .horizontal-row::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .horizontal-row::-webkit-scrollbar-thumb {
+            background: rgba(148, 163, 184, 0.55);
+            border-radius: 9999px;
+        }
+
+        .horizontal-row {
+            scroll-padding-inline: 0.25rem;
+        }
+
+        .search-shell {
+            position: relative;
+            width: min(560px, 92vw);
+        }
+
+        .search-input {
+            height: 44px;
+            width: 100%;
+            border-radius: 9999px;
+            border: 1px solid rgba(148, 163, 184, 0.35);
+            background: rgba(255, 255, 255, 0.72);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            color: rgb(30 41 59);
+            padding: 0 2.75rem 0 2.6rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+        }
+
+        .search-input::placeholder {
+            color: rgb(100 116 139);
+            font-weight: 500;
+        }
+
+        .search-input:focus {
+            border-color: rgba(99, 102, 241, 0.6);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.18);
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 0.95rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgb(100 116 139);
+            font-size: 0.875rem;
+            pointer-events: none;
+        }
+
+        .search-clear {
+            position: absolute;
+            right: 0.45rem;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 30px;
+            height: 30px;
+            border-radius: 9999px;
+            border: 0;
+            background: transparent;
+            color: rgb(100 116 139);
+            display: grid;
+            place-items: center;
+            cursor: pointer;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+
+        .search-clear:hover {
+            background: rgba(148, 163, 184, 0.2);
+            color: rgb(30 41 59);
+        }
+
+        .dark .search-input {
+            background: rgba(15, 23, 42, 0.72);
+            color: rgb(226 232 240);
+            border-color: rgba(100, 116, 139, 0.55);
+        }
+
+        .dark .search-input::placeholder {
+            color: rgb(148 163 184);
+        }
+
+        .dark .search-input:focus {
+            background: rgba(15, 23, 42, 0.88);
+            border-color: rgba(125, 211, 252, 0.65);
+            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2);
+        }
+
+        .dark .search-icon,
+        .dark .search-clear {
+            color: rgb(148 163 184);
+        }
+
+        .dark .search-clear:hover {
+            background: rgba(51, 65, 85, 0.62);
+            color: rgb(226 232 240);
+        }
+
+        @media (min-width: 640px) {
+            .tool-card {
+                width: clamp(232px, 34vw, 278px);
+                min-height: 226px;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .tool-card {
+                width: clamp(224px, 23vw, 270px);
+            }
+        }
+
+        @media (min-width: 1440px) {
+            .tool-card {
+                width: clamp(214px, 16.4vw, 248px);
+                min-height: 216px;
+            }
+        }
+
+        @media (min-width: 1800px) {
+            .tool-card {
+                width: clamp(208px, 13.6vw, 236px);
+            }
+        }
+
+        @media (hover: none), (pointer: coarse) {
+            .tool-card:hover {
+                transform: none;
+                box-shadow: none;
+                border-color: inherit;
+            }
+
+            .tool-arrow {
+                display: none;
+            }
+        }
+
+        @media (hover: hover) and (pointer: fine) {
+            .tool-card:hover .tool-icon-wrap {
+                transform: scale(1.06);
+            }
+
+            .tool-card:hover .tool-arrow {
+                opacity: 1;
+                transform: translateX(0);
+            }
         }
 
         .delay-100 {
@@ -779,38 +991,52 @@
     </div>
 
     <!-- Header -->
-    <header class="relative z-10 pt-12 pb-8 px-6 text-center animate-fade-in-up">
-        <div class="flex items-center justify-center gap-3 mb-3">
-            <div
-                class="w-12 h-12 rounded-2xl bg-gradient-to-br from-slate-700 to-slate-900 flex items-center justify-center shadow-lg shadow-slate-500/25 ring-4 ring-white dark:ring-slate-900 transform transition-transform hover:rotate-12">
-                <i class="fa-solid fa-bolt text-white text-xl"></i>
-            </div>
-            <h1 class="text-4xl font-extrabold text-slate-800 dark:text-white tracking-tight">Powertools</h1>
-        </div>
-        <p class="text-base text-slate-500 dark:text-slate-400 font-medium max-w-sm mx-auto">
-            A suite of smart utilities designed to help you make better decisions, faster.
-        </p>
+    <header class="relative z-10 pt-10 pb-8 px-4 sm:px-6 animate-fade-in-up">
+        <div class="max-w-[92rem] mx-auto w-full flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
+            <div class="space-y-4">
+                <div class="flex items-center gap-3">
+                    <div
+                        class="w-12 h-12 rounded-2xl bg-gradient-to-br from-slate-700 to-slate-900 flex items-center justify-center shadow-lg shadow-slate-500/25 ring-4 ring-white dark:ring-slate-900 transform transition-transform hover:rotate-12">
+                        <i class="fa-solid fa-bolt text-white text-xl"></i>
+                    </div>
+                    <h1 class="text-4xl font-extrabold text-slate-800 dark:text-white tracking-tight">Powertools</h1>
+                </div>
+                <p class="text-base text-slate-500 dark:text-slate-400 font-medium max-w-xl">
+                    A suite of smart utilities designed to help you make better decisions, faster.
+                </p>
 
-        <!-- Theme Toggle -->
-        <button id="themeToggle"
-            class="absolute top-6 right-6 p-2 rounded-full text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 transition-all focus:outline-none focus:ring-2 focus:ring-indigo-500">
-            <div class="relative w-6 h-6">
-                <i
-                    class="fa-solid fa-moon absolute inset-0 transition-transform duration-500 rotate-0 dark:-rotate-90 scale-100 dark:scale-0"></i>
-                <i
-                    class="fa-solid fa-sun absolute inset-0 transition-transform duration-500 rotate-90 dark:rotate-0 scale-0 dark:scale-100 text-yellow-400"></i>
+                <div class="search-shell">
+                    <label for="toolSearchInput" class="sr-only">Search tools</label>
+                    <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                    <input id="toolSearchInput" type="text" class="search-input" placeholder="Search tools by name or description..." autocomplete="off" />
+                    <button id="toolSearchClear" class="search-clear hidden" type="button" aria-label="Clear search">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
             </div>
-        </button>
+
+            <!-- Theme Toggle -->
+            <button id="themeToggle"
+                class="self-end sm:self-start p-2 rounded-full text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 transition-all focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                aria-label="Toggle theme">
+                <div class="relative w-6 h-6">
+                    <i
+                        class="fa-solid fa-moon absolute inset-0 transition-transform duration-500 rotate-0 dark:-rotate-90 scale-100 dark:scale-0"></i>
+                    <i
+                        class="fa-solid fa-sun absolute inset-0 transition-transform duration-500 rotate-90 dark:rotate-0 scale-0 dark:scale-100 text-yellow-400"></i>
+                </div>
+            </button>
+        </div>
     </header>
 
     <!-- Main Content -->
-    <main class="relative z-10 flex-1 px-4 sm:px-6 py-6 max-w-6xl mx-auto w-full" id="app-container">
+    <main class="relative z-10 flex-1 px-4 sm:px-6 py-6 max-w-[92rem] mx-auto w-full" id="app-container">
         <!-- Dynamic content will be injected here -->
     </main>
 
     <!-- Footer -->
     <footer class="relative z-10 border-t border-slate-200/70 dark:border-slate-800/80 bg-white/50 dark:bg-slate-950/40 backdrop-blur-sm">
-        <div class="max-w-6xl mx-auto px-4 sm:px-6 py-10">
+        <div class="max-w-[92rem] mx-auto px-4 sm:px-6 py-10">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-left">
                 <div>
                     <div class="flex items-center gap-2 mb-3">

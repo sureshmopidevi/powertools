@@ -1,14 +1,28 @@
 import { ToolCard } from './ToolCard.js';
 
 export class Section {
-    constructor(title, tools, delay = 0) {
+    constructor({ title, tools, delay = 0, query = '' }) {
         this.title = title;
-        this.tools = tools;
+        this.tools = Array.isArray(tools) ? tools : [];
         this.delay = delay;
+        this.query = (query || '').trim().toLowerCase();
+    }
+
+    getFilteredTools() {
+        if (!this.query) return this.tools;
+
+        return this.tools.filter((tool) => {
+            const title = (tool.title || '').toLowerCase();
+            const description = (tool.description || '').toLowerCase();
+            return title.includes(this.query) || description.includes(this.query);
+        });
     }
 
     render() {
-        const toolCardsHTML = this.tools.map(tool => {
+        const filteredTools = this.getFilteredTools();
+        if (filteredTools.length === 0) return '';
+
+        const toolCardsHTML = filteredTools.map(tool => {
             const card = new ToolCard(tool);
             return card.render();
         }).join('');
@@ -17,7 +31,7 @@ export class Section {
 
         return `
             <section class="mb-12 animate-fade-in-up ${delayClass}">
-                <div class="flex items-center gap-3 mb-6 px-1">
+                <div class="relative z-20 flex items-center gap-3 mb-7 px-1">
                     <div class="h-px bg-gradient-to-r from-transparent via-slate-300 dark:via-slate-700 to-transparent w-full"></div>
                     <span class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest whitespace-nowrap">
                         ${this.title}
@@ -25,8 +39,10 @@ export class Section {
                     <div class="h-px bg-gradient-to-r from-transparent via-slate-300 dark:via-slate-700 to-transparent w-full"></div>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    ${toolCardsHTML}
+                <div class="horizontal-row relative z-10 overflow-x-auto pt-1 pb-2 -mx-1 px-1">
+                    <div class="flex items-stretch gap-4 sm:gap-5 xl:gap-6 snap-x snap-mandatory">
+                        ${toolCardsHTML}
+                    </div>
                 </div>
             </section>
         `;

@@ -55,7 +55,7 @@ export class ToolCard {
     }
 
     render() {
-        const { id, title, description, icon, url, color } = this.tool;
+        const { title, description, icon, url, color } = this.tool;
 
         // Dynamic classes are generated based on the 'color' property
         // relying on the custom colors defined in tailwind.config in index.html
@@ -67,21 +67,20 @@ export class ToolCard {
 
         const iconClass = `text-${color}-500 dark:text-${color}-400`;
         const bgClass = `bg-${color}-50 dark:bg-${color}-900/20`;
-        const titleHoverClass = `group-hover:text-${color}-600 dark:group-hover:text-${color}-400`;
         const arrowClass = `text-${color}-500`;
 
         return `
-            <a href="${url}" class="tool-card group relative flex flex-col bg-white dark:bg-slate-800/50 backdrop-blur-sm border border-slate-200 dark:border-slate-700/50 rounded-3xl p-6 overflow-hidden">
+            <a href="${url}" class="tool-card squircle-card group relative z-0 flex flex-col bg-white dark:bg-slate-800/50 backdrop-blur-sm border border-slate-200 dark:border-slate-700/50 p-6 overflow-hidden shrink-0 snap-start focus:outline-none focus-visible:ring-1 focus-visible:ring-slate-400/60 dark:focus-visible:ring-slate-500/60 focus-visible:ring-offset-1 focus-visible:ring-offset-transparent">
                 ${this.getBadgeHTML()}
 
                 <div class="flex items-start justify-between mb-4">
-                    <div class="w-14 h-14 rounded-2xl ${bgClass} flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                    <div class="tool-icon-wrap w-14 h-14 rounded-2xl ${bgClass} flex items-center justify-center transition-transform duration-300">
                         <i class="fa-solid ${icon} ${iconClass} text-2xl"></i>
                     </div>
                 </div>
 
                 <div class="mt-auto">
-                    <h3 class="text-lg font-bold text-slate-800 dark:text-slate-100 ${titleHoverClass} transition-colors">
+                    <h3 class="tool-title text-lg font-bold text-slate-800 dark:text-slate-100 transition-colors">
                         ${title}
                     </h3>
                     <p class="text-sm text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
@@ -90,7 +89,7 @@ export class ToolCard {
                 </div>
 
                 <!-- Hover Arrow -->
-                <div class="absolute bottom-6 right-6 opacity-0 transform translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300">
+                <div class="tool-arrow absolute bottom-6 right-6 opacity-0 transform translate-x-2 transition-all duration-300">
                     <i class="fa-solid fa-arrow-right ${arrowClass}"></i>
                 </div>
             </a>
