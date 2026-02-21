@@ -32,7 +32,7 @@ export class Section {
         const animationClass = this.animate ? `animate-fade-in-up ${delayClass}` : '';
 
         return `
-            <section class="mb-12 ${animationClass}">
+            <section class="mb-12 ${animationClass}" data-tools-section="1">
                 <div class="relative z-20 flex items-center gap-3 mb-7 px-1">
                     <div class="h-px bg-gradient-to-r from-transparent via-slate-300 dark:via-slate-700 to-transparent w-full"></div>
                     <span class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest whitespace-nowrap">

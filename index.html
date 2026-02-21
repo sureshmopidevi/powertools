@@ -465,11 +465,21 @@
         }
 
         .tool-card {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: transform 0.24s cubic-bezier(0.4, 0, 0.2, 1),
+                box-shadow 0.24s cubic-bezier(0.4, 0, 0.2, 1),
+                border-color 0.2s ease;
             position: relative;
             width: min(80vw, 286px);
             min-height: 220px;
             flex: 0 0 auto;
+        }
+
+        .theme-switching,
+        .theme-switching *,
+        .theme-switching *::before,
+        .theme-switching *::after {
+            transition: none !important;
+            animation: none !important;
         }
 
         .tool-card:hover {
@@ -946,7 +956,7 @@
 </head>
 
 <body
-    class="text-slate-600 dark:text-slate-400 min-h-screen transition-colors duration-300 flex flex-col relative overflow-x-hidden space-bg">
+    class="text-slate-600 dark:text-slate-400 min-h-screen flex flex-col relative overflow-x-hidden space-bg">
 
     <!-- Background Decoration -->
     <div class="fixed inset-0 pointer-events-none z-0 scene-3d">

@@ -3,6 +3,14 @@ export class ToolCard {
         this.tool = tool;
     }
 
+    escapeAttr(value) {
+        return String(value)
+            .replaceAll('&', '&amp;')
+            .replaceAll('"', '&quot;')
+            .replaceAll('<', '&lt;')
+            .replaceAll('>', '&gt;');
+    }
+
     isWithinRange(date, startDate, endDate) {
         if (startDate && date < new Date(`${startDate}T00:00:00`)) return false;
         if (endDate && date > new Date(`${endDate}T23:59:59`)) return false;
@@ -68,9 +76,10 @@ export class ToolCard {
         const iconClass = `text-${color}-500 dark:text-${color}-400`;
         const bgClass = `bg-${color}-50 dark:bg-${color}-900/20`;
         const arrowClass = `text-${color}-500`;
+        const searchText = this.escapeAttr(`${title || ''} ${description || ''}`.toLowerCase());
 
         return `
-            <a href="${url}" class="tool-card squircle-card group relative z-0 flex flex-col bg-white dark:bg-slate-800/50 backdrop-blur-sm border border-slate-200 dark:border-slate-700/50 p-6 overflow-hidden shrink-0 snap-start focus:outline-none focus-visible:ring-1 focus-visible:ring-slate-400/60 dark:focus-visible:ring-slate-500/60 focus-visible:ring-offset-1 focus-visible:ring-offset-transparent">
+            <a href="${url}" data-tool-card="1" data-search="${searchText}" class="tool-card squircle-card group relative z-0 flex flex-col bg-white dark:bg-slate-800/50 backdrop-blur-sm border border-slate-200 dark:border-slate-700/50 p-6 overflow-hidden shrink-0 snap-start focus:outline-none focus-visible:ring-1 focus-visible:ring-slate-400/60 dark:focus-visible:ring-slate-500/60 focus-visible:ring-offset-1 focus-visible:ring-offset-transparent">
                 ${this.getBadgeHTML()}
 
                 <div class="flex items-start justify-between mb-4">
