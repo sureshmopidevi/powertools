@@ -81,6 +81,26 @@
           }
         ],
         "color": "gold"
+      },
+      {
+        "id": "bmi-calculator",
+        "title": "BMI Calculator",
+        "description": "Check BMI, category, and healthy range using metric or imperial units.",
+        "icon": "fa-weight-scale",
+        "url": "tools/bmi-calculator/index.html",
+        "introducedOn": "2026-02-21",
+        "lastUpdatedOn": "2026-02-21",
+        "commitCount": 1,
+        "badges": [
+          {
+            "label": "New",
+            "type": "new",
+            "startDate": "2026-02-21",
+            "endDate": "2026-03-21",
+            "priority": 2
+          }
+        ],
+        "color": "gold"
       }
     ]
   },
