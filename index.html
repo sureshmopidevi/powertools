@@ -1186,8 +1186,22 @@
     </header>
 
     <!-- Main Content -->
-    <main class="relative z-10 flex-1 px-4 sm:px-6 py-6 max-w-[92rem] mx-auto w-full" id="app-container">
-        <!-- Dynamic content will be injected here -->
+    <main class="relative z-10 flex-1 px-4 sm:px-6 py-6 max-w-[92rem] mx-auto w-full min-h-[500px]" id="app-container">
+        <script>
+            (function () {
+                try {
+                    // Fast-path hide of skeleton shimmer if we have cached data.
+                    // This suppresses the "again loading" feeling for back-navigation.
+                    if (sessionStorage.getItem('powertools.tools.data.v1')) {
+                        document.write('<style>#app-container>.loading-stage{display:none!important;}</style>');
+                    }
+                } catch (e) { }
+            })();
+        </script>
+        <!-- Skeleton Loader (Static for Instant Paint) -->
+        <section class="loading-stage animate-fade-in-up" aria-label="Loading tools">
+            <!-- Dynamic content will be injected here -->
+        </section>
     </main>
 
     <!-- Footer -->
