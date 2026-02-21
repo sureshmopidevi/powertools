@@ -46,7 +46,7 @@ export class ThemeManager {
 
         this.themeSwitchTimer = window.setTimeout(() => {
             this.html.classList.remove('theme-switching');
-        }, 140);
+        }, 16);
     }
 
     setThemeClass(isDark, emitEvent = false) {

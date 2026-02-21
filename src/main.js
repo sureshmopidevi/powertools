@@ -17,6 +17,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     let noResultsStateEl = null;
     let latestQuery = '';
     let activeCacheStoredAt = null;
+    let themeSettleTimer = null;
 
     const TOOLS_CACHE_KEY = 'powertools.tools.cache.v1';
     const UI_STATE_KEY = 'powertools.home.ui.v1';
@@ -82,6 +83,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         return (Date.now() - snapshot.storedAt) > NETWORK_REFRESH_INTERVAL_MS;
     };
 
+    const getLoadingSkeletonHTML = () => ''; // Now handled statically in index.html
+
     const readUIState = () => {
         try {
             const raw = sessionStorage.getItem(UI_STATE_KEY);
@@ -113,9 +116,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const query = typeof state.query === 'string' ? state.query : '';
         latestQuery = query;
-        if (searchInput) searchInput.value = query;
+        if (searchInput) {
+            searchInput.value = query;
+            setSearchClearVisibility(query);
+        }
+
         renderCategories(query);
 
+        // Batch scroll restoration
         requestAnimationFrame(() => {
             if (Array.isArray(state.rowOffsets)) {
                 const rows = Array.from(document.querySelectorAll('.horizontal-row'));
@@ -129,16 +137,33 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (typeof state.windowScrollY === 'number' && Number.isFinite(state.windowScrollY)) {
                 window.scrollTo({ top: Math.max(0, state.windowScrollY), behavior: 'auto' });
             }
+            // Allow theme transitions after initial restoration
+            document.body.classList.add('theme-settled');
         });
+    };
+
+    const triggerThemeSettle = () => {
+        if (!appContainer || sectionIndex.length === 0) return;
+        appContainer.classList.remove('theme-settle');
+        if (themeSettleTimer) {
+            clearTimeout(themeSettleTimer);
+        }
+        themeSettleTimer = window.setTimeout(() => {
+            appContainer.classList.add('theme-settle');
+            themeSettleTimer = window.setTimeout(() => {
+                appContainer.classList.remove('theme-settle');
+            }, 260);
+        }, 150);
     };
 
     const ensureNoResultsState = () => {
         if (noResultsStateEl) return;
         noResultsStateEl = document.createElement('section');
         noResultsStateEl.id = 'noResultsState';
-        noResultsStateEl.className = 'hidden animate-fade-in-up';
+        // Use opacity for smoother transition
+        noResultsStateEl.className = 'hidden transition-opacity duration-300';
         noResultsStateEl.innerHTML = `
-            <div class="mx-auto max-w-xl rounded-3xl border border-slate-200/80 dark:border-slate-700/70 bg-white/70 dark:bg-slate-900/60 backdrop-blur-sm p-8 text-center shadow-sm">
+            <div class="mx-auto max-w-xl rounded-2xl border border-slate-200/80 dark:border-slate-700/70 bg-white/70 dark:bg-slate-900/60 backdrop-blur-sm p-8 text-center shadow-sm">
                 <div class="w-12 h-12 mx-auto rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center mb-4">
                     <i class="fa-solid fa-magnifying-glass text-slate-500 dark:text-slate-400"></i>
                 </div>
@@ -156,13 +181,21 @@ document.addEventListener('DOMContentLoaded', async () => {
         const messageEl = noResultsStateEl.querySelector('#noResultsMessage');
         if (messageEl) {
             if (query.trim()) {
-                messageEl.innerHTML = `No results for "<span class="font-semibold">${escapeHtml(query.trim())}</span>". Try a different keyword.`;
+                messageEl.innerHTML = `No results for "<span class="font-semibold text-slate-700 dark:text-slate-200">${escapeHtml(query.trim())}</span>". Try a different keyword.`;
             } else {
                 messageEl.textContent = 'No tools are available right now.';
             }
         }
 
-        noResultsStateEl.classList.toggle('hidden', hasResults);
+        if (hasResults) {
+            noResultsStateEl.classList.add('hidden');
+            noResultsStateEl.style.opacity = '0';
+        } else {
+            noResultsStateEl.classList.remove('hidden');
+            requestAnimationFrame(() => {
+                noResultsStateEl.style.opacity = '1';
+            });
+        }
     };
 
     const buildSectionIndex = () => {
@@ -235,7 +268,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (searchDebounceTimer) clearTimeout(searchDebounceTimer);
             searchDebounceTimer = setTimeout(() => {
                 renderCategories(nextQuery);
-            }, 90);
+            }, 120); // Slightly longer for smoother typing
         });
     }
 
@@ -258,6 +291,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         writeUIState();
     });
 
+    window.addEventListener('powertools:theme-changed', () => {
+        triggerThemeSettle();
+    });
+
     // Load Tools
     try {
         const cachedSnapshot = getCachedSnapshot();
@@ -274,23 +311,17 @@ document.addEventListener('DOMContentLoaded', async () => {
                 appContainer.innerHTML = cachedHtml;
                 buildSectionIndex();
                 hasAnimatedInitialRender = true;
-                renderCategories('');
+                // Important: Do not call renderCategories('') if we already have the HTML, 
+                // just rely on buildSectionIndex for search state later if query is restored.
             } else {
                 renderCategories('', { forceRerender: true });
             }
 
-            restoreUIState(savedUIState);
             renderedFromCache = true;
+            restoreUIState(savedUIState);
         } else {
-            appContainer.innerHTML = `
-                <section class="animate-fade-in-up">
-                    <div class="mx-auto max-w-xl rounded-3xl border border-slate-200/80 dark:border-slate-700/70 bg-white/70 dark:bg-slate-900/60 backdrop-blur-sm p-8 text-center shadow-sm">
-                        <p class="text-sm font-semibold text-slate-600 dark:text-slate-300">
-                            <i class="fa-solid fa-spinner fa-spin mr-2"></i>Loading tools...
-                        </p>
-                    </div>
-                </section>
-            `;
+            // Skeleton is already in HTML, just ensure body is ready for transitions eventually
+            setTimeout(() => document.body.classList.add('theme-settled'), 500);
         }
 
         if (cachedSnapshot && !shouldBackgroundRefresh(cachedSnapshot)) {
