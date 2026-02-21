@@ -1,6 +1,6 @@
 # Powertools Design System Rules
 
-This document extends `/Users/lt-sureshmopidevi/Documents/hobby/powertools/CONVENTIONS.md` into a reusable UI + business-logic architecture standard for all future tools.
+This document extends `powertools/CONVENTIONS.md` into a reusable UI + business-logic architecture standard for all future tools.
 
 ## 1. Product Principles
 - Build for decision speed: each screen should help users decide in under 30 seconds.
@@ -104,7 +104,7 @@ This document extends `/Users/lt-sureshmopidevi/Documents/hobby/powertools/CONVE
 
 ## 10. Tool Delivery Checklist
 1. Home button implemented and functional.
-2. Tool registered in `/Users/lt-sureshmopidevi/Documents/hobby/powertools/src/data/tools.json`.
+2. Tool registered in `powertools/src/data/tools.json`.
 3. Category color and icon semantics are correct.
 4. Desktop/mobile layouts verified.
 5. Empty, loading, and error states are present.
