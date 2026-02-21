@@ -30,12 +30,12 @@ export class AppUI {
     getHTML() {
         return `
         <div class="max-w-7xl mx-auto px-4 sm:px-6 py-8 md:py-12 font-inter text-slate-700 dark:text-slate-300 space-y-8">
-            <header class="space-y-4">
+            <header class="space-y-4 animate-enter">
                 <a href="../../index.html" class="inline-flex items-center gap-2 h-11 px-4 rounded-xl bg-white/90 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:text-gold-600 dark:hover:text-gold-400 transition-colors no-underline text-sm font-semibold">
                     <i class="fa-solid fa-arrow-left"></i> Home
                 </a>
 
-                <div class="flex items-start justify-between gap-4">
+                <div class="flex items-start justify-between gap-4 animate-enter delay-100">
                     <div class="space-y-1">
                         <p class="text-xs font-semibold uppercase tracking-wider text-gold-700 dark:text-gold-400">Finance Tool</p>
                         <h1 class="text-3xl md:text-4xl font-sans font-bold text-slate-900 dark:text-white tracking-tight">EMI Discount Analyzer</h1>
@@ -50,7 +50,7 @@ export class AppUI {
 
             <section class="grid grid-cols-1 lg:grid-cols-12 gap-6">
                 <div class="lg:col-span-8 space-y-6">
-                    <article id="recommendationCard" class="rounded-2xl p-6 md:p-8 border border-slate-200 dark:border-slate-700 bg-gradient-to-br from-slate-900 to-slate-800 text-white shadow-xl">
+                    <article id="recommendationCard" class="rounded-2xl p-6 md:p-8 border border-slate-200 dark:border-slate-700 bg-gradient-to-br from-slate-900 to-slate-800 text-white shadow-xl animate-enter delay-200">
                         <p class="text-[11px] font-semibold uppercase tracking-wider text-white/70 mb-2">Decision</p>
                         <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
                             <div>
@@ -66,7 +66,7 @@ export class AppUI {
                     </article>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <article id="optionACard" class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-6 space-y-4">
+                        <article id="optionACard" class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-6 space-y-4 animate-enter delay-300">
                             <div class="flex items-center justify-between">
                                 <div>
                                     <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Option A</p>
@@ -84,7 +84,7 @@ export class AppUI {
                             </div>
                         </article>
 
-                        <article id="optionBCard" class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-6 space-y-4">
+                        <article id="optionBCard" class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-6 space-y-4 animate-enter delay-400">
                             <div class="flex items-center justify-between">
                                 <div>
                                     <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Option B</p>
@@ -105,7 +105,7 @@ export class AppUI {
                         </article>
                     </div>
 
-                    <article class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-6 md:p-8">
+                    <article class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-6 md:p-8 animate-enter delay-500">
                         <h3 class="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-5">Decision Surface</h3>
                         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                             ${this.renderMetric('Monthly EMI', 'monthlyEmiMetric', 'based on strategy')}
@@ -117,7 +117,7 @@ export class AppUI {
                 </div>
 
                 <div class="lg:col-span-4 space-y-6">
-                    <section class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-6 md:p-8 space-y-5">
+                    <section class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-6 md:p-8 space-y-5 animate-enter delay-700">
                         <div>
                             <h2 class="text-xl font-sans font-bold text-slate-900 dark:text-white">Inputs</h2>
                             <p class="text-xs text-slate-500">All values normalized to monthly cashflow logic.</p>
@@ -146,10 +146,10 @@ export class AppUI {
 
                             <div id="advancedPanel" class="space-y-4 overflow-hidden transition-all duration-300 ${this.state.showAdvanced ? 'max-h-[620px] opacity-100' : 'max-h-0 opacity-0'}">
                                 ${this.renderSelectGroup('emiStrategy', 'EMI Type', [
-                                    { value: 'no_cost_subvention', label: 'No-cost EMI' },
-                                    { value: 'reducing_balance', label: 'Normal bank EMI' },
-                                    { value: 'flat_rate', label: 'Flat EMI' }
-                                ])}
+            { value: 'no_cost_subvention', label: 'No-cost EMI' },
+            { value: 'reducing_balance', label: 'Normal bank EMI' },
+            { value: 'flat_rate', label: 'Flat EMI' }
+        ])}
                                 ${this.renderSlider('bankInterestRate', 'Bank Interest (%/year)', 0, 36, 0.1, '%')}
                                 ${this.renderToggle('gstOnInterest', 'Add GST on EMI interest', 'Use this if your lender charges GST on interest.')}
                                 ${this.renderSlider('gstRate', 'GST Rate on Interest', 0, 28, 1, '%')}
