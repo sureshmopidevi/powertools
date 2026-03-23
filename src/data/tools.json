@@ -101,6 +101,26 @@
           }
         ],
         "color": "gold"
+      },
+      {
+        "id": "compact-suv-showdown",
+        "title": "Compact SUV Showdown",
+        "description": "Compare 6 top compact SUVs in 2026 for specs, safety, and features.",
+        "icon": "fa-car-side",
+        "url": "tools/compact-suv-showdown/index.html",
+        "introducedOn": "2026-03-23",
+        "lastUpdatedOn": "2026-03-23",
+        "commitCount": 1,
+        "badges": [
+          {
+            "label": "New",
+            "type": "new",
+            "startDate": "2026-03-23",
+            "endDate": "2026-04-23",
+            "priority": 2
+          }
+        ],
+        "color": "silver"
       }
     ]
   },

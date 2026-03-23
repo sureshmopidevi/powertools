@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en" class="dark" data-theme="dark">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Compact SUV Showdown 2026 — 6 Cars Compared</title>
+  <meta name="description"
+    content="Compare Skoda Kushaq, Hyundai Creta, Kia Seltos, VW Taigun, Honda Elevate, and Tata Sierra side-by-side. Specs, safety, features, and verdicts.">
+
+  <!-- Tailwind (used for nav back-button utility classes) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', 'sans-serif'],
+          },
+          colors: {
+            silver: {
+              50: '#f8fafc',
+              100: '#f1f5f9',
+              300: '#cbd5e1',
+              400: '#94a3b8',
+              500: '#64748b',
+              600: '#475569',
+              900: '#0f172a'
+            }
+          }
+        }
+      }
+    };
+  </script>
+
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="../../src/styles/global.css">
+  <link rel="stylesheet" href="style.css">
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+
+  <!-- NAVIGATION -->
+  <nav class="nav" id="top-nav">
+    <div class="nav-inner">
+      <a href="../../index.html"
+        class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:text-violet-600 dark:hover:text-violet-400 hover:border-violet-300 dark:hover:border-violet-600 transition-all text-xs font-semibold no-underline w-fit">
+        <i class="fa-solid fa-arrow-left"></i>Home
+      </a>
+
+      <div class="nav-logo">
+        <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="2" y="8" width="28" height="16" rx="4" stroke="currentColor" stroke-width="2" />
+          <circle cx="9" cy="24" r="3" stroke="currentColor" stroke-width="2" />
+          <circle cx="23" cy="24" r="3" stroke="currentColor" stroke-width="2" />
+          <path d="M4 16h24" stroke="currentColor" stroke-width="1.5" stroke-dasharray="2 2" />
+          <rect x="8" y="11" width="6" height="4" rx="1" fill="currentColor" opacity="0.3" />
+          <rect x="18" y="11" width="6" height="4" rx="1" fill="currentColor" opacity="0.3" />
+        </svg>
+        SUV Showdown
+      </div>
+      <ul class="nav-links">
+        <li><a href="#overview">Overview</a></li>
+        <li><a href="#compare">Compare</a></li>
+        <li><a href="#safety">Safety</a></li>
+        <li><a href="#performance">Performance</a></li>
+        <li><a href="#features">Features</a></li>
+        <li><a href="#verdict">Verdict</a></li>
+      </ul>
+      <div class="nav-actions">
+        <button class="theme-toggle" data-theme-toggle aria-label="Toggle theme">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="5" />
+            <path
+              d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO SECTION -->
+  <section class="hero" id="overview">
+    <div class="container">
+      <div class="hero-badge fade-in">
+        <span class="dot"></span>
+        Updated March 2026
+      </div>
+      <h1 class="fade-in">Compact SUV Showdown 2026</h1>
+      <p class="hero-sub fade-in">6 Cars. Head-to-Head. Every Spec, Feature &amp; Detail Compared.</p>
+      <div class="stats-bar fade-in">
+        <div class="stat-item">
+          <span class="stat-value">6</span>
+          <span class="stat-label">Cars Compared</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-value">₹10.58L – ₹21.29L</span>
+          <span class="stat-label">Price Range</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-value">Petrol / Diesel / Turbo</span>
+          <span class="stat-label">Engine Options</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICE COMPARISON -->
+  <section class="section" id="prices">
+    <div class="container">
+      <div class="section-header fade-in">
+        <h2>Price Comparison</h2>
+        <div class="section-divider"></div>
+        <p>Starting price vs top variant — see who gives you the widest range and best entry point.</p>
+      </div>
+      <div class="chart-container fade-in">
+        <div class="chart-wrapper">
+          <canvas id="priceChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- QUICK SPECS OVERVIEW -->
+  <section class="section" id="specs">
+    <div class="container">
+      <div class="section-header fade-in">
+        <h2>Quick Specs Overview</h2>
+        <div class="section-divider"></div>
+        <p>At-a-glance specs for each contender. Best-in-class highlights marked.</p>
+      </div>
+      <div class="specs-grid" id="specCards"></div>
+    </div>
+  </section>
+
+  <!-- HEAD-TO-HEAD COMPARISON MATRIX -->
+  <section class="section" id="compare">
+    <div class="container">
+      <div class="section-header fade-in">
+        <h2>Head-to-Head Comparison</h2>
+        <div class="section-divider"></div>
+        <p>The full spec-by-spec showdown. Green highlights show category winners.</p>
+      </div>
+      <div class="matrix-wrapper fade-in" id="matrixWrapper"></div>
+    </div>
+  </section>
+
+  <!-- SAFETY SHOWDOWN -->
+  <section class="section" id="safety">
+    <div class="container">
+      <div class="section-header fade-in">
+        <h2>Safety Showdown</h2>
+        <div class="section-divider"></div>
+        <p>NCAP ratings, ADAS availability, and active/passive safety tech compared.</p>
+      </div>
+      <div class="safety-grid">
+        <div class="safety-chart-box fade-in">
+          <h3 style="font-size:var(--text-lg);font-weight:700;margin-bottom:var(--space-4);">Safety Radar</h3>
+          <div style="position:relative;height:380px;">
+            <canvas id="safetyRadar"></canvas>
+          </div>
+        </div>
+        <div class="safety-chart-box fade-in" id="safetyFeatureGrid">
+          <h3 style="font-size:var(--text-lg);font-weight:700;margin-bottom:var(--space-4);">Feature Availability</h3>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PERFORMANCE COMPARISON -->
+  <section class="section" id="performance">
+    <div class="container">
+      <div class="section-header fade-in">
+        <h2>Performance Comparison</h2>
+        <div class="section-divider"></div>
+        <p>Power, torque, mileage, ground clearance &amp; boot space — normalized and compared.</p>
+      </div>
+      <div class="perf-layout">
+        <div class="chart-container fade-in">
+          <h3 style="font-size:var(--text-lg);font-weight:700;margin-bottom:var(--space-4);">Performance Radar</h3>
+          <div style="position:relative;height:400px;">
+            <canvas id="perfRadar"></canvas>
+          </div>
+        </div>
+        <div class="fade-in">
+          <h3 style="font-size:var(--text-lg);font-weight:700;margin-bottom:var(--space-4);">Engine Specifications</h3>
+          <div class="engine-cards" id="engineCards"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROS & CONS -->
+  <section class="section" id="proscons">
+    <div class="container">
+      <div class="section-header fade-in">
+        <h2>Pros &amp; Cons</h2>
+        <div class="section-divider"></div>
+        <p>The good and the bad for each car. Click to collapse.</p>
+      </div>
+      <div class="proscons-grid" id="prosConsCards"></div>
+    </div>
+  </section>
+
+  <!-- FEATURE HEATMAP -->
+  <section class="section" id="features">
+    <div class="container">
+      <div class="section-header fade-in">
+        <h2>Feature Availability Heatmap</h2>
+        <div class="section-divider"></div>
+        <p>Which cars have what — at a glance. Green = available, red = missing, yellow = partial.</p>
+      </div>
+      <div class="heatmap-wrapper fade-in" id="heatmapWrapper"></div>
+    </div>
+  </section>
+
+  <!-- VERDICT -->
+  <section class="section" id="verdict">
+    <div class="container">
+      <div class="section-header fade-in">
+        <h2>The Verdict</h2>
+        <div class="section-divider"></div>
+        <p>Our picks across every category — and who should buy what.</p>
+      </div>
+      <div class="verdicts-grid" id="verdictsGrid"></div>
+      <div class="persona-section fade-in">
+        <h3 class="persona-title">Which One Should YOU Buy?</h3>
+        <div class="persona-grid" id="personaGrid"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <div class="footer-sources">
+          <h4>Data Sources</h4>
+          <ul class="footer-sources-list" id="footerSources"></ul>
+        </div>
+        <div class="footer-meta">
+          <p>Last updated: March 2026</p>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="data.js"></script>
+  <script src="script.js"></script>
+
+</body>
+
+</html>
