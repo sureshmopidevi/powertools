@@ -244,6 +244,169 @@ button {
   gap: var(--space-2);
 }
 
+/* =========================================
+   SAFETY BENTO GRID
+   ========================================= */
+.safety-bento-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--space-4);
+  width: 100%;
+}
+
+.sbn-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 1rem;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.sbn-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08); /* Dark mode shadow */
+}
+[data-theme="dark"] .sbn-card:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.sbn-accent {
+  height: 4px;
+  width: 100%;
+}
+
+.sbn-inner {
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  flex: 1;
+}
+
+.sbn-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.sbn-name {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 700;
+  font-size: var(--text-base);
+  line-height: 1.2;
+}
+
+.sbn-brand {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: 2px;
+}
+
+.sbn-score-badge {
+  display: flex;
+  align-items: baseline;
+  padding: 4px 8px;
+  border-radius: 8px;
+  border: 1px solid;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 800;
+  font-size: var(--text-lg);
+  line-height: 1;
+}
+
+.sbn-score-max {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  opacity: 0.6;
+  margin-left: 1px;
+}
+
+.sbn-ncap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--text-sm);
+  margin-top: -4px;
+}
+
+.sbn-star {
+  font-size: 16px;
+  line-height: 1;
+}
+.sbn-star.filled { color: #F59E0B; }
+.sbn-star.empty { color: var(--color-border); }
+
+.sbn-ncap-label {
+  font-weight: 600;
+  color: var(--color-text);
+  margin-left: 2px;
+}
+
+.sbn-no-ncap {
+  color: var(--color-text-muted);
+  font-style: italic;
+  font-size: var(--text-sm);
+}
+
+.sbn-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: auto; /* push to bottom before bar */
+}
+
+.sbn-chip {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px solid var(--color-border);
+  display: inline-flex;
+  align-items: center;
+  background: var(--color-surface-2);
+}
+
+.sbn-chip.has {
+  background: rgba(16, 185, 129, 0.1);
+  color: #10B981;
+  border-color: rgba(16, 185, 129, 0.2);
+}
+
+.sbn-chip.partial {
+  background: rgba(245, 158, 11, 0.1);
+  color: #F59E0B;
+  border-color: rgba(245, 158, 11, 0.2);
+}
+
+.sbn-chip.no {
+  background: var(--color-bg);
+  color: var(--color-text-muted);
+  opacity: 0.7;
+}
+
+.sbn-bar-row {
+  margin-top: 4px;
+}
+
+.sbn-bar-bg {
+  height: 6px;
+  background: var(--color-border);
+  border-radius: 3px;
+  overflow: hidden;
+  width: 100%;
+}
+
+.sbn-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 1s ease-out;
+}
+
 .theme-toggle {
   width: 40px;
   height: 40px;

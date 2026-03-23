@@ -4,6 +4,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>
+    // Enforce trailing slash for directory URLs to ensure relative paths work
+    if (!window.location.pathname.endsWith('/') && !window.location.pathname.endsWith('.html')) {
+      window.location.replace(window.location.pathname + '/' + window.location.search);
+    }
+  </script>
   <title>Compact SUV Showdown 2026 — 11 Cars Compared</title>
   <meta name="description"
     content="Compare Hyundai Creta, Kia Seltos, Honda Elevate, Maruti Grand Vitara, Toyota Hyryder, Skoda Kushaq, VW Taigun, MG Astor, Citroën C3 Aircross, Tata Sierra, and Renault Duster 2026 — specs, safety, features &amp; verdicts.">
@@ -40,8 +46,7 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
     rel="stylesheet">
-  <link rel="stylesheet" href="../../src/styles/global.css">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="./style.css">
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -168,8 +173,8 @@
             <canvas id="safetyRadar"></canvas>
           </div>
         </div>
-        <div class="safety-chart-box fade-in" id="safetyFeatureGrid">
-          <h3 style="font-size:var(--text-lg);font-weight:700;margin-bottom:var(--space-4);">Feature Availability</h3>
+        <div class="safety-bento-grid fade-in" id="safetyBentoGrid">
+          <!-- Bento cards injected by JS -->
         </div>
       </div>
     </div>
@@ -253,8 +258,8 @@
     </div>
   </footer>
 
-  <script src="data.js"></script>
-  <script src="script.js"></script>
+  <script src="./data.js"></script>
+  <script src="./script.js"></script>
 
 </body>
 

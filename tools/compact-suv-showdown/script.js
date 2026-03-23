@@ -328,45 +328,79 @@ function buildMatrix() {
 }
 
 // =========================================
-// BUILD SAFETY FEATURE GRID
+// BUILD SAFETY BENTO CARDS
 // =========================================
-function buildSafetyGrid() {
-  const container = document.getElementById('safetyFeatureGrid');
-  const features = [
-    { label: "NCAP 5-Star", key: "ncap", check: c => c.ncap === 5 },
-    { label: "ADAS", key: "adas", check: c => c.adas },
-    { label: "360° Camera", key: "cam360", check: c => c.cam360 },
-    { label: "6 Airbags", key: "airbags", check: c => c.airbags >= 6 },
-    { label: "All Disc Brakes", key: "allDisc", check: c => c.allDisc, partial: c => c.discNote.includes('only') },
-    { label: "Hill Descent", key: "hd", check: c => ['Hyundai Creta', 'Kia Seltos', 'Tata Sierra', 'Maruti Grand Vitara', 'Toyota Urban Cruiser Hyryder', 'MG Astor', 'Renault Duster'].includes(c.name) }
-  ];
+function buildSafetyBento() {
+  const grid = document.getElementById('safetyBentoGrid');
+  if (!grid) return;
 
-  let headerRow = '<div class="safety-feature-row" style="border-bottom:2px solid var(--color-border);">';
-  headerRow += '<div class="safety-feature-label" style="font-size:var(--text-xs);color:var(--color-text-muted);text-transform:uppercase;letter-spacing:0.05em;">Feature</div>';
+  // Safety score: NCAP(40) + ADAS(20) + 360cam(15) + AllDisc(15) + 6Airbags(10) = 100
+  const hillDescentCars = ['Hyundai Creta','Kia Seltos','Tata Sierra','Maruti Grand Vitara','Toyota Urban Cruiser Hyryder','MG Astor','Renault Duster'];
+
+  function safetyScore(car) {
+    let s = 0;
+    s += Math.min(car.ncap, 5) * 8; // max 40
+    if (car.adas) s += 20;
+    if (car.cam360) s += 15;
+    if (car.allDisc) s += 15;
+    else if (car.discNote && car.discNote.includes('only')) s += 7;
+    if (car.airbags >= 6) s += 10;
+    return s;
+  }
+
+  const starsHtml = (n) => Array.from({ length: 5 }, (_, i) =>
+    `<span class="sbn-star ${i < n ? 'filled' : 'empty'}">★</span>`
+  ).join('');
+
+  function chip(label, state) {
+    // state: 'has' | 'no' | 'partial'
+    const icon = state === 'has' ? '✓' : state === 'partial' ? '½' : '✗';
+    return `<span class="sbn-chip ${state}">${icon}&nbsp;${label}</span>`;
+  }
+
   DATA.cars.forEach(car => {
-    headerRow += `<div style="text-align:center;font-size:var(--text-xs);font-weight:700;color:${car.color};">${car.short}</div>`;
-  });
-  headerRow += '</div>';
+    const score = safetyScore(car);
+    const discState = car.allDisc ? 'has' : (car.discNote && car.discNote.includes('only') ? 'partial' : 'no');
+    const hdState = hillDescentCars.includes(car.name) ? 'has' : 'no';
 
-  let gridHtml = headerRow;
-  features.forEach(f => {
-    gridHtml += '<div class="safety-feature-row">';
-    gridHtml += `<div class="safety-feature-label">${f.label}</div>`;
-    DATA.cars.forEach(car => {
-      const has = f.check(car);
-      const isPartial = f.partial && f.partial(car);
-      if (has) {
-        gridHtml += '<div><div class="safety-cell has">✓</div></div>';
-      } else if (isPartial) {
-        gridHtml += '<div><div class="safety-cell partial">½</div></div>';
-      } else {
-        gridHtml += '<div><div class="safety-cell no">✗</div></div>';
-      }
-    });
-    gridHtml += '</div>';
-  });
+    const card = document.createElement('div');
+    card.className = 'sbn-card fade-in';
+    card.innerHTML = `
+      <div class="sbn-accent" style="background:${car.color}"></div>
+      <div class="sbn-inner">
+        <div class="sbn-head">
+          <div>
+            <div class="sbn-name" style="color:${car.color}">${car.short}</div>
+            <div class="sbn-brand">${car.brand}</div>
+          </div>
+          <div class="sbn-score-badge" style="background:${car.color}22;color:${car.color};border-color:${car.color}44">
+            ${score}<span class="sbn-score-max">/100</span>
+          </div>
+        </div>
 
-  container.innerHTML += `<div class="safety-features-grid">${gridHtml}</div>`;
+        <div class="sbn-ncap">
+          ${car.ncap > 0
+            ? starsHtml(car.ncap) + `<span class="sbn-ncap-label">${car.ncapBody}</span>`
+            : '<span class="sbn-no-ncap">Not tested</span>'
+          }
+        </div>
+
+        <div class="sbn-chips">
+          ${chip('ADAS', car.adas ? 'has' : 'no')}
+          ${chip('360°', car.cam360 ? 'has' : 'no')}
+          ${chip('Disc', discState)}
+          ${chip('Hill', hdState)}
+        </div>
+
+        <div class="sbn-bar-row">
+          <div class="sbn-bar-bg">
+            <div class="sbn-bar-fill" style="width:${score}%;background:${car.color}"></div>
+          </div>
+        </div>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
 }
 
 // =========================================
@@ -533,7 +567,7 @@ document.addEventListener('DOMContentLoaded', () => {
   buildSpecCards();
   buildMatrix();
   buildSafetyRadar();
-  buildSafetyGrid();
+  buildSafetyBento();
   buildPerfRadar();
   buildEngineCards();
   buildProsCons();
