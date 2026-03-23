@@ -77,15 +77,21 @@ function buildPriceChart() {
       maintainAspectRatio: false,
       plugins: {
         legend: {
-          labels: { color: textColor, font: { family: "'General Sans'", size: 13 }, usePointStyle: true, pointStyle: 'rectRounded', padding: 20 },
+          labels: {
+            color: textColor,
+            font: { family: "'Plus Jakarta Sans'", size: 12, weight: '600' },
+            usePointStyle: true,
+            pointStyle: 'rectRounded',
+            padding: 20
+          },
           position: 'top'
         },
         tooltip: {
-          backgroundColor: 'rgba(0,0,0,0.85)',
-          titleFont: { family: "'Cabinet Grotesk'", size: 14, weight: 'bold' },
-          bodyFont: { family: "'General Sans'", size: 13 },
+          backgroundColor: 'rgba(0,0,0,0.88)',
+          titleFont: { family: "'Plus Jakarta Sans'", size: 13, weight: 'bold' },
+          bodyFont: { family: "'Inter'", size: 12 },
           padding: 14,
-          cornerRadius: 8,
+          cornerRadius: 12,
           callbacks: {
             label: ctx => ctx.dataset.label + ': ₹' + ctx.parsed.y.toFixed(2) + 'L'
           }
@@ -96,11 +102,11 @@ function buildPriceChart() {
           beginAtZero: true,
           max: 24,
           grid: { color: gridColor + '44' },
-          ticks: { color: textColor, font: { family: "'General Sans'" }, callback: v => '₹' + v + 'L' }
+          ticks: { color: textColor, font: { family: "'Inter'", weight: '500' }, callback: v => '₹' + v + 'L' }
         },
         x: {
           grid: { display: false },
-          ticks: { color: textColor, font: { family: "'General Sans'", weight: 'bold' } }
+          ticks: { color: textColor, font: { family: "'Plus Jakarta Sans'", weight: '700', size: 11 } }
         }
       }
     }
@@ -141,7 +147,7 @@ function buildSafetyRadar() {
       responsive: true,
       maintainAspectRatio: false,
       plugins: {
-        legend: { labels: { color: textColor, font: { family: "'General Sans'", size: 12 }, usePointStyle: true, padding: 12 } }
+        legend: { labels: { color: textColor, font: { family: "'Plus Jakarta Sans'", size: 11, weight: '600' }, usePointStyle: true, padding: 12 } }
       },
       scales: {
         r: {
@@ -149,7 +155,7 @@ function buildSafetyRadar() {
           max: 100,
           ticks: { display: false },
           grid: { color: textColor + '15' },
-          pointLabels: { color: textColor, font: { family: "'General Sans'", size: 12, weight: '600' } },
+          pointLabels: { color: textColor, font: { family: "'Plus Jakarta Sans'", size: 11, weight: '700' } },
           angleLines: { color: textColor + '15' }
         }
       }
@@ -197,7 +203,7 @@ function buildPerfRadar() {
       responsive: true,
       maintainAspectRatio: false,
       plugins: {
-        legend: { labels: { color: textColor, font: { family: "'General Sans'", size: 12 }, usePointStyle: true, padding: 12 } }
+        legend: { labels: { color: textColor, font: { family: "'Plus Jakarta Sans'", size: 11, weight: '600' }, usePointStyle: true, padding: 12 } }
       },
       scales: {
         r: {
@@ -205,7 +211,7 @@ function buildPerfRadar() {
           max: 100,
           ticks: { display: false },
           grid: { color: textColor + '15' },
-          pointLabels: { color: textColor, font: { family: "'General Sans'", size: 12, weight: '600' } },
+          pointLabels: { color: textColor, font: { family: "'Plus Jakarta Sans'", size: 11, weight: '700' } },
           angleLines: { color: textColor + '15' }
         }
       }
@@ -239,7 +245,7 @@ function buildSpecCards() {
         <div class="spec-card-body">
           <div class="spec-card-header">
             <div>
-              <div class="spec-card-name">${car.name}</div>
+              <div class="spec-card-name" style="color:${car.color}">${car.name}</div>
               <div class="spec-card-year">${car.year}</div>
             </div>
             ${badgeHtml}
@@ -299,7 +305,7 @@ function buildMatrix() {
   html += '</tr></thead><tbody>';
 
   DATA.comparisonMatrix.forEach(cat => {
-    html += `<tr class="category-row"><td colspan="7">${cat.category}</td></tr>`;
+    html += `<tr class="category-row"><td colspan="12">${cat.category}</td></tr>`;
     cat.metrics.forEach(m => {
       html += '<tr>';
       html += `<td>${m.label}</td>`;
@@ -332,7 +338,7 @@ function buildSafetyGrid() {
     { label: "360° Camera", key: "cam360", check: c => c.cam360 },
     { label: "6 Airbags", key: "airbags", check: c => c.airbags >= 6 },
     { label: "All Disc Brakes", key: "allDisc", check: c => c.allDisc, partial: c => c.discNote.includes('only') },
-    { label: "Hill Descent", key: "hd", check: c => ['Skoda Kushaq', 'Hyundai Creta', 'Kia Seltos', 'Tata Sierra'].includes(c.name) }
+    { label: "Hill Descent", key: "hd", check: c => ['Hyundai Creta', 'Kia Seltos', 'Tata Sierra', 'Maruti Grand Vitara', 'Toyota Urban Cruiser Hyryder', 'MG Astor', 'Renault Duster'].includes(c.name) }
   ];
 
   let headerRow = '<div class="safety-feature-row" style="border-bottom:2px solid var(--color-border);">';
@@ -444,7 +450,7 @@ function buildHeatmap() {
 
   html += `<tr class="total-row"><td>Total Score</td>`;
   totals.forEach((t, i) => {
-    html += `<td style="color:${DATA.cars[i].color}">${t}/12</td>`;
+    html += `<td style="color:${DATA.cars[i].color}">${t}/14</td>`;
   });
   html += '</tr></tbody></table>';
 
