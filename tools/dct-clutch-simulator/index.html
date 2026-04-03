@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kia 7DCT Clutch Thermal Simulator — D7UF1 v3 | Powertools</title>
+<meta name="description" content="Real-time thermal simulation of the Kia D7UF1 dry 7-speed dual-clutch gearbox across Hyderabad traffic scenarios. Understand clutch heat, TCU protection and slip behaviour.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+
+<!-- ── App bar ── -->
+<header class="bar">
+  <div class="bar-logo">
+    <a href="../../index.html" class="home-btn" title="Back to Powertools">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M19 12H5M12 19l-7-7 7-7"/>
+      </svg>
+      Home
+    </a>
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+      <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.4"/>
+      <circle cx="10" cy="10" r="3.5" stroke="currentColor" stroke-width="1.4"/>
+      <line x1="10" y1="2"    x2="10" y2="5.5"  stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+      <line x1="10" y1="14.5" x2="10" y2="18"   stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+      <line x1="2"  y1="10"   x2="5.5"  y2="10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+      <line x1="14.5" y1="10" x2="18"   y2="10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+    </svg>
+    Kia D7UF1 — Dual Clutch Thermal Simulator
+  </div>
+  <div class="bar-right">
+    <span class="pill">7DCT · 340 Nm · Dry · FlexRay TCU</span>
+    <button class="icon-btn" data-theme-toggle title="Toggle theme">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+  </div>
+</header>
+
+<!-- ── Two-column layout ── -->
+<div class="layout">
+
+  <!-- ── Sidebar ── -->
+  <aside class="sidebar">
+
+    <!-- Traffic Scenario -->
+    <div>
+      <div class="sec-head">Traffic Scenario</div>
+      <div class="sc-grid">
+        <button class="sc-btn active" onclick="setScenario('mall',this)">
+          <span class="icon">🏬</span><span class="name">InOrbit Mall</span><span class="sub">Crawl 5–12 km/h</span>
+        </button>
+        <button class="sc-btn" onclick="setScenario('signal',this)">
+          <span class="icon">🚦</span><span class="name">Hitech Signal</span><span class="sub">Full stop 3 min</span>
+        </button>
+        <button class="sc-btn" onclick="setScenario('orr',this)">
+          <span class="icon">🛣️</span><span class="name">ORR Highway</span><span class="sub">80–100 km/h cruise</span>
+        </button>
+        <button class="sc-btn" onclick="setScenario('tirumala',this)">
+          <span class="icon">⛰️</span><span class="name">Tirumala Ghat</span><span class="sub">10° grade · hillhold</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- DCT Controls -->
+    <div>
+      <div class="sec-head">DCT Controls</div>
+      <div class="tog-row">
+        <div class="tog-info"><div class="label">Auto Hold</div><div class="sub">Servo releases clutch at full stop</div></div>
+        <label class="switch"><input type="checkbox" id="ah" checked onchange="refresh()"><span class="sw-track"></span></label>
+      </div>
+      <div class="tog-row">
+        <div class="tog-info"><div class="label">Neutral at Signals</div><div class="sub">Shift N when stopped &gt;30 s</div></div>
+        <label class="switch"><input type="checkbox" id="nt" onchange="refresh()"><span class="sw-track"></span></label>
+      </div>
+      <div class="tog-row">
+        <div class="tog-info"><div class="label">Manual Mode (M)</div><div class="sub">Locks gear, reduces shift hunting</div></div>
+        <label class="switch"><input type="checkbox" id="mmode" onchange="refresh()"><span class="sw-track"></span></label>
+      </div>
+      <div class="clutch-pair">
+        <div class="cp-card">
+          <div class="cp-label">Clutch C1</div>
+          <div class="cp-temp" id="cp-c1-temp" style="color:var(--green)">80°</div>
+          <div class="cp-gears">Odd: 1·3·5·7</div>
+        </div>
+        <div class="cp-card">
+          <div class="cp-label">Clutch C2</div>
+          <div class="cp-temp" id="cp-c2-temp" style="color:var(--green)">80°</div>
+          <div class="cp-gears">Even: 2·4·6·R</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Vehicle Load -->
+    <div>
+      <div class="sec-head">Vehicle Load</div>
+      <div class="sl-wrap">
+        <div class="sl-head"><span>Occupants + Luggage</span><span id="load-txt">5 pax + bags</span></div>
+        <input type="range" id="load" min="1" max="5" value="5" oninput="updateLoad(this.value)">
+      </div>
+      <div class="sl-wrap" style="margin-top:10px">
+        <div class="sl-head"><span>Ambient Temp (Hyderabad)</span><span id="amb-txt">42°C</span></div>
+        <input type="range" id="amb" min="25" max="48" value="42" oninput="updateAmb(this.value)">
+      </div>
+    </div>
+
+    <!-- Simulation controls -->
+    <div>
+      <div class="sec-head">Simulation</div>
+      <div class="sim-btns">
+        <button class="btn-p" id="play-btn" onclick="toggleSim()">▶ Start</button>
+        <button class="btn-g" onclick="resetSim()">↺ Reset</button>
+      </div>
+      <div class="stat-grid">
+        <div class="stat-r"><span class="stat-k">Speed</span><span class="stat-v" id="sv-spd">0 km/h</span></div>
+        <div class="stat-r"><span class="stat-k">Acceleration</span><span class="stat-v" id="sv-acc">0.00 m/s²</span></div>
+        <div class="stat-r"><span class="stat-k">Gear / Active Clutch</span><span class="stat-v" id="sv-gear">P</span></div>
+        <div class="stat-r"><span class="stat-k">Slip Δω</span><span class="stat-v" id="sv-slip">0 rad/s</span></div>
+        <div class="stat-r"><span class="stat-k">Heat Gen P_slip</span><span class="stat-v" id="sv-pgen">0 W</span></div>
+        <div class="stat-r"><span class="stat-k">Heat Diss P_cool</span><span class="stat-v" id="sv-pdis">0 W</span></div>
+        <div class="stat-r"><span class="stat-k">dT/dt</span><span class="stat-v" id="sv-dtdt">0 °C/s</span></div>
+        <div class="stat-r"><span class="stat-k">Wear Energy ΣE</span><span class="stat-v" id="sv-wear">0 kJ</span></div>
+        <div class="stat-r"><span class="stat-k">TCU State</span><span class="stat-v" id="sv-tcu" style="color:var(--green)">NORMAL</span></div>
+        <div class="stat-r"><span class="stat-k">μ(T) friction coeff</span><span class="stat-v" id="sv-mu">0.350</span></div>
+      </div>
+    </div>
+
+    <!-- Source badge -->
+    <div class="src-badge">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;margin-top:1px"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+      SAE 2015-01-1144 · ATZ 2016 D7UF1 · Politecnico di Torino DCT thesis · Kia Cerato service manual
+    </div>
+
+  </aside>
+
+  <!-- ── Main panel ── -->
+  <main class="main">
+
+    <!-- TCU protection banner -->
+    <div class="tcu-banner" id="tcu-banner">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      <span id="tcu-text">TCU Protection Active</span>
+    </div>
+
+    <!-- KPI row -->
+    <div class="kpi-row">
+      <div class="kpi">
+        <div class="kpi-label">Peak Clutch Temp</div>
+        <div class="kpi-val" id="k-temp" style="color:var(--green)">80°C</div>
+        <div class="kpi-sub" id="k-temp-sub">Normal operating</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">TCU Status</div>
+        <div class="kpi-val" id="k-status" style="font-size:13px;padding-top:4px;color:var(--green)">🟢 Normal</div>
+        <div class="kpi-sub" id="k-status-sub">No protective action</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Elapsed</div>
+        <div class="kpi-val" id="k-time" style="font-size:17px;padding-top:3px;color:var(--text)">00:00</div>
+        <div class="kpi-sub" id="k-sc">Mall traffic</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">AutoHold Saves</div>
+        <div class="kpi-val" id="k-saves" style="font-size:17px;padding-top:3px;color:var(--accent)">0</div>
+        <div class="kpi-sub">Slip events avoided</div>
+      </div>
+    </div>
+
+    <!-- Animation row -->
+    <div class="anim-row">
+
+      <!-- 2D Street Scene -->
+      <div class="card">
+        <div class="card-title">
+          <span>Street Scene</span>
+          <span id="scene-label" style="font-size:10px;color:var(--accent);font-family:var(--mono)">STOPPED</span>
+        </div>
+        <canvas id="scene-canvas" height="200"></canvas>
+        <div class="scene-info">
+          <div class="si-item"><div class="si-dot" style="background:#22c55e"></div><span>C1 heat glow (odd gears)</span></div>
+          <div class="si-item"><div class="si-dot" style="background:#a78bfa"></div><span>C2 heat glow (even gears)</span></div>
+          <div class="si-item"><div class="si-dot" style="background:#f97316"></div><span>Slip sparks active</span></div>
+        </div>
+      </div>
+
+      <!-- SVG Temperature Gauge -->
+      <div class="card">
+        <div class="card-title">
+          <span>Clutch Temperature</span>
+          <span class="card-badge" id="gauge-badge" style="background:var(--green-bg);color:var(--green)">SAFE</span>
+        </div>
+        <div class="gauge-wrap">
+          <svg id="svg-gauge" viewBox="0 0 280 200" xmlns="http://www.w3.org/2000/svg">
+            <path id="gauge-track"    d="" fill="none" stroke-width="16" stroke-linecap="round" stroke="var(--faint)" opacity="0.6"/>
+            <path id="gauge-z0"      d="" fill="none" stroke-width="16" stroke-linecap="butt" stroke="#22c55e" opacity="0.15"/>
+            <path id="gauge-z1"      d="" fill="none" stroke-width="16" stroke-linecap="butt" stroke="#f59e0b" opacity="0.15"/>
+            <path id="gauge-z2"      d="" fill="none" stroke-width="16" stroke-linecap="butt" stroke="#f97316" opacity="0.15"/>
+            <path id="gauge-z3"      d="" fill="none" stroke-width="16" stroke-linecap="butt" stroke="#ef4444" opacity="0.15"/>
+            <path id="gauge-arc-fill" d="" fill="none" stroke-width="16" stroke-linecap="round" stroke="#22c55e"/>
+            <g id="gauge-ticks"      fill="none" stroke="var(--muted)" stroke-width="1" stroke-linecap="round"></g>
+            <g id="gauge-labels"     font-family="DM Mono,monospace" font-size="9.5" fill="var(--muted)" text-anchor="middle"></g>
+            <g id="gauge-zone-lines" stroke="var(--surface)" stroke-width="2" opacity="0.8"></g>
+            <g id="gauge-needle" transform="rotate(0 140 155)" style="transition:transform .55s cubic-bezier(.34,1.56,.64,1)">
+              <line x1="140" y1="155" x2="140" y2="66"  stroke="var(--text)" stroke-width="2" stroke-linecap="round" opacity="0.9"/>
+              <line x1="140" y1="155" x2="140" y2="170" stroke="var(--text)" stroke-width="3" stroke-linecap="round" opacity="0.4"/>
+            </g>
+            <circle cx="140" cy="155" r="5.5" fill="var(--text)" opacity="0.9"/>
+            <circle cx="140" cy="155" r="2.5" fill="var(--surface)"/>
+            <text id="gauge-temp-text" x="140" y="134" text-anchor="middle" font-family="DM Mono,monospace" font-size="38" font-weight="600" fill="#22c55e">80°</text>
+            <text x="140" y="150" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="10" fill="var(--muted)">Celsius</text>
+            <text id="gauge-zone-text" x="140" y="165" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="11" font-weight="600" fill="#22c55e" letter-spacing="0.05em">SAFE</text>
+            <text x="30"  y="188" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="var(--muted)">C1</text>
+            <text x="250" y="188" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="var(--muted)">C2</text>
+          </svg>
+          <div class="zone-legend">
+            <span class="zl"><span class="zl-dot" style="background:#22c55e"></span>&lt;150° Safe</span>
+            <span class="zl"><span class="zl-dot" style="background:#f59e0b"></span>150–200° Warm</span>
+            <span class="zl"><span class="zl-dot" style="background:#f97316"></span>200–260° Hot</span>
+            <span class="zl"><span class="zl-dot" style="background:#ef4444"></span>&gt;260° Critical</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Temperature History Chart -->
+    <div class="card">
+      <div class="card-title">
+        <span>Temperature History — C1 &amp; C2</span>
+        <span style="font-size:10px;color:var(--muted)" id="chart-annotation">Peak: —</span>
+      </div>
+      <div class="chart-wrap"><canvas id="chart"></canvas></div>
+    </div>
+
+    <!-- Tips + Event Log -->
+    <div class="bot-row">
+      <div class="card">
+        <div class="card-title"><span>Live Recommendations</span></div>
+        <div class="tip-list" id="tips"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">
+          <span>Event Log</span>
+          <button onclick="clearLog()" style="font-size:10px;color:var(--muted);padding:2px 7px;border-radius:var(--r-sm);border:1px solid var(--border)">Clear</button>
+        </div>
+        <div class="log-list" id="log"></div>
+      </div>
+    </div>
+
+  </main>
+</div>
+</div>
+
+<!-- ── Scripts loaded in dependency order ── -->
+<script src="physics.js"></script>
+<script src="simulation.js"></script>
+<script src="gauge.js"></script>
+<script src="scene.js"></script>
+<script src="chart-setup.js"></script>
+<script src="ui.js"></script>
+</body>
+</html>

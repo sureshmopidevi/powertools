@@ -1,0 +1,1330 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kia 7DCT Clutch Thermal Simulator — D7UF1 v3</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root{
+  --bg:#0a0b0d;--surface:#101215;--surface-2:#15181e;--surface-3:#1c1f27;
+  --border:#232730;--text:#c8cdd8;--muted:#5a6075;--faint:#2e3240;
+  --accent:#00d4c8;--accent-h:#00a89e;--accent-dim:rgba(0,212,200,.08);
+  --green:#22c55e;--yellow:#f59e0b;--orange:#f97316;--red:#ef4444;
+  --green-bg:rgba(34,197,94,.09);--yellow-bg:rgba(245,158,11,.09);
+  --orange-bg:rgba(249,115,22,.09);--red-bg:rgba(239,68,68,.09);
+  --font:'DM Sans',sans-serif;--mono:'DM Mono',monospace;
+  --tr:160ms cubic-bezier(.16,1,.3,1);
+  --r-sm:5px;--r-md:8px;--r-lg:12px;
+}
+[data-theme="light"]{
+  --bg:#f0f2f5;--surface:#fafbfc;--surface-2:#fff;--surface-3:#edf0f4;
+  --border:#dde1e8;--text:#1a1d26;--muted:#7a8099;--faint:#c5cad8;
+  --accent:#007b73;--accent-h:#005f59;--accent-dim:rgba(0,123,115,.07);
+  --green:#16a34a;--yellow:#d97706;--orange:#ea580c;--red:#dc2626;
+  --green-bg:rgba(22,163,74,.08);--yellow-bg:rgba(217,119,6,.08);
+  --orange-bg:rgba(234,88,12,.08);--red-bg:rgba(220,38,38,.08);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-font-smoothing:antialiased}
+body{min-height:100dvh;font-family:var(--font);font-size:13px;color:var(--text);background:var(--bg);line-height:1.5}
+button{cursor:pointer;background:none;border:none;font:inherit;color:inherit;transition:all var(--tr)}
+input[type=range]{-webkit-appearance:none;width:100%;height:2px;border-radius:2px;background:var(--border);outline:none;cursor:pointer}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;height:13px;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 0 0 3px rgba(0,212,200,.15)}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+
+.app{display:grid;grid-template-rows:46px 1fr;min-height:100dvh}
+.bar{display:flex;align-items:center;justify-content:space-between;padding:0 16px;background:var(--surface);border-bottom:1px solid var(--border)}
+.bar-logo{display:flex;align-items:center;gap:8px;font-weight:600;font-size:13px;letter-spacing:-.02em}
+.bar-logo svg{color:var(--accent)}
+.bar-right{display:flex;align-items:center;gap:8px}
+.pill{font-size:10px;padding:3px 8px;border-radius:999px;background:var(--accent-dim);color:var(--accent);font-weight:500;letter-spacing:.04em;font-family:var(--mono)}
+.icon-btn{width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:var(--r-md);color:var(--muted)}
+.icon-btn:hover{background:var(--surface-3);color:var(--text)}
+
+.layout{display:grid;grid-template-columns:262px 1fr;min-height:0}
+.sidebar{background:var(--surface);border-right:1px solid var(--border);overflow-y:auto;padding:13px 11px;display:flex;flex-direction:column;gap:13px}
+.main{overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:9px;background:var(--bg)}
+
+.sec-head{font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.09em;margin-bottom:7px;padding:0 2px}
+.sc-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+.sc-btn{padding:8px 6px;border-radius:var(--r-md);border:1px solid var(--border);background:var(--surface-2);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;transition:all var(--tr)}
+.sc-btn .icon{font-size:1.1rem}
+.sc-btn .name{font-size:11px;color:var(--text);font-weight:600}
+.sc-btn .sub{font-size:10px;color:var(--muted);line-height:1.3}
+.sc-btn:hover,.sc-btn.active{border-color:var(--accent);background:var(--accent-dim)}
+.sc-btn.active .name{color:var(--accent)}
+
+.tog-row{display:flex;align-items:center;justify-content:space-between;padding:8px 10px;border-radius:var(--r-md);border:1px solid var(--border);background:var(--surface-2);margin-bottom:5px}
+.tog-info .label{font-size:12px;font-weight:500}
+.tog-info .sub{font-size:10px;color:var(--muted);margin-top:1px}
+.switch{position:relative;width:34px;height:20px;flex-shrink:0}
+.switch input{opacity:0;width:0;height:0;position:absolute}
+.sw-track{position:absolute;inset:0;border-radius:999px;background:var(--surface-3);transition:background var(--tr);cursor:pointer}
+.sw-track::before{content:'';position:absolute;width:14px;height:14px;left:3px;top:3px;border-radius:50%;background:#fff;transition:transform var(--tr)}
+.switch input:checked~.sw-track{background:var(--accent)}
+.switch input:checked~.sw-track::before{transform:translateX(14px)}
+
+.sl-wrap{margin-bottom:3px}
+.sl-head{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:6px}
+.sl-head span:last-child{font-family:var(--mono);color:var(--text);font-size:10px}
+
+.sim-btns{display:flex;gap:6px;margin-top:4px}
+.btn-p{padding:7px 16px;border-radius:var(--r-md);font-size:12px;font-weight:600;background:var(--accent);color:#000;border:1px solid var(--accent)}
+.btn-p:hover{background:var(--accent-h);border-color:var(--accent-h)}
+.btn-g{padding:7px 14px;border-radius:var(--r-md);font-size:12px;font-weight:500;border:1px solid var(--border);color:var(--muted)}
+.btn-g:hover{border-color:var(--accent);color:var(--accent)}
+
+.stat-grid{display:flex;flex-direction:column;gap:2px;margin-top:10px}
+.stat-r{display:flex;justify-content:space-between;align-items:center;padding:4px 8px;background:var(--surface-2);border-radius:var(--r-sm)}
+.stat-k{font-size:10px;color:var(--muted)}
+.stat-v{font-family:var(--mono);font-size:10px;font-weight:500}
+
+.clutch-pair{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:8px}
+.cp-card{padding:7px 8px;border-radius:var(--r-md);border:1px solid var(--border);background:var(--surface-2);text-align:center}
+.cp-label{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:2px}
+.cp-temp{font-family:var(--mono);font-size:14px;font-weight:600;transition:color .3s}
+.cp-gears{font-size:9px;color:var(--muted)}
+
+.src-badge{display:flex;align-items:flex-start;gap:6px;padding:7px 9px;border-radius:var(--r-md);background:var(--accent-dim);border:1px solid rgba(0,212,200,.15);font-size:10px;color:var(--accent);line-height:1.5}
+
+/* ── Main grid ── */
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:11px 13px}
+.kpi-label{font-size:9px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px}
+.kpi-val{font-family:var(--mono);font-size:19px;font-weight:600;line-height:1;transition:color .3s}
+.kpi-sub{font-size:10px;color:var(--muted);margin-top:4px}
+
+/* ── ANIMATION ROW ── */
+.anim-row{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:13px}
+.card-title{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between}
+.card-badge{font-size:10px;padding:2px 8px;border-radius:999px;font-weight:600;font-family:var(--mono)}
+
+/* Street scene canvas */
+#scene-canvas{display:block;width:100%;border-radius:var(--r-md);cursor:default}
+.scene-info{display:flex;gap:10px;margin-top:8px;flex-wrap:wrap}
+.si-item{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--muted)}
+.si-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0}
+
+/* Gauge card */
+.gauge-wrap{display:flex;flex-direction:column;align-items:center;gap:8px}
+#svg-gauge{width:100%;height:auto;display:block}
+.zone-legend{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.zl{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--muted)}
+.zl-dot{width:7px;height:7px;border-radius:2px;flex-shrink:0}
+
+/* Chart row */
+.chart-row{display:grid;grid-template-columns:1fr;gap:9px}
+.chart-wrap{position:relative;height:170px}
+
+/* Bottom row */
+.bot-row{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.tip-list,.log-list{display:flex;flex-direction:column;gap:3px}
+.tip-item{display:flex;align-items:flex-start;gap:7px;font-size:11px;color:var(--muted);line-height:1.5;padding:3px 0}
+.tip-dot{width:4px;height:4px;border-radius:50%;flex-shrink:0;margin-top:6px}
+.log-list{max-height:110px;overflow-y:auto}
+.log-e{display:flex;align-items:center;gap:6px;padding:3px 7px;border-radius:var(--r-sm);font-size:11px;background:var(--surface-2);margin-bottom:2px}
+.log-t{font-family:var(--mono);font-size:9px;color:var(--faint);flex-shrink:0;width:36px}
+
+.tcu-banner{display:none;padding:8px 13px;border-radius:var(--r-md);border:1px solid var(--red);background:var(--red-bg);font-size:12px;font-weight:600;color:var(--red);align-items:center;gap:8px}
+.tcu-banner.show{display:flex}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.35}}
+.tcu-banner.active{animation:blink 1.1s ease infinite}
+
+@media(max-width:920px){
+  .layout{grid-template-columns:1fr}
+  .sidebar{border-right:none;border-bottom:1px solid var(--border);max-height:none}
+  .kpi-row{grid-template-columns:repeat(2,1fr)}
+  .anim-row,.bot-row{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<header class="bar">
+  <div class="bar-logo">
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+      <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.4"/>
+      <circle cx="10" cy="10" r="3.5" stroke="currentColor" stroke-width="1.4"/>
+      <line x1="10" y1="2" x2="10" y2="5.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+      <line x1="10" y1="14.5" x2="10" y2="18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+      <line x1="2" y1="10" x2="5.5" y2="10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+      <line x1="14.5" y1="10" x2="18" y2="10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+    </svg>
+    Kia D7UF1 — Dual Clutch Thermal Simulator
+  </div>
+  <div class="bar-right">
+    <span class="pill">7DCT · 340 Nm · Dry · FlexRay TCU</span>
+    <button class="icon-btn" data-theme-toggle title="Toggle theme">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+  </div>
+</header>
+
+<div class="layout">
+<aside class="sidebar">
+  <div>
+    <div class="sec-head">Traffic Scenario</div>
+    <div class="sc-grid">
+      <button class="sc-btn active" onclick="setScenario('mall',this)">
+        <span class="icon">🏬</span><span class="name">InOrbit Mall</span><span class="sub">Crawl 5–12 km/h</span>
+      </button>
+      <button class="sc-btn" onclick="setScenario('signal',this)">
+        <span class="icon">🚦</span><span class="name">Hitech Signal</span><span class="sub">Full stop 3 min</span>
+      </button>
+      <button class="sc-btn" onclick="setScenario('orr',this)">
+        <span class="icon">🛣️</span><span class="name">ORR Highway</span><span class="sub">80–100 km/h cruise</span>
+      </button>
+      <button class="sc-btn" onclick="setScenario('tirumala',this)">
+        <span class="icon">⛰️</span><span class="name">Tirumala Ghat</span><span class="sub">10° grade · hillhold</span>
+      </button>
+    </div>
+  </div>
+
+  <div>
+    <div class="sec-head">DCT Controls</div>
+    <div class="tog-row">
+      <div class="tog-info"><div class="label">Auto Hold</div><div class="sub">Servo releases clutch at full stop</div></div>
+      <label class="switch"><input type="checkbox" id="ah" checked onchange="refresh()"><span class="sw-track"></span></label>
+    </div>
+    <div class="tog-row">
+      <div class="tog-info"><div class="label">Neutral at Signals</div><div class="sub">Shift N when stopped &gt;30 s</div></div>
+      <label class="switch"><input type="checkbox" id="nt" onchange="refresh()"><span class="sw-track"></span></label>
+    </div>
+    <div class="tog-row">
+      <div class="tog-info"><div class="label">Manual Mode (M)</div><div class="sub">Locks gear, reduces shift hunting</div></div>
+      <label class="switch"><input type="checkbox" id="mmode" onchange="refresh()"><span class="sw-track"></span></label>
+    </div>
+    <div class="clutch-pair">
+      <div class="cp-card">
+        <div class="cp-label">Clutch C1</div>
+        <div class="cp-temp" id="cp-c1-temp" style="color:var(--green)">80°</div>
+        <div class="cp-gears">Odd: 1·3·5·7</div>
+      </div>
+      <div class="cp-card">
+        <div class="cp-label">Clutch C2</div>
+        <div class="cp-temp" id="cp-c2-temp" style="color:var(--green)">80°</div>
+        <div class="cp-gears">Even: 2·4·6·R</div>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div class="sec-head">Vehicle Load</div>
+    <div class="sl-wrap">
+      <div class="sl-head"><span>Occupants + Luggage</span><span id="load-txt">5 pax + bags</span></div>
+      <input type="range" id="load" min="1" max="5" value="5" oninput="updateLoad(this.value)">
+    </div>
+    <div class="sl-wrap" style="margin-top:10px">
+      <div class="sl-head"><span>Ambient Temp (Hyderabad)</span><span id="amb-txt">42°C</span></div>
+      <input type="range" id="amb" min="25" max="48" value="42" oninput="updateAmb(this.value)">
+    </div>
+  </div>
+
+  <div>
+    <div class="sec-head">Simulation</div>
+    <div class="sim-btns">
+      <button class="btn-p" id="play-btn" onclick="toggleSim()">▶ Start</button>
+      <button class="btn-g" onclick="resetSim()">↺ Reset</button>
+    </div>
+    <div class="stat-grid">
+      <div class="stat-r"><span class="stat-k">Speed</span><span class="stat-v" id="sv-spd">0 km/h</span></div>
+      <div class="stat-r"><span class="stat-k">Acceleration</span><span class="stat-v" id="sv-acc">0.00 m/s²</span></div>
+      <div class="stat-r"><span class="stat-k">Gear / Active Clutch</span><span class="stat-v" id="sv-gear">P</span></div>
+      <div class="stat-r"><span class="stat-k">Slip Δω</span><span class="stat-v" id="sv-slip">0 rad/s</span></div>
+      <div class="stat-r"><span class="stat-k">Heat Gen P_slip</span><span class="stat-v" id="sv-pgen">0 W</span></div>
+      <div class="stat-r"><span class="stat-k">Heat Diss P_cool</span><span class="stat-v" id="sv-pdis">0 W</span></div>
+      <div class="stat-r"><span class="stat-k">dT/dt</span><span class="stat-v" id="sv-dtdt">0 °C/s</span></div>
+      <div class="stat-r"><span class="stat-k">Wear Energy ΣE</span><span class="stat-v" id="sv-wear">0 kJ</span></div>
+      <div class="stat-r"><span class="stat-k">TCU State</span><span class="stat-v" id="sv-tcu" style="color:var(--green)">NORMAL</span></div>
+      <div class="stat-r"><span class="stat-k">μ(T) friction coeff</span><span class="stat-v" id="sv-mu">0.350</span></div>
+    </div>
+  </div>
+
+  <div class="src-badge">
+    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;margin-top:1px"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+    SAE 2015-01-1144 · ATZ 2016 D7UF1 · Politecnico di Torino DCT thesis · Kia Cerato service manual
+  </div>
+</aside>
+
+<main class="main">
+
+  <div class="tcu-banner" id="tcu-banner">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    <span id="tcu-text">TCU Protection Active</span>
+  </div>
+
+  <div class="kpi-row">
+    <div class="kpi">
+      <div class="kpi-label">Peak Clutch Temp</div>
+      <div class="kpi-val" id="k-temp" style="color:var(--green)">80°C</div>
+      <div class="kpi-sub" id="k-temp-sub">Normal operating</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">TCU Status</div>
+      <div class="kpi-val" id="k-status" style="font-size:13px;padding-top:4px;color:var(--green)">🟢 Normal</div>
+      <div class="kpi-sub" id="k-status-sub">No protective action</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Elapsed</div>
+      <div class="kpi-val" id="k-time" style="font-size:17px;padding-top:3px;color:var(--text)">00:00</div>
+      <div class="kpi-sub" id="k-sc">Mall traffic</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">AutoHold Saves</div>
+      <div class="kpi-val" id="k-saves" style="font-size:17px;padding-top:3px;color:var(--accent)">0</div>
+      <div class="kpi-sub">Slip events avoided</div>
+    </div>
+  </div>
+
+  <!-- ── ANIMATION ROW ── -->
+  <div class="anim-row">
+    <!-- 2D Scene -->
+    <div class="card">
+      <div class="card-title">
+        <span>Street Scene</span>
+        <span id="scene-label" style="font-size:10px;color:var(--accent);font-family:var(--mono)">STOPPED</span>
+      </div>
+      <canvas id="scene-canvas" height="200"></canvas>
+      <div class="scene-info">
+        <div class="si-item"><div class="si-dot" style="background:#22c55e"></div><span>C1 heat glow (odd gears)</span></div>
+        <div class="si-item"><div class="si-dot" style="background:#a78bfa"></div><span>C2 heat glow (even gears)</span></div>
+        <div class="si-item"><div class="si-dot" style="background:#f97316"></div><span>Slip sparks active</span></div>
+      </div>
+    </div>
+
+    <!-- SVG Gauge -->
+    <div class="card">
+      <div class="card-title">
+        <span>Clutch Temperature</span>
+        <span class="card-badge" id="gauge-badge" style="background:var(--green-bg);color:var(--green)">SAFE</span>
+      </div>
+      <div class="gauge-wrap">
+        <svg id="svg-gauge" viewBox="0 0 280 200" xmlns="http://www.w3.org/2000/svg">
+          <path id="gauge-track" d="" fill="none" stroke-width="16" stroke-linecap="round" stroke="var(--faint)" opacity="0.6"/>
+          <path id="gauge-z0" d="" fill="none" stroke-width="16" stroke-linecap="butt" stroke="#22c55e" opacity="0.15"/>
+          <path id="gauge-z1" d="" fill="none" stroke-width="16" stroke-linecap="butt" stroke="#f59e0b" opacity="0.15"/>
+          <path id="gauge-z2" d="" fill="none" stroke-width="16" stroke-linecap="butt" stroke="#f97316" opacity="0.15"/>
+          <path id="gauge-z3" d="" fill="none" stroke-width="16" stroke-linecap="butt" stroke="#ef4444" opacity="0.15"/>
+          <path id="gauge-arc-fill" d="" fill="none" stroke-width="16" stroke-linecap="round" stroke="#22c55e"/>
+          <g id="gauge-ticks" fill="none" stroke="var(--muted)" stroke-width="1" stroke-linecap="round"></g>
+          <g id="gauge-labels" font-family="DM Mono,monospace" font-size="9.5" fill="var(--muted)" text-anchor="middle"></g>
+          <g id="gauge-zone-lines" stroke="var(--surface)" stroke-width="2" opacity="0.8"></g>
+          <g id="gauge-needle" transform="rotate(0 140 155)" style="transition:transform .55s cubic-bezier(.34,1.56,.64,1)">
+            <line x1="140" y1="155" x2="140" y2="66" stroke="var(--text)" stroke-width="2" stroke-linecap="round" opacity="0.9"/>
+            <line x1="140" y1="155" x2="140" y2="170" stroke="var(--text)" stroke-width="3" stroke-linecap="round" opacity="0.4"/>
+          </g>
+          <circle cx="140" cy="155" r="5.5" fill="var(--text)" opacity="0.9"/>
+          <circle cx="140" cy="155" r="2.5" fill="var(--surface)"/>
+          <text id="gauge-temp-text" x="140" y="134" text-anchor="middle" font-family="DM Mono,monospace" font-size="38" font-weight="600" fill="#22c55e">80°</text>
+          <text x="140" y="150" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="10" fill="var(--muted)">Celsius</text>
+          <text id="gauge-zone-text" x="140" y="165" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="11" font-weight="600" fill="#22c55e" letter-spacing="0.05em">SAFE</text>
+          <text x="30" y="188" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="var(--muted)">C1</text>
+          <text x="250" y="188" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="var(--muted)">C2</text>
+        </svg>
+        <div class="zone-legend">
+          <span class="zl"><span class="zl-dot" style="background:#22c55e"></span>&lt;150° Safe</span>
+          <span class="zl"><span class="zl-dot" style="background:#f59e0b"></span>150–200° Warm</span>
+          <span class="zl"><span class="zl-dot" style="background:#f97316"></span>200–260° Hot</span>
+          <span class="zl"><span class="zl-dot" style="background:#ef4444"></span>&gt;260° Critical</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chart -->
+  <div class="card">
+    <div class="card-title">
+      <span>Temperature History — C1 &amp; C2</span>
+      <span style="font-size:10px;color:var(--muted)" id="chart-annotation">Peak: —</span>
+    </div>
+    <div class="chart-wrap"><canvas id="chart"></canvas></div>
+  </div>
+
+  <!-- Tips + Log -->
+  <div class="bot-row">
+    <div class="card">
+      <div class="card-title"><span>Live Recommendations</span></div>
+      <div class="tip-list" id="tips"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">
+        <span>Event Log</span>
+        <button onclick="clearLog()" style="font-size:10px;color:var(--muted);padding:2px 7px;border-radius:var(--r-sm);border:1px solid var(--border)">Clear</button>
+      </div>
+      <div class="log-list" id="log"></div>
+    </div>
+  </div>
+
+</main>
+</div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════
+   PHYSICS MODEL — Kia D7UF1 Dry 7DCT
+   Sources: SAE 2015-01-1144, ATZ 2016, Polito DCT thesis
+   ═══════════════════════════════════════════════════════════════ */
+const PHY = {
+  r_eff: 0.095, F_clamp: 7200, n_faces: 2,
+  C_disc: 1150,
+  k_nat: 0.65, k_forced: 0.016,
+  mu_ref: 0.35, alpha_mu: 0.0018,
+  T_warn: 180, T_tcu_lim: 220, T_limp: 260, T_damage: 300,
+  gears: [3.929, 2.318, 2.043, 1.023, 0.822, 0.884, 0.721],
+  final_drive: 4.429, tyre_radius: 0.335,
+  omega_idle: 78.5,
+  // Vehicle dynamics
+  mass: 1480,      // kg — Kia Sorento 5-pax est.
+  drag_cd: 0.33,   // Cd
+  frontal_A: 2.61, // m²
+  roll_rr: 0.013,  // rolling resistance coefficient
+  T_floor: (amb) => amb + 25,
+};
+function mu_T(T){ return Math.max(0.15, Math.min(0.42, PHY.mu_ref*(1-PHY.alpha_mu*Math.max(0,T-200)))); }
+
+/* ── State ── */
+let tempC1=80, tempC2=80, tempBell=50, peakTemp=80;
+let elapsed=0, running=false, interval=null;
+let scenario='mall', loadFactor=1.30, ambTemp=42;
+let ahSaves=0, wearJoules=0, tcuMode='normal';
+let simSpeed=0, simGear='P', simActiveClutch='C1';
+let simSlip=0, simPgen=0, simPdis=0, simMu=0.35;
+let simAccel=0; // m/s²
+// smooth speed for animation (sub-second interpolation)
+let displaySpeed=0; // km/h (animated, updated by rAF loop)
+let prevSpeed=0;    // speed at last tick boundary
+
+const tempHistC1=[], tempHistC2=[], timeHist=[];
+const MAX_H=180;
+
+/* ── Scenario configs ── */
+const SCEN = {
+  mall:{
+    name:'InOrbit Mall',
+    bg:'urban',
+    state(t){
+      const c=t%52;
+      if(c<22) return [0,1];
+      if(c<44) return [5+Math.random()*8,1];
+      return [16+Math.random()*10,2];
+    },
+    events:[
+      {t:15,m:'Queue at InOrbit junction — bumper-to-bumper'},
+      {t:48,m:'Ramp entry congestion — steep incline'},
+      {t:90,m:'Waiting for parking slot — 8 min queue'},
+      {t:150,m:'Speed bump zone — repeated stop-go'},
+    ]
+  },
+  signal:{
+    name:'Hitech City Signal',
+    bg:'urban',
+    state(t){
+      const c=t%68;
+      if(c<40) return [0,1];
+      if(c<57) return [3+Math.random()*9,1];
+      return [20+Math.random()*14,2];
+    },
+    events:[
+      {t:10,m:'Phase 1 signal — 3 min 20 sec wait begins'},
+      {t:48,m:'Queue crawls forward 2 car lengths'},
+      {t:84,m:'Phase 2 signal — full stop again'},
+      {t:130,m:'U-turn queue after HITEC flyover'},
+    ]
+  },
+  orr:{
+    name:'ORR Highway',
+    bg:'highway',
+    state(t){
+      const base=85+Math.sin(t/28)*10;
+      return [base+(Math.random()-.5)*5, 6];
+    },
+    events:[
+      {t:8,m:'Entered ORR from Nanakramguda toll plaza'},
+      {t:50,m:'Smooth 90 km/h cruise — clutch fully locked'},
+      {t:105,m:'Brief slowdown near Shamshabad exit'},
+      {t:145,m:'Overtaking — downshift to 5th then back to 6th'},
+    ]
+  },
+  tirumala:{
+    name:'Tirumala Ghat',
+    bg:'ghat',
+    state(t){
+      const c=t%40;
+      if(c<12) return [0,1];
+      return [7+Math.random()*12,2];
+    },
+    events:[
+      {t:8,m:'Alipiri ghat start — gradient to 10°'},
+      {t:38,m:'First hairpin — queue, repeated hill-holds'},
+      {t:72,m:'Mid-ghat sustained incline — peak stress'},
+      {t:112,m:'Vehicle queue near checkpoint — uphill hold'},
+      {t:162,m:'Descent phase — engine braking critical'},
+    ]
+  }
+};
+
+/* ── Heat model ── */
+function computeHeat(spd, gearNum, activeClutch, ah, nt, lf, tcuF){
+  const isStopped=spd<2, isCrawl=spd>=2&&spd<22, isCity=spd>=22&&spd<55, isHighway=spd>=55;
+  const isHill=scenario==='tirumala';
+  const tf={normal:1.0,monitoring:1.0,limiting:0.62,limp:0.33}[tcuF]??1.0;
+  const activeTemp=activeClutch==='C1'?tempC1:tempC2;
+  const mu=mu_T(activeTemp); simMu=mu;
+  const hCoeff=mu*PHY.F_clamp*lf*tf*PHY.r_eff*PHY.n_faces;
+  if(isStopped){
+    if(nt){simSlip=0;return 5;}
+    if(ah){ahSaves++;simSlip=0;return 8;}
+    const hillF=isHill?2.1:1.0, deltaOmega=PHY.omega_idle*hillF;
+    simSlip=deltaOmega;return hCoeff*deltaOmega;
+  }
+  if(isCrawl){
+    const v_ms=spd/3.6, gRatio=PHY.gears[gearNum-1]||PHY.gears[0];
+    const omega_wheel=v_ms/PHY.tyre_radius, omega_shaft=omega_wheel*gRatio*PHY.final_drive;
+    const omega_eng=PHY.omega_idle*(isHill?1.35:1.0);
+    const deltaOmega=Math.max(0,omega_eng-omega_shaft); simSlip=deltaOmega;
+    if(ah&&isHill) return hCoeff*deltaOmega*0.40;
+    if(ah)         return hCoeff*deltaOmega*0.45;
+    return hCoeff*deltaOmega;
+  }
+  if(isCity){simSlip=6+Math.random()*10;return 48*lf*tf;}
+  if(isHighway){simSlip=0.15+Math.random()*0.4;return 7;}
+  return 0;
+}
+function coolPower(T,spd){ return (PHY.k_nat+PHY.k_forced*spd)*Math.max(0,T-tempBell); }
+function updateBell(dt){ const target=ambTemp+18+(tempC1+tempC2)*0.02; tempBell+=(target-tempBell)*(dt/90); }
+function getTCUMode(T){ if(T<PHY.T_warn)return 'normal';if(T<PHY.T_tcu_lim)return 'monitoring';if(T<PHY.T_limp)return 'limiting';return 'limp'; }
+
+/* ── Acceleration model (vehicle dynamics) ── */
+// Simplified longitudinal dynamics: F_traction - F_resist = m*a
+function computeAccel(spd, gearNum){
+  const v=spd/3.6; // m/s
+  const isHill=scenario==='tirumala';
+  const grade=isHill?Math.sin(10*Math.PI/180):0; // 10° grade
+  // Approximate traction force from engine torque mapped through gear
+  const engineTorque=scenario==='orr'?280:180; // Nm — simplified
+  const gRatio=PHY.gears[Math.min(gearNum-1,6)]||PHY.gears[0];
+  const F_tract=engineTorque*gRatio*PHY.final_drive/PHY.tyre_radius*0.85; // 85% driveline η
+  // Resistances
+  const rho=1.18; // kg/m³ air density Hyderabad
+  const F_drag=0.5*rho*PHY.drag_cd*PHY.frontal_A*v*v;
+  const m=PHY.mass*loadFactor;
+  const F_roll=PHY.roll_rr*m*9.81;
+  const F_grade=m*9.81*grade;
+  const a=(F_tract-F_drag-F_roll-F_grade)/m;
+  return Math.max(-8, Math.min(4, a));
+}
+
+/* ── Tick ── */
+function tick(){
+  elapsed++;
+  const ah=document.getElementById('ah').checked;
+  const nt=document.getElementById('nt').checked;
+  const [spd,gearNum]=SCEN[scenario].state(elapsed);
+  const activeCL=(gearNum%2===1)?'C1':'C2';
+  simActiveClutch=activeCL;
+  const maxTemp=Math.max(tempC1,tempC2);
+  tcuMode=getTCUMode(maxTemp);
+  const Pg=computeHeat(spd,gearNum,activeCL,ah,nt,loadFactor,tcuMode);
+  const Pd_C1=coolPower(tempC1,spd), Pd_C2=coolPower(tempC2,spd);
+  const dT_active=(Pg-(activeCL==='C1'?Pd_C1:Pd_C2))/PHY.C_disc;
+  const dT_idle=-(activeCL==='C1'?Pd_C2:Pd_C1)/PHY.C_disc;
+  const noise=(Math.random()-.5)*0.25, floor=PHY.T_floor(ambTemp);
+  if(activeCL==='C1'){
+    tempC1=Math.max(floor,Math.min(380,tempC1+dT_active+noise));
+    tempC2=Math.max(floor,Math.min(380,tempC2+dT_idle+noise*0.3));
+  } else {
+    tempC2=Math.max(floor,Math.min(380,tempC2+dT_active+noise));
+    tempC1=Math.max(floor,Math.min(380,tempC1+dT_idle+noise*0.3));
+  }
+  updateBell(1);
+  peakTemp=Math.max(peakTemp,tempC1,tempC2);
+  wearJoules+=Math.max(0,Pg);
+  // Acceleration
+  simAccel=spd<2?0:computeAccel(spd,gearNum);
+  prevSpeed=simSpeed;
+  simSpeed=spd;
+  simGear=gearNum===0?'P':gearNum+' ('+activeCL+')';
+  simPgen=Pg;
+  simPdis=activeCL==='C1'?Pd_C1:Pd_C2;
+  const tLabel=fmt(elapsed);
+  tempHistC1.push(+tempC1.toFixed(1));
+  tempHistC2.push(+tempC2.toFixed(1));
+  timeHist.push(tLabel);
+  if(tempHistC1.length>MAX_H){tempHistC1.shift();tempHistC2.shift();timeHist.shift();}
+  SCEN[scenario].events.forEach(ev=>{if(!ev._fired&&elapsed>=ev.t){ev._fired=true;log(ev.m);}});
+  const hotT=Math.max(tempC1,tempC2);
+  if(hotT>=PHY.T_damage&&elapsed%10===0) log('🚨 DAMAGE zone! μ degrading permanently');
+  else if(hotT>=PHY.T_limp&&elapsed%15===0) log('🔴 Limp mode: 33% torque, 3rd locked');
+  else if(hotT>=PHY.T_tcu_lim&&elapsed%20===0) log('🟠 TCU limiting to 62% clutch torque');
+  render();
+}
+
+/* ── Render ── */
+function render(){
+  const maxT=Math.max(tempC1,tempC2), zone=getZone(maxT);
+  setKV('k-temp',Math.round(peakTemp)+'°C',zone.color);
+  setKV('k-status',zone.badge,zone.color);
+  el('k-temp-sub').textContent=zone.sub;
+  el('k-status-sub').textContent=zone.action;
+  el('k-time').textContent=fmt(elapsed);
+  el('k-sc').textContent=SCEN[scenario].name;
+  el('k-saves').textContent=ahSaves.toLocaleString();
+  updateSVGGauge(maxT,tempC1,tempC2);
+  const badge=el('gauge-badge');
+  badge.textContent=zone.name;badge.style.background=zone.bgColor;badge.style.color=zone.color;
+  const zC1=getZone(tempC1),zC2=getZone(tempC2);
+  el('cp-c1-temp').textContent=Math.round(tempC1)+'°';el('cp-c1-temp').style.color=zC1.color;
+  el('cp-c2-temp').textContent=Math.round(tempC2)+'°';el('cp-c2-temp').style.color=zC2.color;
+  el('sv-spd').textContent=Math.round(simSpeed)+' km/h';
+  el('sv-acc').textContent=(simAccel>=0?'+':'')+simAccel.toFixed(2)+' m/s²';
+  el('sv-gear').textContent=simGear;
+  el('sv-slip').textContent=simSlip.toFixed(1)+' rad/s';
+  el('sv-pgen').textContent=Math.round(simPgen)+' W';
+  el('sv-pdis').textContent=Math.round(simPdis)+' W';
+  const dtdt=(simPgen-simPdis)/PHY.C_disc;
+  el('sv-dtdt').style.color=dtdt>0?'var(--orange)':'var(--green)';
+  el('sv-dtdt').textContent=(dtdt>0?'+':'')+dtdt.toFixed(3)+' °C/s';
+  el('sv-wear').textContent=(wearJoules/1000).toFixed(1)+' kJ';
+  el('sv-mu').textContent=simMu.toFixed(3);
+  const tcuEl=el('sv-tcu');
+  if(tcuMode==='limp'){tcuEl.textContent='LIMP MODE';tcuEl.style.color='var(--red)';}
+  else if(tcuMode==='limiting'){tcuEl.textContent='LIMITING 62%';tcuEl.style.color='var(--orange)';}
+  else if(tcuMode==='monitoring'){tcuEl.textContent='MONITORING';tcuEl.style.color='var(--yellow)';}
+  else{tcuEl.textContent='NORMAL';tcuEl.style.color='var(--green)';}
+  const banner=el('tcu-banner');
+  if(tcuMode==='limp'){banner.classList.add('show','active');banner.style.borderColor='var(--red)';el('tcu-text').textContent='🔴 LIMP MODE — TCU at 33% torque. Park, engine off, cool 10 min.';}
+  else if(tcuMode==='limiting'){banner.classList.add('show');banner.classList.remove('active');banner.style.borderColor='var(--orange)';el('tcu-text').textContent='🟠 TCU Limiting — Clutch torque capped at 62%. Shift to N.';}
+  else{banner.classList.remove('show','active');}
+  updateChart();renderTips(zone);
+  el('chart-annotation').textContent=`Peak: ${Math.round(peakTemp)}°C`;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   2D STREET SCENE ANIMATION
+   Canvas: continuous rAF loop, 60fps independent of sim ticks
+   Elements:
+   - Scrolling road/environment (speed-proportional parallax)
+   - Player Kia (side view, body tilts on accel/decel)
+   - Traffic vehicles ahead (stop-and-go behaviour)
+   - Traffic lights (scenario-aware)
+   - Heat shimmer glow under engine bay (clutch temp → orange/red)
+   - Wheel spin particles during slip
+   - Speedometer & gear overlay
+   - Hill tilt for tirumala
+   ═══════════════════════════════════════════════════════════ */
+const SCENE = {
+  cvs: null, ctx: null,
+  W: 0, H: 200,
+  // Parallax layers scroll positions
+  skyX: 0, bgX: 0, midX: 0, fgX: 0,
+  // Road markings
+  dashX: 0,
+  // Traffic
+  cars: [],
+  // Particles (slip heat, exhaust)
+  particles: [],
+  // Traffic light
+  lightState: 'green', lightTimer: 0,
+  // Tilt for accel/decel
+  carTilt: 0, targetTilt: 0,
+  // Wheel rotation
+  wheelAngle: 0,
+  // Scene type (urban/highway/ghat)
+  type: 'urban',
+  // Animated speed (smooth)
+  animSpeed: 0,
+  // RAF id
+  rafId: null,
+};
+
+function initScene(){
+  SCENE.cvs=el('scene-canvas');
+  SCENE.ctx=SCENE.cvs.getContext('2d');
+  // Set actual pixel width
+  const rect=SCENE.cvs.getBoundingClientRect();
+  SCENE.W=SCENE.cvs.width=Math.round(rect.width||600);
+  SCENE.cvs.height=SCENE.H;
+  // Spawn initial traffic
+  SCENE.cars=[];
+  for(let i=0;i<4;i++){
+    SCENE.cars.push(spawnCar(SCENE.W*0.45+i*140+Math.random()*60));
+  }
+  SCENE.particles=[];
+  if(!SCENE.rafId) SCENE.rafId=requestAnimationFrame(animFrame);
+}
+
+function spawnCar(x){
+  const types=['sedan','suv','truck'];
+  const t=types[Math.floor(Math.random()*types.length)];
+  const palettes={
+    sedan:['#c0c0c0','#e8e8e8','#8b0000','#00008b','#808080'],
+    suv:['#ffffff','#808080','#1a1a1a','#003366','#004d00'],
+    truck:['#cc6600','#ffffff','#333','#990000','#cccccc']
+  };
+  const col=palettes[t][Math.floor(Math.random()*palettes[t].length)];
+  return {x, type:t, color:col, speed:simSpeed, braking:false, stopped:false};
+}
+
+let lastRaf=performance.now();
+function animFrame(now){
+  SCENE.rafId=requestAnimationFrame(animFrame);
+  const dt=Math.min((now-lastRaf)/1000, 0.05); // seconds, capped at 50ms
+  lastRaf=now;
+  if(!running && elapsed===0){ drawIdleScene(); return; }
+  updateScene(dt);
+  drawScene();
+}
+
+function updateScene(dt){
+  // Smooth display speed toward target
+  const targetSpd=running?simSpeed:0;
+  SCENE.animSpeed+=(targetSpd-SCENE.animSpeed)*(1-Math.exp(-dt*3));
+
+  const spd=SCENE.animSpeed;
+  const spd_ms=spd/3.6;
+  SCENE.type=SCEN[scenario].bg;
+
+  // Parallax scroll rates (pixels/s)
+  const skyRate=spd_ms*0.06, bgRate=spd_ms*0.20, midRate=spd_ms*0.50, fgRate=spd_ms*1.0;
+  SCENE.skyX-=skyRate*dt;
+  SCENE.bgX -=bgRate*dt;
+  SCENE.midX-=midRate*dt;
+  SCENE.fgX -=fgRate*dt;
+
+  // Road dashes scroll at 1:1 with ground speed
+  SCENE.dashX-=spd_ms*dt*60; // px/s scaled to canvas
+  if(SCENE.dashX<-80) SCENE.dashX+=80;
+
+  // Wheel rotation angle (proportional to speed)
+  SCENE.wheelAngle+=spd_ms*dt*180/0.335; // rad/s × dt → ° per frame
+  SCENE.wheelAngle%=360;
+
+  // Car body tilt: nose up on acceleration, nose down on braking
+  SCENE.targetTilt=simAccel*0.7; // degrees: +ve = nose up
+  SCENE.carTilt+=(SCENE.targetTilt-SCENE.carTilt)*Math.min(1,dt*5);
+
+  // Traffic light
+  SCENE.lightTimer+=dt;
+  if(SCENE.type==='urban'){
+    if(simSpeed<2 && elapsed>5){ SCENE.lightState='red'; }
+    else if(simSpeed>5){ SCENE.lightState='green'; }
+  } else { SCENE.lightState='green'; }
+
+  // Update traffic cars
+  SCENE.cars.forEach(c=>{
+    const targetGap=simSpeed<2?0:90;
+    // Move car: try to maintain gap ahead of player
+    // Player car is at x=SCENE.W*0.22; cars should stay ahead
+    const leadX=SCENE.cars[0]===c ? SCENE.W*0.45+30 : SCENE.cars[SCENE.cars.indexOf(c)-1].x-120;
+    c.braking=simSpeed<2||c.x-SCENE.W*0.22<160;
+    const cTarget=c.braking?c.x:c.x-(spd_ms*dt*55);
+    c.x=c.x+(cTarget-c.x)*0.12;
+    // Respawn if scrolled off left
+    if(c.x<SCENE.W*0.1){
+      c.x=SCENE.W+100+Math.random()*60;
+      c.color=spawnCar(0).color;c.type=spawnCar(0).type;
+    }
+  });
+
+  // Slip particles (when clutch is slipping)
+  const isSlipping=simSlip>10 && running;
+  if(isSlipping && Math.random()<dt*18){
+    // Spawn spark below car body
+    const carX=SCENE.W*0.22+18, groundY=SCENE.H*0.70;
+    SCENE.particles.push({
+      x:carX+Math.random()*24-12, y:groundY-2,
+      vx:(Math.random()-0.5)*60, vy:-Math.random()*40-10,
+      life:1, maxLife:0.5+Math.random()*0.3,
+      type:'spark',
+      col:tempC1>tempC2?'#f97316':'#a78bfa'
+    });
+  }
+  // Exhaust puffs
+  if(running && Math.random()<dt*3){
+    const carX=SCENE.W*0.22, groundY=SCENE.H*0.62;
+    SCENE.particles.push({
+      x:carX-10, y:groundY+4,
+      vx:-20-Math.random()*20, vy:-8-Math.random()*8,
+      life:1, maxLife:1.2+Math.random()*0.8,
+      type:'exhaust',
+      col:simPgen>500?'rgba(200,100,30,':'rgba(100,100,100,'
+    });
+  }
+  // Update particles
+  SCENE.particles=SCENE.particles.filter(p=>{
+    p.x+=p.vx*dt; p.y+=p.vy*dt; p.vy+=60*dt;
+    p.life-=dt/p.maxLife;
+    return p.life>0;
+  });
+}
+
+/* ── Draw functions ── */
+function drawIdleScene(){
+  const {ctx,W,H}=SCENE;
+  const dark=isDarkTheme();
+  ctx.clearRect(0,0,W,H);
+  drawSky(0);
+  drawGround();
+  drawRoad(0);
+  drawPlayerCar(W*0.22, H*0.62, 0, 0);
+  // "Press Start" overlay
+  ctx.fillStyle=dark?'rgba(0,0,0,.4)':'rgba(255,255,255,.4)';
+  ctx.fillRect(0,0,W,H);
+  ctx.fillStyle=dark?'#c8cdd8':'#1a1d26';
+  ctx.font='bold 14px DM Sans,sans-serif';
+  ctx.textAlign='center';
+  ctx.fillText('Press ▶ Start to begin simulation',W/2,H/2);
+  ctx.font='11px DM Sans,sans-serif';
+  ctx.fillStyle='#5a6075';
+  ctx.fillText('Stop-and-go animation will play here',W/2,H/2+20);
+}
+
+function drawScene(){
+  const {ctx,W,H,animSpeed}=SCENE;
+  const dark=isDarkTheme();
+  ctx.clearRect(0,0,W,H);
+
+  // Hill tilt for tirumala
+  const hillAngle=SCENE.type==='ghat'?-8:0; // degrees
+
+  if(hillAngle!==0){
+    ctx.save();
+    ctx.translate(W/2,H);
+    ctx.rotate(hillAngle*Math.PI/180);
+    ctx.translate(-W/2,-H);
+  }
+
+  drawSky(SCENE.skyX);
+  drawBuildings(SCENE.bgX, SCENE.midX);
+  drawGround();
+  drawRoad(SCENE.dashX);
+
+  // Traffic cars (behind player)
+  SCENE.cars.forEach(c=>drawTrafficCar(c));
+
+  // Heat shimmer under car
+  const maxT=Math.max(tempC1,tempC2);
+  if(maxT>150&&running){
+    const alpha=Math.min(0.55,(maxT-150)/200);
+    const shimmerColor=maxT>260?`rgba(239,68,68,${alpha})`
+      :maxT>200?`rgba(249,115,22,${alpha})`:`rgba(245,158,11,${alpha*0.6})`;
+    const carX=W*0.22, carBaseY=H*0.76;
+    const grad=ctx.createRadialGradient(carX+30,carBaseY,0,carX+30,carBaseY,60);
+    grad.addColorStop(0,shimmerColor);
+    grad.addColorStop(1,'transparent');
+    ctx.fillStyle=grad;
+    ctx.beginPath();ctx.ellipse(carX+30,carBaseY,60,14,0,0,Math.PI*2);ctx.fill();
+  }
+
+  // Particles (sparks behind wheel area, exhausts)
+  SCENE.particles.forEach(p=>{
+    ctx.save();ctx.globalAlpha=Math.max(0,p.life);
+    if(p.type==='spark'){
+      ctx.beginPath();ctx.arc(p.x,p.y,2,0,Math.PI*2);
+      ctx.fillStyle=p.col;ctx.fill();
+    } else {
+      const r=6*(1-p.life*0.5);
+      ctx.beginPath();ctx.arc(p.x,p.y,r,0,Math.PI*2);
+      ctx.fillStyle=p.col+(0.3*(p.life)).toFixed(2)+')';ctx.fill();
+    }
+    ctx.restore();
+  });
+
+  // Player car
+  drawPlayerCar(W*0.22, H*0.62, SCENE.carTilt, SCENE.wheelAngle);
+
+  // Traffic light
+  if(SCENE.type==='urban') drawTrafficLight(W*0.58, H*0.30);
+
+  if(hillAngle!==0) ctx.restore();
+
+  // HUD overlay (speed, gear, accel bar)
+  drawHUD();
+}
+
+function drawSky(scrollX){
+  const {ctx,W,H}=SCENE;
+  const dark=isDarkTheme();
+  const type=SCENE.type;
+  // Sky gradient
+  let skyTop,skyBot;
+  if(type==='ghat'){skyTop=dark?'#0d1f0a':'#a8d5a2';skyBot=dark?'#1a3d12':'#d4f0c8';}
+  else if(type==='highway'){skyTop=dark?'#0a0e1a':'#b8d4f0';skyBot=dark?'#141e35':'#ddeeff';}
+  else{skyTop=dark?'#0a0b0d':'#c8d4e8';skyBot=dark?'#161820':'#e8eef8';}
+  const g=ctx.createLinearGradient(0,0,0,H*0.55);
+  g.addColorStop(0,skyTop);g.addColorStop(1,skyBot);
+  ctx.fillStyle=g;ctx.fillRect(0,0,W,H*0.55);
+
+  // Clouds (only daytime / light mode or highway)
+  if(!isDarkTheme()||type==='highway'){
+    const cx=((scrollX*0.03)%W+W*3)%W;
+    ctx.fillStyle='rgba(255,255,255,0.7)';
+    [[cx-40,H*0.08,50,18],[cx+120,H*0.05,70,22],[cx+300,H*0.12,45,15]].forEach(([x,y,w,h])=>{
+      ctx.beginPath();ctx.ellipse(x,y,w,h,0,0,Math.PI*2);ctx.fill();
+    });
+  }
+
+  // Sun / moon
+  if(isDarkTheme()){
+    ctx.beginPath();ctx.arc(W*0.82,H*0.12,10,0,Math.PI*2);
+    ctx.fillStyle='rgba(220,220,180,0.6)';ctx.fill();
+  } else {
+    ctx.beginPath();ctx.arc(W*0.82,H*0.1,14,0,Math.PI*2);
+    ctx.fillStyle='rgba(255,220,60,0.85)';ctx.fill();
+  }
+}
+
+function drawBuildings(bgX, midX){
+  const {ctx,W,H}=SCENE;
+  const dark=isDarkTheme();
+  const type=SCENE.type;
+  if(type==='highway') return; // open highway, no buildings
+  if(type==='ghat'){
+    // Mountains/treeline
+    const mX=((bgX*0.4)%(W+200)-100+W*3)%(W+200)-100;
+    ctx.fillStyle=dark?'#0f2a0a':'#2d6e24';
+    for(let i=0;i<5;i++){
+      const mx=(mX+i*210)%( W+400)-100;
+      ctx.beginPath();ctx.moveTo(mx,H*0.55);ctx.lineTo(mx+120,H*0.20);ctx.lineTo(mx+220,H*0.48);ctx.closePath();ctx.fill();
+    }
+    return;
+  }
+  // Urban buildings
+  const bX=((bgX*0.5)%(W+400)+W*3)%(W+400);
+  const buildH=[0.55,0.40,0.48,0.35,0.52,0.42,0.38,0.50];
+  const buildW=[55,40,60,45,50,65,38,55];
+  const buildCol=dark?['#1a1d2a','#141720','#1e2230','#161924']:['#b8bec8','#c8cfd8','#a8b0bc','#d0d5de'];
+  for(let i=0;i<8;i++){
+    const bx=(bX+i*75)%(W+600)-100;
+    const bh=H*buildH[i%buildH.length];
+    ctx.fillStyle=buildCol[i%buildCol.length];
+    ctx.fillRect(bx,H*0.55-bh,buildW[i%buildW.length],bh);
+    // Windows
+    if(dark){
+      ctx.fillStyle='rgba(255,220,100,0.4)';
+      for(let r=0;r<4;r++)for(let c=0;c<3;c++){
+        if(Math.random()>0.3) ctx.fillRect(bx+5+c*14,H*0.55-bh+8+r*14,8,8);
+      }
+    }
+  }
+}
+
+function drawGround(){
+  const {ctx,W,H}=SCENE;
+  const dark=isDarkTheme();
+  const type=SCENE.type;
+  // Pavement/ground
+  const groundY=H*0.55;
+  if(type==='ghat'){
+    ctx.fillStyle=dark?'#1a2a15':'#4a7a35';
+    ctx.fillRect(0,groundY,W,H-groundY);
+  } else {
+    ctx.fillStyle=dark?'#161820':'#c0c8d0';
+    ctx.fillRect(0,groundY,W,H-groundY);
+  }
+}
+
+function drawRoad(dashX){
+  const {ctx,W,H}=SCENE;
+  const dark=isDarkTheme();
+  const roadTop=H*0.56, roadBot=H;
+  // Road surface with perspective
+  ctx.fillStyle=dark?'#1c1e28':'#888c98';
+  ctx.beginPath();
+  ctx.moveTo(0,roadTop);ctx.lineTo(W,roadTop);ctx.lineTo(W,roadBot);ctx.lineTo(0,roadBot);
+  ctx.closePath();ctx.fill();
+
+  // Road edges
+  ctx.fillStyle=dark?'#f5f5f5':'#ffffff';
+  ctx.fillRect(0,roadTop,W,2);ctx.fillRect(0,H-6,W,4);
+
+  // Lane dashes (center)
+  const laneY=H*0.72;
+  ctx.fillStyle=dark?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.7)';
+  for(let x=dashX;x<W+80;x+=80){
+    ctx.fillRect(x,laneY-2,50,4);
+  }
+}
+
+function drawTrafficCar(car){
+  const {ctx,H}=SCENE;
+  const y=H*0.63;
+  const scale=0.7;
+  ctx.save();
+  ctx.translate(car.x,y);
+  ctx.scale(scale,scale);
+  // Brake lights
+  if(car.braking||simSpeed<2){
+    ctx.fillStyle='rgba(255,60,30,0.85)';
+    ctx.fillRect(-38,-12,8,10);ctx.fillRect(-38,0,8,10);
+  }
+  drawCarShape(ctx,car.type,car.color,false,0,0);
+  ctx.restore();
+}
+
+function drawPlayerCar(x, y, tiltDeg, wheelAngle){
+  const {ctx,W,H}=SCENE;
+  ctx.save();
+  ctx.translate(x,y);
+  ctx.rotate(tiltDeg*Math.PI/180);
+  // Clutch heat glow (C1 vs C2)
+  const maxT=Math.max(tempC1,tempC2);
+  if(maxT>150&&running){
+    const hAlpha=Math.min(0.7,(maxT-150)/180);
+    const hColor=simActiveClutch==='C1'?`rgba(0,212,200,${hAlpha*0.4})`:`rgba(167,139,250,${hAlpha*0.4})`;
+    ctx.shadowColor=hColor;ctx.shadowBlur=18;
+  }
+  drawCarShape(ctx,'player','#c0c8d0',true,wheelAngle,maxT);
+  ctx.shadowBlur=0;
+  ctx.restore();
+}
+
+function drawCarShape(ctx, type, color, isPlayer, wheelAngle, maxT){
+  const dark=isDarkTheme();
+  if(isPlayer){
+    // Kia-like side silhouette (sedan/SUV)
+    // Body
+    ctx.fillStyle=color;
+    // Main body rectangle
+    ctx.beginPath();
+    ctx.moveTo(-45,10);ctx.lineTo(-45,-8);ctx.lineTo(-30,-20);ctx.lineTo(10,-28);ctx.lineTo(28,-28);
+    ctx.lineTo(42,-18);ctx.lineTo(48,-8);ctx.lineTo(48,10);ctx.closePath();
+    ctx.fill();
+    // Roof
+    ctx.fillStyle=dark?'#2a2e3a':'#a0a8b8';
+    ctx.beginPath();
+    ctx.moveTo(-28,-18);ctx.lineTo(-12,-32);ctx.lineTo(22,-32);ctx.lineTo(36,-18);ctx.closePath();
+    ctx.fill();
+    // Windows
+    ctx.fillStyle='rgba(100,180,220,0.6)';
+    ctx.beginPath();ctx.moveTo(-22,-19);ctx.lineTo(-10,-31);ctx.lineTo(5,-31);ctx.lineTo(5,-19);ctx.closePath();ctx.fill();
+    ctx.beginPath();ctx.moveTo(8,-19);ctx.lineTo(8,-31);ctx.lineTo(22,-31);ctx.lineTo(34,-19);ctx.closePath();ctx.fill();
+    // Headlight
+    ctx.fillStyle='rgba(255,240,150,0.9)';
+    ctx.beginPath();ctx.ellipse(46,-4,5,4,0,0,Math.PI*2);ctx.fill();
+    // Rear light
+    ctx.fillStyle='rgba(255,60,30,0.8)';
+    ctx.fillRect(-46,-6,5,10);
+    // Wheels
+    [[-28,10],[30,10]].forEach(([wx,wy])=>{
+      ctx.save();ctx.translate(wx,wy);
+      ctx.fillStyle='#1a1a1a';ctx.beginPath();ctx.arc(0,0,11,0,Math.PI*2);ctx.fill();
+      ctx.fillStyle='#555';ctx.beginPath();ctx.arc(0,0,7,0,Math.PI*2);ctx.fill();
+      // Spoke rotation
+      ctx.strokeStyle='#888';ctx.lineWidth=1.5;
+      for(let i=0;i<4;i++){
+        const a=(wheelAngle+i*90)*Math.PI/180;
+        ctx.beginPath();ctx.moveTo(Math.cos(a)*3,Math.sin(a)*3);ctx.lineTo(Math.cos(a)*6,Math.sin(a)*6);ctx.stroke();
+      }
+      ctx.restore();
+    });
+    // Clutch temp tint on gearbox area
+    if(maxT>180){
+      const a=Math.min(0.45,(maxT-180)/150);
+      ctx.fillStyle=maxT>260?`rgba(239,68,68,${a})`:`rgba(249,115,22,${a})`;
+      ctx.beginPath();ctx.ellipse(0,2,25,8,0,0,Math.PI*2);ctx.fill();
+    }
+  } else {
+    // Generic traffic car
+    const w=type==='truck'?80:type==='suv'?75:65;
+    const h=type==='truck'?20:18;
+    ctx.fillStyle=color;
+    ctx.beginPath();
+    ctx.moveTo(-w/2,h/2);ctx.lineTo(-w/2,-h/4);ctx.lineTo(-w/2+15,-h);ctx.lineTo(w/2-10,-h);ctx.lineTo(w/2,-h/4);ctx.lineTo(w/2,h/2);ctx.closePath();
+    ctx.fill();
+    // Rear lights
+    ctx.fillStyle='rgba(255,50,20,0.7)';ctx.fillRect(-w/2-2,-h/4,5,10);
+    // Wheels
+    [[-w/2+12,h/2],[w/2-12,h/2]].forEach(([wx,wy])=>{
+      ctx.fillStyle='#222';ctx.beginPath();ctx.arc(wx,wy,9,0,Math.PI*2);ctx.fill();
+      ctx.fillStyle='#555';ctx.beginPath();ctx.arc(wx,wy,5,0,Math.PI*2);ctx.fill();
+    });
+  }
+}
+
+function drawTrafficLight(x, y){
+  const {ctx}=SCENE;
+  const dark=isDarkTheme();
+  // Pole
+  ctx.fillStyle=dark?'#444':'#666';
+  ctx.fillRect(x-2,y,4,60);
+  // Box
+  ctx.fillStyle=dark?'#222':'#333';
+  ctx.fillRect(x-12,y-40,24,48);ctx.strokeStyle='#555';ctx.lineWidth=1;ctx.strokeRect(x-12,y-40,24,48);
+  // Lights
+  const lights=[{col:'#cc0000',active:SCENE.lightState==='red',y:y-32},
+                {col:'#ccaa00',active:false,y:y-18},
+                {col:'#00aa00',active:SCENE.lightState==='green',y:y-4}];
+  lights.forEach(l=>{
+    ctx.fillStyle=l.active?l.col:'rgba(80,80,80,0.5)';
+    ctx.beginPath();ctx.arc(x,l.y,6,0,Math.PI*2);ctx.fill();
+    if(l.active){ctx.shadowColor=l.col;ctx.shadowBlur=8;ctx.beginPath();ctx.arc(x,l.y,6,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;}
+  });
+}
+
+function drawHUD(){
+  const {ctx,W,H,animSpeed}=SCENE;
+  const dark=isDarkTheme();
+  // Speed badge
+  const sx=16,sy=16,sw=80,sh=50;
+  ctx.fillStyle=dark?'rgba(10,11,13,0.72)':'rgba(255,255,255,0.72)';
+  roundRect(ctx,sx,sy,sw,sh,8);ctx.fill();
+  ctx.fillStyle=dark?'#c8cdd8':'#1a1d26';
+  ctx.font='bold 22px DM Mono,monospace';ctx.textAlign='center';
+  ctx.fillText(Math.round(animSpeed),sx+sw/2,sy+28);
+  ctx.font='10px DM Sans,sans-serif';ctx.fillStyle='#5a6075';
+  ctx.fillText('km/h',sx+sw/2,sy+42);
+
+  // Gear badge
+  const gx=W-60,gy=16,gw=46,gh=50;
+  ctx.fillStyle=dark?'rgba(10,11,13,0.72)':'rgba(255,255,255,0.72)';
+  roundRect(ctx,gx,gy,gw,gh,8);ctx.fill();
+  ctx.fillStyle=dark?'#c8cdd8':'#1a1d26';
+  ctx.font='bold 20px DM Mono,monospace';ctx.textAlign='center';
+  const gearLabel=simSpeed<2?'N':String(simGear).split(' ')[0];
+  ctx.fillText(gearLabel,gx+gw/2,gy+28);
+  ctx.font='10px DM Sans,sans-serif';ctx.fillStyle='#5a6075';
+  ctx.fillText('GEAR',gx+gw/2,gy+42);
+
+  // Accel bar
+  const barX=W/2-50, barY=H-18, barW=100, barH=6;
+  ctx.fillStyle=dark?'rgba(10,11,13,0.5)':'rgba(0,0,0,0.15)';
+  roundRect(ctx,barX-2,barY-2,barW+4,barH+4,4);ctx.fill();
+  const aFrac=Math.max(-1,Math.min(1,simAccel/5));
+  const midX=barX+barW/2;
+  if(aFrac>0){
+    ctx.fillStyle='#22c55e';
+    ctx.fillRect(midX,barY,aFrac*barW/2,barH);
+  } else if(aFrac<0){
+    ctx.fillStyle='#ef4444';
+    ctx.fillRect(midX+aFrac*barW/2,barY,-aFrac*barW/2,barH);
+  }
+  ctx.strokeStyle=dark?'rgba(200,200,200,0.3)':'rgba(0,0,0,0.2)';ctx.lineWidth=1;
+  ctx.strokeRect(barX,barY,barW,barH);
+  ctx.beginPath();ctx.moveTo(midX,barY-2);ctx.lineTo(midX,barY+barH+2);ctx.stroke();
+
+  // Scene label
+  el('scene-label').textContent=simSpeed<2?(simSlip>10?'CLUTCH SLIP':'STOPPED'):simSpeed>55?'CRUISE':'STOP-GO';
+}
+
+function roundRect(ctx,x,y,w,h,r){
+  ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.arcTo(x+w,y,x+w,y+r,r);
+  ctx.lineTo(x+w,y+h-r);ctx.arcTo(x+w,y+h,x+w-r,y+h,r);
+  ctx.lineTo(x+r,y+h);ctx.arcTo(x,y+h,x,y+h-r,r);ctx.lineTo(x,y+r);ctx.arcTo(x,y,x+r,y,r);ctx.closePath();
+}
+
+/* ═══ SVG GAUGE ═══ */
+const CX=140,CY=155,R=105,R_INNER=87,START_DEG=155,SWEEP_DEG=230,T_MIN=80,T_MAX=320;
+function degToRad(d){return d*Math.PI/180;}
+function arcPath(cx,cy,r,startDeg,sweepDeg){
+  const a1=degToRad(startDeg),a2=degToRad(startDeg+sweepDeg);
+  const x1=cx+r*Math.cos(a1),y1=cy+r*Math.sin(a1),x2=cx+r*Math.cos(a2),y2=cy+r*Math.sin(a2);
+  const large=sweepDeg>180?1:0;
+  return `M ${x1.toFixed(2)} ${y1.toFixed(2)} A ${r} ${r} 0 ${large} 1 ${x2.toFixed(2)} ${y2.toFixed(2)}`;
+}
+function tempToDeg(T){return START_DEG+Math.max(0,Math.min(1,(T-T_MIN)/(T_MAX-T_MIN)))*SWEEP_DEG;}
+function tempToNeedleAngle(T){return tempToDeg(T)-90;}
+const ZONE_TEMPS=[{lo:80,hi:150,color:'#22c55e'},{lo:150,hi:200,color:'#f59e0b'},{lo:200,hi:260,color:'#f97316'},{lo:260,hi:320,color:'#ef4444'}];
+
+function initGaugePaths(){
+  el('gauge-track').setAttribute('d',arcPath(CX,CY,R,START_DEG,SWEEP_DEG));
+  ['gauge-z0','gauge-z1','gauge-z2','gauge-z3'].forEach((id,i)=>{
+    const z=ZONE_TEMPS[i],ds=tempToDeg(z.lo),sw=tempToDeg(Math.min(z.hi,T_MAX))-ds;
+    if(sw>0)el(id).setAttribute('d',arcPath(CX,CY,R,ds,sw));
+  });
+  const ticksG=el('gauge-ticks'),labsG=el('gauge-labels'),linesG=el('gauge-zone-lines');
+  ticksG.innerHTML='';labsG.innerHTML='';linesG.innerHTML='';
+  [80,120,150,180,200,230,260,290,320].forEach(T=>{
+    const ang=degToRad(tempToDeg(T)),isM=[80,150,200,260,320].includes(T);
+    const r1=R-(isM?9:6),r2=R+(isM?9:6);
+    const line=document.createElementNS('http://www.w3.org/2000/svg','line');
+    line.setAttribute('x1',(CX+r1*Math.cos(ang)).toFixed(1));line.setAttribute('y1',(CY+r1*Math.sin(ang)).toFixed(1));
+    line.setAttribute('x2',(CX+r2*Math.cos(ang)).toFixed(1));line.setAttribute('y2',(CY+r2*Math.sin(ang)).toFixed(1));
+    line.setAttribute('stroke-width',isM?'1.5':'1');ticksG.appendChild(line);
+  });
+  [80,150,200,260,320].forEach(T=>{
+    const ang=degToRad(tempToDeg(T)),lr=R+18;
+    const txt=document.createElementNS('http://www.w3.org/2000/svg','text');
+    txt.setAttribute('x',(CX+lr*Math.cos(ang)).toFixed(1));txt.setAttribute('y',(CY+lr*Math.sin(ang)+3).toFixed(1));
+    txt.textContent=T===80?'80°':T+'°';labsG.appendChild(txt);
+  });
+  [150,200,260].forEach(T=>{
+    const ang=degToRad(tempToDeg(T)),r1=R-8,r2=R+8;
+    const line=document.createElementNS('http://www.w3.org/2000/svg','line');
+    line.setAttribute('x1',(CX+r1*Math.cos(ang)).toFixed(1));line.setAttribute('y1',(CY+r1*Math.sin(ang)).toFixed(1));
+    line.setAttribute('x2',(CX+r2*Math.cos(ang)).toFixed(1));line.setAttribute('y2',(CY+r2*Math.sin(ang)).toFixed(1));
+    line.setAttribute('stroke-width','2');linesG.appendChild(line);
+  });
+  // Inner ring tracks for C1 / C2
+  ['gauge-c1-track','gauge-c2-track'].forEach(id=>{const e=el(id);if(e)e.remove();});
+  const svg=document.getElementById('svg-gauge');
+  const mk=(id,r,ins)=>{
+    const p=document.createElementNS('http://www.w3.org/2000/svg','path');
+    p.id=id;p.setAttribute('d',arcPath(CX,CY,r,START_DEG,SWEEP_DEG));p.setAttribute('fill','none');
+    p.setAttribute('stroke','var(--faint)');p.setAttribute('stroke-width','3');p.setAttribute('stroke-linecap','butt');p.setAttribute('opacity','0.4');
+    svg.insertBefore(p,el('gauge-needle'));return p;
+  };
+  mk('gauge-c1-track',R_INNER-6);mk('gauge-c2-track',R_INNER+6);
+  ['gauge-c1-fill','gauge-c2-fill'].forEach(id=>{const e=el(id);if(e)e.remove();});
+  const mkF=(id,r)=>{
+    const p=document.createElementNS('http://www.w3.org/2000/svg','path');
+    p.id=id;p.setAttribute('fill','none');p.setAttribute('stroke','#22c55e');
+    p.setAttribute('stroke-width','3');p.setAttribute('stroke-linecap','butt');p.setAttribute('opacity','0.7');
+    p.style.transition='stroke .4s ease';
+    svg.insertBefore(p,el('gauge-needle'));
+  };
+  mkF('gauge-c1-fill',R_INNER-6);mkF('gauge-c2-fill',R_INNER+6);
+}
+
+function updateSVGGauge(maxT,tC1,tC2){
+  const zone=getZone(maxT),fillEnd=Math.min(maxT,T_MAX);
+  const fillSweep=Math.max(0,tempToDeg(fillEnd)-START_DEG);
+  const fillEl=el('gauge-arc-fill');
+  if(fillSweep>0){fillEl.setAttribute('d',arcPath(CX,CY,R,START_DEG,fillSweep));fillEl.setAttribute('stroke',zone.raw);}
+  else fillEl.setAttribute('d','');
+  el('gauge-needle').setAttribute('transform',`rotate(${tempToNeedleAngle(maxT).toFixed(2)} ${CX} ${CY})`);
+  el('gauge-temp-text').textContent=Math.round(maxT)+'°';el('gauge-temp-text').setAttribute('fill',zone.raw);
+  el('gauge-zone-text').textContent=zone.name;el('gauge-zone-text').setAttribute('fill',zone.raw);
+  const c1El=el('gauge-c1-fill'),c2El=el('gauge-c2-fill');
+  if(c1El){const s=Math.max(0,tempToDeg(Math.min(tC1,T_MAX))-START_DEG);if(s>0){c1El.setAttribute('d',arcPath(CX,CY,R_INNER-6,START_DEG,s));c1El.setAttribute('stroke',getZone(tC1).raw);}else c1El.setAttribute('d','');}
+  if(c2El){const s=Math.max(0,tempToDeg(Math.min(tC2,T_MAX))-START_DEG);if(s>0){c2El.setAttribute('d',arcPath(CX,CY,R_INNER+6,START_DEG,s));c2El.setAttribute('stroke',getZone(tC2).raw);}else c2El.setAttribute('d','');}
+}
+
+/* ── Zone logic ── */
+function getZone(T){
+  if(T<150)return{name:'SAFE',badge:'🟢 Safe',raw:'#22c55e',color:'var(--green)',bgColor:'var(--green-bg)',sub:'Normal operating range',action:'No action needed'};
+  if(T<200)return{name:'WARM',badge:'🟡 Warm',raw:'#f59e0b',color:'var(--yellow)',bgColor:'var(--yellow-bg)',sub:'Elevated — monitor closely',action:'Enable Auto Hold'};
+  if(T<260)return{name:'HOT',badge:'🟠 Hot',raw:'#f97316',color:'var(--orange)',bgColor:'var(--orange-bg)',sub:'TCU protection active',action:'Shift to N now'};
+  return{name:'CRITICAL',badge:'🔴 Critical',raw:'#ef4444',color:'var(--red)',bgColor:'var(--red-bg)',sub:'⚠️ Lining damage above 300°C',action:'Stop engine & park'};
+}
+
+/* ── Chart ── */
+function isDarkTheme(){return document.documentElement.getAttribute('data-theme')!=='light';}
+const chartCtx=document.getElementById('chart').getContext('2d');
+const chartInst=new Chart(chartCtx,{
+  type:'line',
+  data:{labels:timeHist,datasets:[
+    {label:'C1 (Odd gears)',data:tempHistC1,borderColor:'#00d4c8',backgroundColor:'rgba(0,212,200,.05)',borderWidth:1.8,pointRadius:0,tension:0.4,fill:true},
+    {label:'C2 (Even gears)',data:tempHistC2,borderColor:'#a78bfa',backgroundColor:'rgba(167,139,250,.04)',borderWidth:1.8,pointRadius:0,tension:0.4,fill:false},
+    {label:'TCU Warn 180°',data:[],borderColor:'#f59e0b',borderWidth:1,borderDash:[4,4],pointRadius:0,fill:false},
+    {label:'Limp 260°',data:[],borderColor:'#ef4444',borderWidth:1,borderDash:[3,3],pointRadius:0,fill:false},
+  ]},
+  options:{responsive:true,maintainAspectRatio:false,animation:{duration:0},
+    interaction:{mode:'index',intersect:false},
+    plugins:{
+      legend:{display:true,position:'top',labels:{color:'#5a6075',font:{size:10,family:'DM Mono'},boxWidth:12,padding:10}},
+      tooltip:{callbacks:{label:c=>`${c.dataset.label}: ${typeof c.parsed.y==='number'?c.parsed.y.toFixed(1)+'°C':'—'}`}}
+    },
+    scales:{
+      x:{ticks:{color:'#5a6075',font:{size:9},maxTicksLimit:8},grid:{color:'rgba(128,128,128,.05)'},border:{display:false}},
+      y:{min:50,max:320,ticks:{color:'#5a6075',font:{size:9}},grid:{color:'rgba(128,128,128,.07)'},border:{display:false}}
+    }}
+});
+function updateChart(){
+  chartInst.data.datasets[0].data=[...tempHistC1];
+  chartInst.data.datasets[1].data=[...tempHistC2];
+  chartInst.data.labels=[...timeHist];
+  const n=timeHist.length;
+  chartInst.data.datasets[2].data=Array(n).fill(PHY.T_warn);
+  chartInst.data.datasets[3].data=Array(n).fill(PHY.T_limp);
+  chartInst.update('none');
+}
+
+/* ── Tips ── */
+function renderTips(zone){
+  const ah=document.getElementById('ah').checked,nt=document.getElementById('nt').checked;
+  const tips=[],add=(color,text)=>tips.push({color,text}),maxT=Math.max(tempC1,tempC2);
+  if(maxT>=PHY.T_damage) add('var(--red)','🚨 Friction lining >300°C — permanent μ degradation. Service immediately.');
+  if(maxT>=PHY.T_limp) add('var(--red)','Engine off + park. D7UF1 servo locked at 33% torque — do not drive.');
+  else if(maxT>=PHY.T_tcu_lim){add('var(--orange)','Shift to N — each second in D adds 200–400 W slip heat at this temp.');add('var(--orange)','FlexRay TCU limiting clutch clamp to 62% capacity.');}
+  else if(maxT>=PHY.T_warn){
+    if(!ah) add('var(--yellow)','Enable Auto Hold — D7UF1 servo can fully retract clutch at stops (zero slip).');
+    if(!nt) add('var(--yellow)','Shift to N at signals — idle slip adds ~750 W continuously.');
+  }
+  if(!ah&&simSpeed<2&&scenario!=='orr') add('var(--orange)',`Auto Hold OFF: ${simActiveClutch} slipping at ω_idle ≈ ${PHY.omega_idle.toFixed(0)} rad/s.`);
+  if(ah&&simSpeed<2) add('var(--green)','Auto Hold: servo retracted — C1 & C2 fully open. Zero friction heat at stop. ✅');
+  if(scenario==='tirumala'){add('var(--accent)','⛰️ On descent: keep gear. 1st ratio 3.929:1 provides strong engine braking.');add('var(--accent)','Never N on ghat descent — C1 re-engages with a massive slip surge.');}
+  if(scenario==='mall'&&maxT>160) add('var(--yellow)','Find a straight 100m — forced convection cools disc ~2°C/s faster than idle.');
+  if(maxT<150) add('var(--green)','Clutch healthy — C1 & C2 both in safe zone. Keep it below 150°C. ✅');
+  el('tips').innerHTML=tips.slice(0,5).map(t=>`<div class="tip-item"><span class="tip-dot" style="background:${t.color}"></span><span>${t.text}</span></div>`).join('');
+}
+
+/* ── Log ── */
+function log(msg){
+  const l=el('log'),d=document.createElement('div');
+  d.className='log-e';d.innerHTML=`<span class="log-t">${fmt(elapsed)}</span><span>${msg}</span>`;
+  l.insertBefore(d,l.firstChild);while(l.children.length>25)l.removeChild(l.lastChild);
+}
+function clearLog(){el('log').innerHTML='';}
+
+/* ── Controls ── */
+function setScenario(id,btn){
+  scenario=id;document.querySelectorAll('.sc-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');
+  SCEN[id].events.forEach(ev=>delete ev._fired);log('Scenario → '+SCEN[id].name);el('k-sc').textContent=SCEN[id].name;
+  SCENE.type=SCEN[id].bg;
+}
+function refresh(){log('Settings updated');}
+const loadLabels=['1 pax (solo)','2 pax','3 pax','4 pax','5 pax + bags'];
+const loadFactors=[0.72,0.86,1.0,1.15,1.30];
+function updateLoad(v){loadFactor=loadFactors[v-1];el('load-txt').textContent=loadLabels[v-1];log(`Load: ${loadLabels[v-1]} (×${loadFactor.toFixed(2)})`);}
+function updateAmb(v){ambTemp=parseInt(v);el('amb-txt').textContent=v+'°C';}
+function toggleSim(){
+  running=!running;el('play-btn').textContent=running?'⏸ Pause':'▶ Resume';
+  if(running){interval=setInterval(tick,1000);log('Simulation started');}
+  else{clearInterval(interval);log(`Paused — C1:${Math.round(tempC1)}°C C2:${Math.round(tempC2)}°C`);}
+}
+function resetSim(){
+  clearInterval(interval);running=false;
+  tempC1=80;tempC2=80;tempBell=50;peakTemp=80;elapsed=0;
+  ahSaves=0;wearJoules=0;tcuMode='normal';simSlip=0;simPgen=0;simPdis=0;simMu=0.35;simAccel=0;simSpeed=0;
+  tempHistC1.length=0;tempHistC2.length=0;timeHist.length=0;
+  SCENE.animSpeed=0;SCENE.particles=[];SCENE.carTilt=0;SCENE.wheelAngle=0;
+  Object.values(SCEN).forEach(s=>s.events.forEach(e=>delete e._fired));
+  chartInst.data.datasets.forEach(d=>d.data=[]);chartInst.data.labels=[];chartInst.update();
+  el('play-btn').textContent='▶ Start';el('tcu-banner').classList.remove('show','active');
+  updateSVGGauge(80,80,80);render();
+  log('Reset — D7UF1 dual clutch thermal model ready');
+  log('C1 (1·3·5·7) + C2 (2·4·6·R) modelled independently');
+}
+
+function el(id){return document.getElementById(id);}
+function setKV(id,val,col){const e=el(id);e.textContent=val;if(col)e.style.color=col;}
+function fmt(s){return `${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;}
+
+/* ── Theme toggle ── */
+(function(){
+  const btn=document.querySelector('[data-theme-toggle]'),root=document.documentElement;
+  let d=root.getAttribute('data-theme')||'dark';root.setAttribute('data-theme',d);
+  btn&&btn.addEventListener('click',()=>{
+    d=d==='dark'?'light':'dark';root.setAttribute('data-theme',d);
+    btn.innerHTML=d==='dark'
+      ?`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>`
+      :`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>`;
+    setTimeout(()=>{initGaugePaths();updateSVGGauge(Math.max(tempC1,tempC2),tempC1,tempC2);},30);
+  });
+})();
+
+/* ── Init ── */
+initGaugePaths();
+updateSVGGauge(80,80,80);
+renderTips(getZone(80));
+initScene();
+log('Ready — D7UF1 dual clutch thermal model loaded');
+log('📐 C1 (1·3·5·7) + C2 (2·4·6·R) independent thermal states');
+log('📄 SAE 2015-01-1144 · ATZ 2016 · Polito DCT thesis · μ(T) model');
+
+// Handle canvas resize
+window.addEventListener('resize',()=>{
+  const rect=SCENE.cvs.getBoundingClientRect();
+  SCENE.W=SCENE.cvs.width=Math.round(rect.width||600);
+  SCENE.cvs.height=SCENE.H;
+});
+</script>
+</body>
+</html>

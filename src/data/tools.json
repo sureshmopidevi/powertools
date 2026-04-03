@@ -121,6 +121,26 @@
           }
         ],
         "color": "silver"
+      },
+      {
+        "id": "dct-clutch-simulator",
+        "title": "DCT Clutch Simulator",
+        "description": "Real-time thermal simulation of the Kia D7UF1 dry 7DCT across Hyderabad traffic — understand clutch heat, TCU protection and slip behaviour.",
+        "icon": "fa-gears",
+        "url": "tools/dct-clutch-simulator/index.html",
+        "introducedOn": "2026-04-03",
+        "lastUpdatedOn": "2026-04-03",
+        "commitCount": 1,
+        "badges": [
+          {
+            "label": "New",
+            "type": "new",
+            "startDate": "2026-04-03",
+            "endDate": "2026-05-03",
+            "priority": 2
+          }
+        ],
+        "color": "silver"
       }
     ]
   },
