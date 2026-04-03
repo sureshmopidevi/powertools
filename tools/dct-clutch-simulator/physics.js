@@ -39,9 +39,9 @@ const SCEN = {
       return [16 + Math.random() * 10, 2];
     },
     events: [
-      { t: 15,  m: 'Queue at InOrbit junction — bumper-to-bumper' },
-      { t: 48,  m: 'Ramp entry congestion — steep incline' },
-      { t: 90,  m: 'Waiting for parking slot — 8 min queue' },
+      { t: 15, m: 'Queue at InOrbit junction — bumper-to-bumper' },
+      { t: 48, m: 'Ramp entry congestion — steep incline' },
+      { t: 90, m: 'Waiting for parking slot — 8 min queue' },
       { t: 150, m: 'Speed bump zone — repeated stop-go' },
     ],
   },
@@ -55,9 +55,9 @@ const SCEN = {
       return [20 + Math.random() * 14, 2];
     },
     events: [
-      { t: 10,  m: 'Phase 1 signal — 3 min 20 sec wait begins' },
-      { t: 48,  m: 'Queue crawls forward 2 car lengths' },
-      { t: 84,  m: 'Phase 2 signal — full stop again' },
+      { t: 10, m: 'Phase 1 signal — 3 min 20 sec wait begins' },
+      { t: 48, m: 'Queue crawls forward 2 car lengths' },
+      { t: 84, m: 'Phase 2 signal — full stop again' },
       { t: 130, m: 'U-turn queue after HITEC flyover' },
     ],
   },
@@ -69,8 +69,8 @@ const SCEN = {
       return [base + (Math.random() - .5) * 5, 6];
     },
     events: [
-      { t: 8,   m: 'Entered ORR from Nanakramguda toll plaza' },
-      { t: 50,  m: 'Smooth 90 km/h cruise — clutch fully locked' },
+      { t: 8, m: 'Entered ORR from Nanakramguda toll plaza' },
+      { t: 50, m: 'Smooth 90 km/h cruise — clutch fully locked' },
       { t: 105, m: 'Brief slowdown near Shamshabad exit' },
       { t: 145, m: 'Overtaking — downshift to 5th then back to 6th' },
     ],
@@ -84,9 +84,9 @@ const SCEN = {
       return [7 + Math.random() * 12, 2];
     },
     events: [
-      { t: 8,   m: 'Alipiri ghat start — gradient to 10°' },
-      { t: 38,  m: 'First hairpin — queue, repeated hill-holds' },
-      { t: 72,  m: 'Mid-ghat sustained incline — peak stress' },
+      { t: 8, m: 'Alipiri ghat start — gradient to 10°' },
+      { t: 38, m: 'First hairpin — queue, repeated hill-holds' },
+      { t: 72, m: 'Mid-ghat sustained incline — peak stress' },
       { t: 112, m: 'Vehicle queue near checkpoint — uphill hold' },
       { t: 162, m: 'Descent phase — engine braking critical' },
     ],
@@ -103,8 +103,8 @@ function computeHeat(spd, gearNum, activeClutch, ah, nt, lf, tcuF, scenario, tem
   const hCoeff = mu * PHY.F_clamp * lf * tf * PHY.r_eff * PHY.n_faces;
 
   if (isStopped) {
-    if (nt)  { simSlipRef.val = 0; return { heat: 5, mu }; }
-    if (ah)  { simSlipRef.val = 0; return { heat: 8, mu }; }
+    if (nt) { simSlipRef.val = 0; return { heat: 5, mu }; }
+    if (ah) { simSlipRef.val = 0; return { heat: 8, mu }; }
     const hillF = isHill ? 2.1 : 1.0, deltaOmega = PHY.omega_idle * hillF;
     simSlipRef.val = deltaOmega;
     return { heat: hCoeff * deltaOmega, mu };
@@ -116,10 +116,10 @@ function computeHeat(spd, gearNum, activeClutch, ah, nt, lf, tcuF, scenario, tem
     const deltaOmega = Math.max(0, omega_eng - omega_shaft);
     simSlipRef.val = deltaOmega;
     if (ah && isHill) return { heat: hCoeff * deltaOmega * 0.40, mu };
-    if (ah)           return { heat: hCoeff * deltaOmega * 0.45, mu };
+    if (ah) return { heat: hCoeff * deltaOmega * 0.45, mu };
     return { heat: hCoeff * deltaOmega, mu };
   }
-  if (isCity)    { simSlipRef.val = 6 + Math.random() * 10; return { heat: 48 * lf * tf, mu }; }
+  if (isCity) { simSlipRef.val = 6 + Math.random() * 10; return { heat: 48 * lf * tf, mu }; }
   if (isHighway) { simSlipRef.val = 0.15 + Math.random() * 0.4; return { heat: 7, mu }; }
   simSlipRef.val = 0;
   return { heat: 0, mu };
@@ -138,9 +138,9 @@ function updateBell(tempBell, ambTemp, tempC1, tempC2, dt) {
 
 /** Determine TCU protection mode from peak temperature */
 function getTCUMode(T) {
-  if (T < PHY.T_warn)    return 'normal';
+  if (T < PHY.T_warn) return 'normal';
   if (T < PHY.T_tcu_lim) return 'monitoring';
-  if (T < PHY.T_limp)    return 'limiting';
+  if (T < PHY.T_limp) return 'limiting';
   return 'limp';
 }
 
@@ -153,9 +153,9 @@ function computeAccel(spd, gearNum, scenario, loadFactor) {
   const gRatio = PHY.gears[Math.min(gearNum - 1, 6)] || PHY.gears[0];
   const F_tract = engineTorque * gRatio * PHY.final_drive / PHY.tyre_radius * 0.85; // 85% η
   const rho = 1.18; // kg/m³ air density Hyderabad
-  const F_drag  = 0.5 * rho * PHY.drag_cd * PHY.frontal_A * v * v;
-  const m       = PHY.mass * loadFactor;
-  const F_roll  = PHY.roll_rr * m * 9.81;
+  const F_drag = 0.5 * rho * PHY.drag_cd * PHY.frontal_A * v * v;
+  const m = PHY.mass * loadFactor;
+  const F_roll = PHY.roll_rr * m * 9.81;
   const F_grade = m * 9.81 * grade;
   return Math.max(-8, Math.min(4, (F_tract - F_drag - F_roll - F_grade) / m));
 }

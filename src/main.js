@@ -20,8 +20,8 @@ let latestQuery = '';
 let activeCacheStoredAt = null;
 let themeSettleTimer = null;
 
-const TOOLS_DATA_CACHE_KEY = 'powertools.tools.data.v1';
-const UI_STATE_KEY = 'powertools.home.ui.v1';
+const TOOLS_DATA_CACHE_KEY = 'powertools.tools.data.v2';
+const UI_STATE_KEY = 'powertools.home.ui.v2';
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000;
 const NETWORK_REFRESH_INTERVAL_MS = 5 * 60 * 1000;
 

@@ -11,10 +11,10 @@ const chartInst = new Chart(chartCtx, {
   data: {
     labels: timeHist,
     datasets: [
-      { label: 'C1 (Odd gears)',  data: tempHistC1, borderColor: '#00d4c8', backgroundColor: 'rgba(0,212,200,.05)', borderWidth: 1.8, pointRadius: 0, tension: 0.4, fill: true },
+      { label: 'C1 (Odd gears)', data: tempHistC1, borderColor: '#00d4c8', backgroundColor: 'rgba(0,212,200,.05)', borderWidth: 1.8, pointRadius: 0, tension: 0.4, fill: true },
       { label: 'C2 (Even gears)', data: tempHistC2, borderColor: '#a78bfa', backgroundColor: 'rgba(167,139,250,.04)', borderWidth: 1.8, pointRadius: 0, tension: 0.4, fill: false },
-      { label: 'TCU Warn 180°',   data: [],         borderColor: '#f59e0b', borderWidth: 1, borderDash: [4, 4], pointRadius: 0, fill: false },
-      { label: 'Limp 260°',       data: [],         borderColor: '#ef4444', borderWidth: 1, borderDash: [3, 3], pointRadius: 0, fill: false },
+      { label: 'TCU Warn 180°', data: [], borderColor: '#f59e0b', borderWidth: 1, borderDash: [4, 4], pointRadius: 0, fill: false },
+      { label: 'Limp 260°', data: [], borderColor: '#ef4444', borderWidth: 1, borderDash: [3, 3], pointRadius: 0, fill: false },
     ],
   },
   options: {

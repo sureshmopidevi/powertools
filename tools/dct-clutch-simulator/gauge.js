@@ -9,7 +9,7 @@ const CX = 140, CY = 155, R = 105, R_INNER = 87;
 const START_DEG = 155, SWEEP_DEG = 230, T_MIN = 80, T_MAX = 320;
 
 const ZONE_TEMPS = [
-  { lo: 80,  hi: 150, color: '#22c55e' },
+  { lo: 80, hi: 150, color: '#22c55e' },
   { lo: 150, hi: 200, color: '#f59e0b' },
   { lo: 200, hi: 260, color: '#f97316' },
   { lo: 260, hi: 320, color: '#ef4444' },
@@ -40,9 +40,9 @@ function initGaugePaths() {
     if (sw > 0) el(id).setAttribute('d', arcPath(CX, CY, R, ds, sw));
   });
 
-  const ticksG  = el('gauge-ticks');
-  const labsG   = el('gauge-labels');
-  const linesG  = el('gauge-zone-lines');
+  const ticksG = el('gauge-ticks');
+  const labsG = el('gauge-labels');
+  const linesG = el('gauge-zone-lines');
   ticksG.innerHTML = ''; labsG.innerHTML = ''; linesG.innerHTML = '';
 
   [80, 120, 150, 180, 200, 230, 260, 290, 320].forEach(T => {

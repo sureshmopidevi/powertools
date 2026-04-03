@@ -51,17 +51,17 @@ const IDM = {
 
 /* ─── Traffic car factory ─── */
 const CAR_TYPES = {
-  sedan: { w: 62, h: 22, bodyH: 14, col: ['#c0c0c0','#d0d0d0','#8b0000','#00008b','#2d6a4f','#808080'] },
-  suv:   { w: 72, h: 24, bodyH: 15, col: ['#ffffff','#808080','#1a1a1a','#003366','#4a4e69','#556b2f'] },
-  truck: { w: 86, h: 26, bodyH: 16, col: ['#cc6600','#ffffff','#3c3c3c','#990000','#cccccc','#7b3f00'] },
-  auto:  { w: 50, h: 20, bodyH: 13, col: ['#f5c518','#ff8800','#49c4f3','#111111'] }, /* tuk-tuk */
-  bike:  { w: 36, h: 16, bodyH: 10, col: ['#e74c3c','#2c3e50','#f39c12','#8e44ad'] },
+  sedan: { w: 62, h: 22, bodyH: 14, col: ['#c0c0c0', '#d0d0d0', '#8b0000', '#00008b', '#2d6a4f', '#808080'] },
+  suv: { w: 72, h: 24, bodyH: 15, col: ['#ffffff', '#808080', '#1a1a1a', '#003366', '#4a4e69', '#556b2f'] },
+  truck: { w: 86, h: 26, bodyH: 16, col: ['#cc6600', '#ffffff', '#3c3c3c', '#990000', '#cccccc', '#7b3f00'] },
+  auto: { w: 50, h: 20, bodyH: 13, col: ['#f5c518', '#ff8800', '#49c4f3', '#111111'] }, /* tuk-tuk */
+  bike: { w: 36, h: 16, bodyH: 10, col: ['#e74c3c', '#2c3e50', '#f39c12', '#8e44ad'] },
 };
 
 function spawnCar(x, typeHint) {
   const types = typeHint
     ? [typeHint]
-    : (SCENE.type === 'highway' ? ['sedan','suv','sedan'] : ['sedan','suv','truck','auto','bike','sedan','sedan']);
+    : (SCENE.type === 'highway' ? ['sedan', 'suv', 'sedan'] : ['sedan', 'suv', 'truck', 'auto', 'bike', 'sedan', 'sedan']);
   const t = types[Math.floor(Math.random() * types.length)];
   const spec = CAR_TYPES[t];
   const col = spec.col[Math.floor(Math.random() * spec.col.length)];
@@ -126,7 +126,7 @@ function updateScene(dt) {
 
   /* ── Parallax scroll ── */
   SCENE.skyX -= spd_ms * 0.06 * dt;
-  SCENE.bgX  -= spd_ms * 0.22 * dt;
+  SCENE.bgX -= spd_ms * 0.22 * dt;
   SCENE.midX -= spd_ms * 0.55 * dt;
 
   /* ── Road dashes ── */
@@ -196,9 +196,9 @@ function updateScene(dt) {
 
     /* IDM acceleration */
     const s0 = IDM.s0;
-    const T  = IDM.T;
+    const T = IDM.T;
     const sStar = s0 + Math.max(0, car.vel * T + (car.vel * relVel) / (2 * Math.sqrt(IDM.a * IDM.b)));
-    const freeAcc  = IDM.a * (1 - Math.pow(Math.max(0, car.vel) / Math.max(1, desiredVelPx), IDM.delta));
+    const freeAcc = IDM.a * (1 - Math.pow(Math.max(0, car.vel) / Math.max(1, desiredVelPx), IDM.delta));
     const brakeTerm = Math.pow(sStar / Math.max(1, gapFront), 2);
     const acc = IDM.a * (1 - Math.pow(Math.max(0, car.vel) / Math.max(1, desiredVelPx), IDM.delta) - brakeTerm);
 
@@ -376,9 +376,9 @@ function drawSky(scrollX) {
   const { ctx, W, H } = SCENE;
   const dark = isDarkTheme(), type = SCENE.type;
   let top, bot;
-  if (type === 'ghat')         { top = dark ? '#0d1f0a' : '#a8d5a2'; bot = dark ? '#1e3d14' : '#c8ecc0'; }
+  if (type === 'ghat') { top = dark ? '#0d1f0a' : '#a8d5a2'; bot = dark ? '#1e3d14' : '#c8ecc0'; }
   else if (type === 'highway') { top = dark ? '#080e1a' : '#aecde8'; bot = dark ? '#10192e' : '#d6ecf8'; }
-  else                         { top = dark ? '#090a0d' : '#c4d0e6'; bot = dark ? '#13151c' : '#e4eaf6'; }
+  else { top = dark ? '#090a0d' : '#c4d0e6'; bot = dark ? '#13151c' : '#e4eaf6'; }
   const g = ctx.createLinearGradient(0, 0, 0, H * 0.55);
   g.addColorStop(0, top); g.addColorStop(1, bot);
   ctx.fillStyle = g; ctx.fillRect(0, 0, W, H * 0.55);
@@ -403,7 +403,7 @@ function drawSky(scrollX) {
     const cx = ((scrollX * 0.03) % W + W * 3) % W;
     ctx.fillStyle = 'rgba(255,255,255,0.75)';
     [[cx - 40, H * 0.07, 52, 18], [cx + 140, H * 0.05, 72, 22], [cx + 310, H * 0.12, 46, 15],
-     [cx + 480, H * 0.07, 60, 17]].forEach(([x, y, rw, rh]) => {
+    [cx + 480, H * 0.07, 60, 17]].forEach(([x, y, rw, rh]) => {
       ctx.beginPath(); ctx.ellipse(x, y, rw, rh, 0, 0, Math.PI * 2); ctx.fill();
     });
     /* Sun */
@@ -421,7 +421,7 @@ function drawBuildings(bgX, midX) {
 
   if (type === 'ghat') {
     /* Layered mountain silhouettes */
-    const cols = dark ? ['#0d2209','#0f2a0a','#123010'] : ['#1a5e0e','#237016','#2d8820'];
+    const cols = dark ? ['#0d2209', '#0f2a0a', '#123010'] : ['#1a5e0e', '#237016', '#2d8820'];
     [0.9, 0.65, 0.4].forEach((alpha, layer) => {
       const ox = ((bgX * (0.3 + layer * 0.15)) % (W + 400) + W * 3) % (W + 400);
       ctx.fillStyle = cols[layer];
@@ -471,7 +471,7 @@ function drawBuildings(bgX, midX) {
     { w: 52, h: 0.55 }, { w: 38, h: 0.38 }, { w: 60, h: 0.48 },
     { w: 44, h: 0.32 }, { w: 50, h: 0.52 }, { w: 66, h: 0.44 }, { w: 36, h: 0.35 }, { w: 58, h: 0.50 },
   ];
-  const buildCol = dark ? ['#181b25','#131620','#1d2130','#141820'] : ['#b4bbc8','#c4ccd8','#a4abb8','#ccd0da'];
+  const buildCol = dark ? ['#181b25', '#131620', '#1d2130', '#141820'] : ['#b4bbc8', '#c4ccd8', '#a4abb8', '#ccd0da'];
   for (let i = 0; i < 10; i++) {
     const b = profiles[i % profiles.length];
     const bx = (bX + i * 72 + (i % 3) * 8) % (W + 600) - 80;
@@ -620,8 +620,8 @@ function drawCarShape(ctx, type, color, isPlayer, wheelAngle, maxT, brakeAlpha) 
 
     /* Windows */
     ctx.fillStyle = 'rgba(100,185,230,0.65)';
-    ctx.beginPath(); ctx.moveTo(-24, -19); ctx.lineTo(-11,-33); ctx.lineTo(4,-33); ctx.lineTo(4,-19); ctx.closePath(); ctx.fill();
-    ctx.beginPath(); ctx.moveTo(7,-19); ctx.lineTo(7,-33); ctx.lineTo(22,-33); ctx.lineTo(36,-19); ctx.closePath(); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(-24, -19); ctx.lineTo(-11, -33); ctx.lineTo(4, -33); ctx.lineTo(4, -19); ctx.closePath(); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(7, -19); ctx.lineTo(7, -33); ctx.lineTo(22, -33); ctx.lineTo(36, -19); ctx.closePath(); ctx.fill();
 
     /* Door line */
     ctx.strokeStyle = dark ? '#1e222f' : '#7880a0'; ctx.lineWidth = 0.8;
@@ -745,9 +745,9 @@ function drawTrafficLight(x, y) {
   roundRect(ctx, x + 16, y - 36, 18, 50, 5); ctx.fill();
   /* Lights */
   const lights = [
-    { col: '#dd0000', glow: '#ff2222', active: SCENE.lightState === 'red',   oy: -28 },
+    { col: '#dd0000', glow: '#ff2222', active: SCENE.lightState === 'red', oy: -28 },
     { col: '#cc9900', glow: '#ffcc22', active: SCENE.lightState === 'amber', oy: -14 },
-    { col: '#009900', glow: '#22ff22', active: SCENE.lightState === 'green', oy:   0 },
+    { col: '#009900', glow: '#22ff22', active: SCENE.lightState === 'green', oy: 0 },
   ];
   lights.forEach(l => {
     ctx.fillStyle = l.active ? l.col : 'rgba(60,60,60,0.7)';
@@ -826,9 +826,9 @@ function drawHUD() {
   const label = simSpeed < 2
     ? (simSlip > 10 ? 'CLUTCH SLIP' : 'STOPPED')
     : simSpeed < 15 ? 'CRAWLING'
-    : simSpeed < 35 ? 'STOP-GO'
-    : simSpeed > 55 ? 'CRUISE'
-    : 'CITY';
+      : simSpeed < 35 ? 'STOP-GO'
+        : simSpeed > 55 ? 'CRUISE'
+          : 'CITY';
   el('scene-label').textContent = label;
 }
 

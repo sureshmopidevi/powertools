@@ -22,8 +22,8 @@ const MAX_H = 180;
 /* ── Tick — 1-second physics step ── */
 function tick() {
   elapsed++;
-  const ah  = document.getElementById('ah').checked;
-  const nt  = document.getElementById('nt').checked;
+  const ah = document.getElementById('ah').checked;
+  const nt = document.getElementById('nt').checked;
   const [spd, gearNum] = SCEN[scenario].state(elapsed);
   const activeCL = (gearNum % 2 === 1) ? 'C1' : 'C2';
   simActiveClutch = activeCL;
@@ -39,15 +39,15 @@ function tick() {
   const Pd_C1 = coolPower(tempC1, spd, tempBell);
   const Pd_C2 = coolPower(tempC2, spd, tempBell);
   const dT_active = (Pg - (activeCL === 'C1' ? Pd_C1 : Pd_C2)) / PHY.C_disc;
-  const dT_idle   = -(activeCL === 'C1' ? Pd_C2 : Pd_C1) / PHY.C_disc;
+  const dT_idle = -(activeCL === 'C1' ? Pd_C2 : Pd_C1) / PHY.C_disc;
   const noise = (Math.random() - .5) * 0.25, floor = PHY.T_floor(ambTemp);
 
   if (activeCL === 'C1') {
     tempC1 = Math.max(floor, Math.min(380, tempC1 + dT_active + noise));
-    tempC2 = Math.max(floor, Math.min(380, tempC2 + dT_idle   + noise * 0.3));
+    tempC2 = Math.max(floor, Math.min(380, tempC2 + dT_idle + noise * 0.3));
   } else {
     tempC2 = Math.max(floor, Math.min(380, tempC2 + dT_active + noise));
-    tempC1 = Math.max(floor, Math.min(380, tempC1 + dT_idle   + noise * 0.3));
+    tempC1 = Math.max(floor, Math.min(380, tempC1 + dT_idle + noise * 0.3));
   }
 
   // Update auto-hold save counter
@@ -59,10 +59,10 @@ function tick() {
 
   simAccel = spd < 2 ? 0 : computeAccel(spd, gearNum, scenario, loadFactor);
   prevSpeed = simSpeed;
-  simSpeed  = spd;
-  simGear   = gearNum === 0 ? 'P' : gearNum + ' (' + activeCL + ')';
-  simPgen   = Pg;
-  simPdis   = activeCL === 'C1' ? Pd_C1 : Pd_C2;
+  simSpeed = spd;
+  simGear = gearNum === 0 ? 'P' : gearNum + ' (' + activeCL + ')';
+  simPgen = Pg;
+  simPdis = activeCL === 'C1' ? Pd_C1 : Pd_C2;
 
   const tLabel = fmt(elapsed);
   tempHistC1.push(+tempC1.toFixed(1));
@@ -73,9 +73,9 @@ function tick() {
   SCEN[scenario].events.forEach(ev => { if (!ev._fired && elapsed >= ev.t) { ev._fired = true; log(ev.m); } });
 
   const hotT = Math.max(tempC1, tempC2);
-  if      (hotT >= PHY.T_damage  && elapsed % 10  === 0) log('🚨 DAMAGE zone! μ degrading permanently');
-  else if (hotT >= PHY.T_limp    && elapsed % 15  === 0) log('🔴 Limp mode: 33% torque, 3rd locked');
-  else if (hotT >= PHY.T_tcu_lim && elapsed % 20 === 0)  log('🟠 TCU limiting to 62% clutch torque');
+  if (hotT >= PHY.T_damage && elapsed % 10 === 0) log('🚨 DAMAGE zone! μ degrading permanently');
+  else if (hotT >= PHY.T_limp && elapsed % 15 === 0) log('🔴 Limp mode: 33% torque, 3rd locked');
+  else if (hotT >= PHY.T_tcu_lim && elapsed % 20 === 0) log('🟠 TCU limiting to 62% clutch torque');
 
   render();
 }
@@ -95,7 +95,7 @@ function setScenario(id, btn) {
 
 function refresh() { log('Settings updated'); }
 
-const loadLabels  = ['1 pax (solo)', '2 pax', '3 pax', '4 pax', '5 pax + bags'];
+const loadLabels = ['1 pax (solo)', '2 pax', '3 pax', '4 pax', '5 pax + bags'];
 const loadFactors = [0.72, 0.86, 1.0, 1.15, 1.30];
 function updateLoad(v) {
   loadFactor = loadFactors[v - 1];

@@ -1192,7 +1192,7 @@
                 try {
                     // Fast-path hide of skeleton shimmer if we have cached data.
                     // This suppresses the "again loading" feeling for back-navigation.
-                    if (sessionStorage.getItem('powertools.tools.data.v1')) {
+                    if (sessionStorage.getItem('powertools.tools.data.v2')) {
                         document.write('<style>#app-container>.loading-stage{display:none!important;}</style>');
                     }
                 } catch (e) { }

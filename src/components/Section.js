@@ -42,7 +42,7 @@ export class Section {
                 </div>
 
                 <div class="horizontal-row relative z-10 overflow-x-auto pt-1 pb-2 -mx-1 px-1">
-                    <div class="flex items-stretch gap-4 sm:gap-5 xl:gap-6 snap-x snap-mandatory">
+                    <div class="grid grid-rows-2 grid-flow-col gap-4 sm:gap-5 xl:gap-6 snap-x snap-mandatory">
                         ${toolCardsHTML}
                     </div>
                 </div>
