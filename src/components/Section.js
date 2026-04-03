@@ -23,10 +23,28 @@ export class Section {
         const filteredTools = this.getFilteredTools();
         if (filteredTools.length === 0) return '';
 
-        const toolCardsHTML = filteredTools.map(tool => {
-            const card = new ToolCard(tool);
-            return card.render();
-        }).join('');
+        const renderCards = (tools) => tools.map(t => new ToolCard(t).render()).join('');
+
+        let contentHTML = '';
+        if (filteredTools.length <= 4) {
+            contentHTML = `
+                <div class="flex items-stretch gap-4 sm:gap-5 xl:gap-6 snap-x snap-mandatory">
+                    ${renderCards(filteredTools)}
+                </div>
+            `;
+        } else {
+            const half = Math.ceil(filteredTools.length / 2);
+            contentHTML = `
+                <div class="flex flex-col gap-4 sm:gap-5 xl:gap-6 w-max pb-1">
+                    <div class="flex items-stretch gap-4 sm:gap-5 xl:gap-6 snap-x snap-mandatory">
+                        ${renderCards(filteredTools.slice(0, half))}
+                    </div>
+                    <div class="flex items-stretch gap-4 sm:gap-5 xl:gap-6 snap-x snap-mandatory">
+                        ${renderCards(filteredTools.slice(half))}
+                    </div>
+                </div>
+            `;
+        }
 
         const delayClass = this.delay > 0 ? `delay-${this.delay}` : '';
         const animationClass = this.animate ? `animate-fade-in-up ${delayClass}` : '';
@@ -42,9 +60,7 @@ export class Section {
                 </div>
 
                 <div class="horizontal-row relative z-10 overflow-x-auto pt-1 pb-2 -mx-1 px-1">
-                    <div class="grid grid-rows-2 grid-flow-col gap-4 sm:gap-5 xl:gap-6 snap-x snap-mandatory">
-                        ${toolCardsHTML}
-                    </div>
+                    ${contentHTML}
                 </div>
             </section>
         `;
